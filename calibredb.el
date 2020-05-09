@@ -3,7 +3,7 @@
 ;; Copyright (C) 2020 Damon Chan
 
 ;; Author: Damon Chan <elecming@gmail.com>
-;; URL: https://github.com/chenyanming/calibredb
+;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: faces
 ;; Created: 9 May 2020
 ;; Version: 1.0
