@@ -49,7 +49,7 @@ Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this pack
 *** Add comments
 [[img/comment.gif]]
 ** Dashboard
-[[img/dashboard.gif]]
+[[img/dashboard.png]]
 
 * Installation
 
