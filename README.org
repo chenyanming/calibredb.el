@@ -10,6 +10,7 @@
   - [[#another-bookmarks-solution][Another bookmarks solution]]
     - [[#add-tags][Add tags]]
     - [[#add-comments][Add comments]]
+  - [[#dashboard][Dashboard]]
 - [[#installation][Installation]]
   - [[#install-calibredbel][Install calibredb.el]]
     - [[#ues-package][ues-package]]
@@ -47,6 +48,8 @@ Inspired by [[# https://github.com/whacked/calibre-mode][calibre-mode]], this pa
 [[img/tag.gif]]
 *** Add comments
 [[img/comment.gif]]
+** Dashboard
+[[img/dashboard.gif]]
 
 * Installation
 
