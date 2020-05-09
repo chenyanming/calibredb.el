@@ -63,7 +63,7 @@ Choose one of the following installation methods based on your needs:
 #+BEGIN_SRC emacs-lisp
 (use-package calibredb
   :quelpa
-  (inherit-org :repo "chenyanming/calibredb.el" :fetcher github))
+  (calibredb :repo "chenyanming/calibredb.el" :fetcher github))
 #+END_SRC
 
 *** Doom Emacs
@@ -82,7 +82,7 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/private/inherit-org"))
+(add-to-list 'load-path (expand-file-name "~/.emacs.d/private/calibredb.el"))
 (require 'calibredb)
 #+END_SRC
 
