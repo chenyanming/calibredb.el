@@ -32,7 +32,7 @@
 * Description
 Yet another *calibre* emacs client.
 
-Inspired by [[# https://github.com/whacked/calibre-mode][calibre-mode]], this package integrate calibre (using *calibredb*) into emacs.
+Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this package integrate calibre (using *calibredb*) into emacs.
 
 1. Manage ebooks, actually not only ebooks!
 2. Another bookmarks solution, by setting the tags and comments.
