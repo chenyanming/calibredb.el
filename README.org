@@ -118,11 +118,12 @@ First, you have to fire
 M-x calibredb-find-helm or calibredb-find-counsel
 #+END_SRC
 
-I recommend to use calibredb-find-helm, which has more supports.
+I recommend to use =calibredb-find-helm=, which has more supports.
 
 Then,
 for helm, =C-i= to enter the action menus, =tab= to preview the cover page (if any).
-for helm, =C-o= to enter the action menus
+
+for ivy, =C-o= to enter the action menus.
 
 ** remove
 Remove a item.
