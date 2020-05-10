@@ -107,6 +107,14 @@ FROM
 GROUP BY id"
   "TODO calibre database query statement.")
 
+(defvar calibredb-helm-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map helm-map)
+    (define-key map (kbd "C-c t") #'calibredb-set-metadata-tags-1)
+    (define-key map (kbd "C-c c") #'calibredb-set-metadata-comments-1)
+    map)
+  "Keymap for `calibredb-find-helm'.")
+
 (defvar calibredb-helm-source
   (helm-build-sync-source "calibredb"
     :header-name (lambda (name)
@@ -114,11 +122,10 @@ GROUP BY id"
     :candidates 'calibredb-candidates
     ;; :filtered-candidate-transformer 'helm-findutils-transformer
     ;; :action-transformer 'helm-transform-file-load-el
-    :persistent-action (lambda (candidate)
-                         (find-file (concat (file-name-directory (calibredb-getattr candidate :file-path)) "cover.jpg")))
+    :persistent-action 'calibredb-find-cover
     :action 'calibredb-helm-actions
     ;; :help-message 'helm-generic-file-help-message
-    ;; :keymap helm-find-map
+    :keymap calibredb-helm-map
     :candidate-number-limit 9999
     ;; :requires-pattern 3
     )
@@ -153,7 +160,7 @@ GROUP BY id"
           (calibredb-remove)) "Delete ebook")
    ("t" (lambda (candidate)
           (calibredb-set-metadata-tags (cdr candidate)) ) "Tag ebook")
-   ("C" (lambda (candidate)
+   ("c" (lambda (candidate)
           (calibredb-set-metadata-comments (cdr candidate)) )"Comment ebook")
    ("q"
     (lambda ()
@@ -365,6 +372,10 @@ This function honors `shr-max-image-proportion' if possible."
                            :id id)
         (setq last-input input)))))
 
+(defun calibredb-set-metadata-tags-1 ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'calibredb-set-metadata-tags)))
 
 (defun calibredb-set-metadata-comments (candidate)
   (let* ((title (calibredb-getattr candidate :book-title))
@@ -375,6 +386,11 @@ This function honors `shr-max-image-proportion' if possible."
                        :option "--field"
                        :input (format "comments:\"%s\"" input)
                        :id id)))
+
+(defun calibredb-set-metadata-comments-1 ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'calibredb-set-metadata-comments)))
 
 (defun calibredb-set-metadata-list-fields (candidate)
   (let* ((id (calibredb-getattr candidate :id)))
