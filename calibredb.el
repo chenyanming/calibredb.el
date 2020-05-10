@@ -351,14 +351,19 @@ This function honors `shr-max-image-proportion' if possible."
 ;; set_metadata
 
 (defun calibredb-set-metadata-tags (candidate)
-  (let* ((title (calibredb-getattr candidate :book-title))
-         (tag (calibredb-getattr candidate :tag))
-         (id (calibredb-getattr candidate :id))
-         (input (read-string (concat "Add tags for " title ": ") tag)))
-    (calibredb-command :command "set_metadata"
-                       :option "--field"
-                       :input (format "tags:\"%s\"" input)
-                       :id id)))
+  "Add tags, divided by comma, on marked candidates."
+  (let ((last-input))
+    (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
+                        (t (helm-marked-candidates))))
+      (let* ((title (calibredb-getattr cand :book-title))
+             (tag (calibredb-getattr cand :tag))
+             (id (calibredb-getattr cand :id))
+             (input (or last-input (read-string (concat "Add tags for " title ": ") tag))))
+        (calibredb-command :command "set_metadata"
+                           :option "--field"
+                           :input (format "tags:\"%s\"" input)
+                           :id id)
+        (setq last-input input)))))
 
 
 (defun calibredb-set-metadata-comments (candidate)
@@ -440,7 +445,8 @@ This function honors `shr-max-image-proportion' if possible."
         (calibredb-getbooklist res-list)))))
 
 (defun calibredb-helm-read ()
-  (helm :sources 'calibredb-helm-source))
+  (helm :sources 'calibredb-helm-source
+        :buffer "*helm calibredb*"))
 
 (defun calibredb-find-helm ()
   "Use helm to list all ebooks details."
