@@ -1,4 +1,4 @@
-;;; calibredb.el --- Yet another calibredb client -*- lexical-binding: t; -*-
+;;; calibredb.el --- Yet another calibre client -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020 Damon Chan
 
@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: faces
 ;; Created: 9 May 2020
-;; Version: 1.0
+;; Version: 1.1
 ;; Package-Requires: ((emacs "25.1") (org "9.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,8 @@
 (require 'sql)
 (ignore-errors
   (require 'ivy)
-  (require 'helm))
+  (require 'helm)
+  (require 'transient))
 
 (defgroup calibredb nil
   "calibredb group"
@@ -110,8 +111,8 @@ GROUP BY id"
 (defvar calibredb-helm-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c t") #'calibredb-set-metadata-tags-1)
-    (define-key map (kbd "C-c c") #'calibredb-set-metadata-comments-1)
+    (define-key map (kbd "C-c t") #'calibredb-set-metadata--tags-1)
+    (define-key map (kbd "C-c c") #'calibredb-set-metadata--comments-1)
     map)
   "Keymap for `calibredb-find-helm'.")
 
@@ -131,17 +132,43 @@ GROUP BY id"
     )
   "calibredb helm source.")
 
+(defvar calibredb-selected-entry nil)
+
+(defvar calibredb-show-entry nil
+  "The entry being displayed in this buffer.")
+
+(defvar calibredb-show-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-cg" 'calibredb-dispatch)
+    map)
+  "Keymap for `calibredb-show-mode'.")
+
+(defcustom calibredb-show-unique-buffers nil
+  "When non-nil, every entry buffer gets a unique name.
+This allows for displaying multiple show buffers at the same
+time."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-show-entry-switch #'switch-to-buffer
+  "Function used to display the calibre entry buffer."
+  :group 'calibredb
+  :type '(choice (function-item switch-to-buffer)
+                 (function-item pop-to-buffer)
+                 function))
+
 (defcustom calibredb-helm-actions
   (helm-make-actions
-   "Find file"             'calibredb-find-file
-   "Find file other frame"                   'calibredb-find-file-other-frame
-   "Open file with default tool"             'calibredb-open-file-with-default-tool
-   "Open Cover Page" 'calibredb-find-cover
-   "set_metadata, tags"                       'calibredb-set-metadata-tags
-   "set_metadata, comments"                       'calibredb-set-metadata-comments
-   "set_metadata, --list-fileds"                       'calibredb-set-metadata-list-fields
-   "show_metadata"                  'calibredb-show-metadata
-   "remove"          'calibredb-remove)
+   "Open file"                   'calibredb-find-file
+   "Show details"                'calibredb-show-entry
+   "Open file other frame"       'calibredb-find-file-other-frame
+   "Open file with default tool" 'calibredb-open-file-with-default-tool
+   "Open Cover Page"             'calibredb-find-cover
+   "set_metadata, tags"          'calibredb-set-metadata--tags
+   "set_metadata, comments"      'calibredb-set-metadata--comments
+   "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
+   "show_metadata"               'calibredb-show-metadata
+   "remove"                      'calibredb-remove)
   "Default actions for calibredb helm."
   :group 'calibredb
   :type '(alist :key-type string :value-type function))
@@ -149,19 +176,19 @@ GROUP BY id"
 (ivy-set-actions
  'calibredb-ivy-read
  '(("o" (lambda (candidate)
-          (calibredb-find-file (cdr candidate)) ) "open")
+          (calibredb-find-file (cdr candidate)) ) "Open")
    ("O" (lambda (candidate)
-          (calibredb-find-cover (cdr candidate)) ) "Cover Page")
+          (calibredb-show-entry (cdr candidate)) ) "Show details")
    ("v" (lambda (candidate)
-          (calibredb-open-file-with-default-tool (cdr candidate)) ) "open with default tool")
+          (calibredb-open-file-with-default-tool (cdr candidate)) ) "Open with default tool")
    ("V" (lambda (candidate)
           (calibredb-find-file-other-frame (cdr candidate)) ) "Find file other frame")
    ("d" (lambda ()
           (calibredb-remove)) "Delete ebook")
    ("t" (lambda (candidate)
-          (calibredb-set-metadata-tags (cdr candidate)) ) "Tag ebook")
+          (calibredb-set-metadata--tags (cdr candidate)) ) "Tag ebook")
    ("c" (lambda (candidate)
-          (calibredb-set-metadata-comments (cdr candidate)) )"Comment ebook")
+          (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
    ("q"
     (lambda ()
       (message "cancelled")) "(or anything else) to cancel")))
@@ -203,7 +230,7 @@ GROUP BY id"
     ;;       ;; (set-process-sentinel proc #'do-something)
     ;;       nil
     ;;     (message "No process running.")))
-    (shell-command line)))
+    (shell-command-to-string line)))
 
 (defun calibredb-chomp (s)
   (replace-regexp-in-string "[\s\n]+$" "" s))
@@ -312,10 +339,10 @@ This function honors `shr-max-image-proportion' if possible."
       (insert-image
        (create-image path 'imagemagick nil
                      :ascent 100
-                     :max-width 300 ;; (truncate (* shr-max-image-proportion
+                     :max-width 500 ;; (truncate (* shr-max-image-proportion
                      ;;              (- (nth 2 edges)
                      ;;                 (nth 0 edges))))
-                     :max-height 300;; (truncate (* shr-max-image-proportion
+                     :max-height 500;; (truncate (* shr-max-image-proportion
                      ;;              (- (nth 3 edges)
                      ;;                 (nth 1 edges))))
                      ))))
@@ -326,13 +353,22 @@ This function honors `shr-max-image-proportion' if possible."
           (insert-image image)
         (insert alt))))))
 
-(defun calibredb-find-file (candidate)
+(defun calibredb-find-file (&optional candidate)
+  (interactive)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (find-file (calibredb-getattr candidate :file-path)))
 
-(defun calibredb-find-file-other-frame (candidate)
+(defun calibredb-find-file-other-frame (&optional candidate)
+  (interactive)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
-(defun calibredb-open-file-with-default-tool (candidate)
+(defun calibredb-open-file-with-default-tool (&optional candidate)
+  (interactive)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (calibredb-open-with-default-opener (calibredb-getattr candidate :file-path)))
 
 ;; add
@@ -357,11 +393,15 @@ This function honors `shr-max-image-proportion' if possible."
 
 ;; set_metadata
 
-(defun calibredb-set-metadata-tags (candidate)
+(defun calibredb-set-metadata--tags (&optional candidate)
   "Add tags, divided by comma, on marked candidates."
+  (interactive)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
-                        (t (helm-marked-candidates))))
+                        ((memq this-command '(helm-maybe-exit-minibuffer)) (helm-marked-candidates))
+                        (t (list candidate))))
       (let* ((title (calibredb-getattr cand :book-title))
              (tag (calibredb-getattr cand :tag))
              (id (calibredb-getattr cand :id))
@@ -370,14 +410,17 @@ This function honors `shr-max-image-proportion' if possible."
                            :option "--field"
                            :input (format "tags:\"%s\"" input)
                            :id id)
-        (setq last-input input)))))
+        (setq last-input input)
+        (when (equal major-mode 'calibredb-show-mode)
+          ;; set the comments back, it is messy, will be improved later
+          (setf (car (cdr (assoc :tag (car calibredb-selected-entry)))) input)
+          (calibredb-show-refresh calibredb-selected-entry))))))
 
-(defun calibredb-set-metadata-tags-1 ()
+(defun calibredb-set-metadata--comments (&optional candidate)
+  "Add comments on one candidate."
   (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action #'calibredb-set-metadata-tags)))
-
-(defun calibredb-set-metadata-comments (candidate)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (let* ((title (calibredb-getattr candidate :book-title))
          (comment (calibredb-getattr candidate :comment))
          (id (calibredb-getattr candidate :id))
@@ -385,31 +428,46 @@ This function honors `shr-max-image-proportion' if possible."
     (calibredb-command :command "set_metadata"
                        :option "--field"
                        :input (format "comments:\"%s\"" input)
-                       :id id)))
+                       :id id)
+    (when (equal major-mode 'calibredb-show-mode)
+      ;; set the comments back, it is messy, will be improved later
+      (setf (car (cdr (assoc :comment (car calibredb-selected-entry)))) input)
+      (calibredb-show-refresh calibredb-selected-entry))))
 
-(defun calibredb-set-metadata-comments-1 ()
+(defun calibredb-set-metadata--list-fields (&optional candidate)
+  "List the selected candidate supported fileds."
   (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action #'calibredb-set-metadata-comments)))
-
-(defun calibredb-set-metadata-list-fields (candidate)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
   (let* ((id (calibredb-getattr candidate :id)))
-    (calibredb-command :command "set_metadata"
+    (message (calibredb-command :command "set_metadata"
                        :option "--list-fields"
-                       :id id)))
+                       :id id) )))
 
 ;; show_metadata
 
-(defun calibredb-show-metadata (candidate)
-  (let* ((title (calibredb-getattr candidate :book-title))
-         (id (calibredb-getattr candidate :id)))
+(defun calibredb-show-metadata (&optional candidate)
+  "Show selected candidate metadata."
+  (interactive)
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
+  (let* ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "show_metadata"
-                       ;; :option "--field"
                        :id id)))
 
+;; export
 
+(defun calibredb-export (&optional candidate)
+  "TODO: Export the selected candidate."
+  (unless candidate
+    (setq candidate calibredb-selected-entry))
+  (let ((id (calibredb-getattr candidate :id)))
+    (calibredb-command :command "export"
+                       :options 
+                       :id id)))
 
 (defun calibredb-find-cover (candidate)
+  "Open the cover page image of selected candidate."
   (if (get-buffer "cover.jpg")
       (kill-buffer "cover.jpg"))
   (let* ((path (calibredb-getattr candidate :file-path))
@@ -420,6 +478,7 @@ This function honors `shr-max-image-proportion' if possible."
       )))
 
 (defun calibredb-item-string (book-alist)
+  "Format the candidate string shown in helm or ivy."
   (format
    "%s\t%s %s %s %s %s %s%s"
    ;; (all-the-icons-icon-for-file (getattr book-alist :file-path))
@@ -473,6 +532,102 @@ This function honors `shr-max-image-proportion' if possible."
   "Use counsel to list all ebooks details."
   (interactive)
   (calibredb-ivy-read))
+
+;; calibredb-mode-map functions
+
+(defun calibredb-set-metadata--tags-1 ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'calibredb-set-metadata--tags)))
+
+(defun calibredb-set-metadata--comments-1 ()
+  (interactive)
+  (with-helm-alive-p
+    (helm-exit-and-execute-action #'calibredb-set-metadata--comments)))
+
+;; Transient dispatch
+
+(defun calibredb-dispatch nil
+  (transient-args 'calibredb-dispatch))
+
+;;;###autoload
+(define-transient-command calibredb-dispatch ()
+  "Invoke a calibredb command from a list of available commands."
+  ["calibredb commands"
+   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ("S" "show_metadata"         calibredb-show-metadata)]
+   [("o" "Open file"         calibredb-find-file)
+    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
+   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]]
+  (interactive)
+  (transient-setup 'calibredb-dispatch))
+
+(define-transient-command calibredb-set-metadata-dispatch ()
+  "Create a new commit or replace an existing commit."
+  [["Field"
+    ("t" "tags"         calibredb-set-metadata--tags)
+    ("c" "comments"         calibredb-set-metadata--comments)]
+   ["List fields"
+    ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
+  (interactive)
+  (transient-setup 'calibredb-set-metadata-dispatch))
+
+(defun calibredb-show-mode ()
+  "Mode for displaying book entry details.
+\\{calibredb-show-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map calibredb-show-mode-map)
+  (setq major-mode 'calibredb-show-mode
+        mode-name "calibredb-show"
+        buffer-read-only t)
+  (buffer-disable-undo)
+  (run-mode-hooks 'calibredb-show-mode-hook))
+
+(defun calibredb-show--buffer-name (entry)
+  "Return the appropriate buffer name for ENTRY.
+The result depends on the value of `calibredb-show-unique-buffers'."
+  (if calibredb-show-unique-buffers
+      (format "*calibredb-entry-<%s>*"
+              (calibredb-getattr entry :book-title))
+    "*calibredb-entry*"))
+
+(defun calibredb-show-entry (entry)
+  "Display ENTRY in the current buffer."
+  (when (get-buffer (calibredb-show--buffer-name entry))
+    (kill-buffer (calibredb-show--buffer-name entry)))
+  (setq calibredb-selected-entry entry)
+  (let ((buff (get-buffer-create (calibredb-show--buffer-name entry)))
+        (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
+    (with-current-buffer buff
+      ;; (setq start (point))
+      ;; (insert title)
+      (insert (calibredb-show-metadata entry))
+      ;; (insert book)
+      (insert "\n")
+      (calibredb-insert-image cover "")
+      ;; (setq end (point))
+      (calibredb-show-mode)
+      (setq calibredb-show-entry entry))
+    (funcall calibredb-show-entry-switch buff)))
+
+(defun calibredb-show-refresh (entry)
+  "Refresh ENTRY in the current buffer."
+  (setq calibredb-selected-entry entry)
+  (let* ((inhibit-read-only t)
+        (buff (get-buffer-create (calibredb-show--buffer-name entry)))
+        (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
+    (with-current-buffer buff
+      (erase-buffer)
+      ;; (setq start (point))
+      ;; (insert title)
+      (insert (calibredb-show-metadata entry))
+      ;; (insert book)
+      (calibredb-insert-image cover "")
+      ;; (setq end (point))
+      (calibredb-show-mode)
+      (setq calibredb-show-entry entry))
+    (funcall calibredb-show-entry-switch buff)))
 
 (provide 'calibredb)
 

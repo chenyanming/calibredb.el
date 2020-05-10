@@ -21,16 +21,19 @@
 - [[#m-x-features][M-x Features]]
   - [[#calibredb-list][calibredb-list]]
   - [[#add][add]]
-- [[#helmcounsel-action-on-items-features][Helm/Counsel Action on Items Features]]
+- [[#helmcounsel-actions][Helm/Counsel Actions]]
+  - [[#show-details][Show details]]
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
   - [[#set_metadata][set_metadata]]
     - [[#--filed-tags][--filed tags]]
     - [[#--filed-comments][--filed comments]]
     - [[#--list-fields][--list-fields]]
+  - [[#2020-05-10][=2020-05-10=]]
+  - [[#2020-05-09][=2020-05-09=]]
 
 * Description
-Yet another *calibre* emacs client.
+Yet another [[https://calibre-ebook.com/][calibre]] emacs client.
 
 Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this package integrates calibre (using *calibredb*) into emacs.
 
@@ -110,7 +113,7 @@ To add a file into calibre, call
 M-x calibredb-add
 #+END_SRC
 
-* Helm/Counsel Action on Items Features
+* Helm/Counsel Actions
 The following operations can only be trigger during helm buffer or counsel buffer.
 
 First, you have to fire
@@ -125,6 +128,18 @@ for helm, =C-i= to enter the action menus, =tab= to preview the cover page (if a
 
 for ivy, =C-o= to enter the action menus.
 
+** Show details
+This action will get you to the book details buffer called =*calibredb-entry*=
+with =calibredb-show-mode=, you can make actions on it, just like =magit-dispatch=,
+
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-dispatch
+#+END_SRC
+Or fire with keybinding =C-c g=
+
+Demo:
+[[img/details.gif]]
+
 ** remove
 Remove a item.
 
@@ -134,3 +149,13 @@ Remove a item.
 *** --filed tags
 *** --filed comments
 *** --list-fields
+
+** =2020-05-10=
+Version *1.1*:
+- =calibredb-dispatch=
+
+** =2020-05-09=
+Version *1.0*:
+- =calibredb-find-helm=
+- =calibredb-find-counsel=
+- =calibredb-list=
