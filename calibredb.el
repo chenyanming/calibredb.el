@@ -24,8 +24,9 @@
 
 ;;; Commentary:
 
-;; This package is a wrapper for calibredb integrating with counsel/helm
-;; support.
+;; This package is a wrapper for calibredb
+;; <https://manual.calibre-ebook.com/generated/en/calibredb.html> integrating
+;; with counsel/helm support.
 
 ;;; Code:
 
@@ -35,6 +36,10 @@
 (ignore-errors
   (require 'ivy)
   (require 'helm))
+
+(defgroup calibredb nil
+  "calibredb group"
+  :group 'calibredb)
 
 (defvar calibredb-root-dir "~/Documents/Calibre/")
 
@@ -62,8 +67,8 @@
              ;; here we try to find the location of the mimetype opener that xdg-mime refers to.
              ;; it works for okular (Exec=okular %U %i -caption "%c"). NO IDEA if it works for others!
              (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
-                                                           "kde4-" "kde4/"
-                                                           (shell-command-to-string "xdg-mime query default application/pdf")))))
+                                                             "kde4-" "kde4/"
+                                                             (shell-command-to-string "xdg-mime query default application/pdf")))))
 
                          (mapcar
                           #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
@@ -76,7 +81,8 @@
          "start")
         ((eq system-type 'darwin)
          "open")
-        (t (message "unknown system!?"))))
+        (t (message "unknown system!?")))
+  "calibre default opener.")
 
 
 (defvar calibredb-query-string "
@@ -98,7 +104,8 @@ FROM
       ON child.tag = tags.id) as sub2
     LEFT OUTER JOIN comments
     ON sub2.id = comments.book)
-GROUP BY id")
+GROUP BY id"
+  "TODO calibre database query statement.")
 
 (defvar calibredb-helm-source
   (helm-build-sync-source "calibredb"
@@ -114,7 +121,8 @@ GROUP BY id")
     ;; :keymap helm-find-map
     :candidate-number-limit 9999
     ;; :requires-pattern 3
-    ))
+    )
+  "calibredb helm source.")
 
 (defcustom calibredb-helm-actions
   (helm-make-actions
@@ -165,38 +173,36 @@ GROUP BY id")
         (cadr (nth (car action) action))))))
 
 (cl-defun calibredb-command (&key command option input id action)
-  (setq command-string
-        (make-calibredb-struct
-         :command command
-         :option option
-         :input input
-         :id id
-         :action action))
-  (setq line (mapconcat 'identity
-   `(,calibredb-program
-     ,(calibredb-struct-command command-string)
-     ,(calibredb-struct-option command-string)
-     ,(calibredb-struct-input command-string)
-     ,(calibredb-struct-id command-string)) " ") )
-
-  ;; (calibredb-get-action command-string)
-  (message line)
-  ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
-  ;; (let* ((output-buffer (get-buffer-create "*Async Shell Command*"))
-  ;;        (proc (progn
-  ;;                (async-shell-command line output-buffer)
-  ;;                (get-buffer-process output-buffer))))
-  ;;   (if (process-live-p proc)
-  ;;       ;; (set-process-sentinel proc #'do-something)
-  ;;       nil
-  ;;     (message "No process running.")))
-  (shell-command line))
+  (let* ((command-string (make-calibredb-struct
+                          :command command
+                          :option option
+                          :input input
+                          :id id
+                          :action action))
+         (line (mapconcat 'identity
+                          `(,calibredb-program
+                            ,(calibredb-struct-command command-string)
+                            ,(calibredb-struct-option command-string)
+                            ,(calibredb-struct-input command-string)
+                            ,(calibredb-struct-id command-string)) " ")))
+    (message line)
+    ;; (calibredb-get-action command-string)
+    ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
+    ;; (let* ((output-buffer (get-buffer-create "*Async Shell Command*"))
+    ;;        (proc (progn
+    ;;                (async-shell-command line output-buffer)
+    ;;                (get-buffer-process output-buffer))))
+    ;;   (if (process-live-p proc)
+    ;;       ;; (set-process-sentinel proc #'do-something)
+    ;;       nil
+    ;;     (message "No process running.")))
+    (shell-command line)))
 
 (defun calibredb-chomp (s)
   (replace-regexp-in-string "[\s\n]+$" "" s))
 
-;; TODO: consolidate default-opener with dispatcher
 (defun calibredb-open-with-default-opener (filepath)
+  ;; TODO: consolidate default-opener with dispatcher
   (if (eq system-type 'windows-nt)
       (start-process "shell-process" "*Messages*"
                      "cmd.exe" "/c" filepath)
@@ -204,6 +210,7 @@ GROUP BY id")
                    calibredb-default-opener filepath)))
 
 (defun calibredb-query (sql-query)
+  "Query calibre databse and return the result."
   (interactive)
   (shell-command-to-string
    (format "%s -separator \"\t\" \"%s\" \"%s\""
@@ -212,7 +219,7 @@ GROUP BY id")
            sql-query)))
 
 (defun calibredb-query-to-alist (query-result)
-  "builds alist out of a full calibredb-query query record result"
+  "Builds alist out of a full calibredb-query query record result."
   (if query-result
       (let ((spl-query-result (split-string (calibredb-chomp query-result) "\t")))
         `((:id                     ,(nth 0 spl-query-result))
@@ -285,7 +292,7 @@ Argument EVENT mouse event."
   (cadr (assoc key (car my-alist))))
 
 (defun calibredb-insert-image (path alt)
-  "Insert an image for PATH at point, falling back to ALT.
+  "TODO: Insert an image for PATH at point, falling back to ALT.
 This function honors `shr-max-image-proportion' if possible."
   (cond
    ((not (display-graphic-p))
@@ -312,10 +319,6 @@ This function honors `shr-max-image-proportion' if possible."
           (insert-image image)
         (insert alt))))))
 
-
-
-
-
 (defun calibredb-find-file (candidate)
   (find-file (calibredb-getattr candidate :file-path)))
 
@@ -325,10 +328,10 @@ This function honors `shr-max-image-proportion' if possible."
 (defun calibredb-open-file-with-default-tool (candidate)
   (calibredb-open-with-default-opener (calibredb-getattr candidate :file-path)))
 
-
 ;; add
 
 (defun calibredb-add ()
+  "Add a file into calibre database."
   (interactive)
   (calibredb-command :command "add"
                      :input (calibredb-complete-file)))
