@@ -50,42 +50,6 @@
 
 (defvar calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 
-(defvar calibredb-default-opener
-  (cond ((eq system-type 'gnu/linux)
-         ;; HACK!
-         ;; "xdg-open"
-         ;; ... but xdg-open doesn't seem work as expected! (process finishes but program doesn't launch)
-         ;; appears to be related to http://lists.gnu.org/archive/html/emacs-devel/2009-07/msg00279.html
-         ;; you're better off replacing it with your exact program...
-         ;; here we run xdg-mime to figure it out for *pdf* only. So this is not general!
-         (calibredb-chomp
-          (shell-command-to-string
-           (concat
-            "grep Exec "
-            (first
-             ;; attempt for more linux compat, ref
-             ;; http://askubuntu.com/questions/159369/script-to-find-executable-based-on-extension-of-a-file
-             ;; here we try to find the location of the mimetype opener that xdg-mime refers to.
-             ;; it works for okular (Exec=okular %U %i -caption "%c"). NO IDEA if it works for others!
-             (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
-                                                             "kde4-" "kde4/"
-                                                             (shell-command-to-string "xdg-mime query default application/pdf")))))
-
-                         (mapcar
-                          #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
-                          '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications")))))
-            "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
-        ((eq system-type 'windows-nt)
-         ;; based on
-         ;; http://stackoverflow.com/questions/501290/windows-equivalent-of-the-mac-os-x-open-command
-         ;; but no idea if it actually works
-         "start")
-        ((eq system-type 'darwin)
-         "open")
-        (t (message "unknown system!?")))
-  "calibre default opener.")
-
-
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
@@ -235,13 +199,30 @@ time."
 (defun calibredb-chomp (s)
   (replace-regexp-in-string "[\s\n]+$" "" s))
 
-(defun calibredb-open-with-default-opener (filepath)
+(defun calibredb-open-with-default-tool (filepath)
   ;; TODO: consolidate default-opener with dispatcher
   (if (eq system-type 'windows-nt)
       (start-process "shell-process" "*Messages*"
                      "cmd.exe" "/c" filepath)
     (start-process "shell-process" "*Messages*"
-                   calibredb-default-opener filepath)))
+                   (cond ((eq system-type 'gnu/linux)
+                          (calibredb-chomp
+                           (shell-command-to-string
+                            (concat
+                             "grep Exec "
+                             (first
+                              (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
+                                                                              "kde4-" "kde4/"
+                                                                              (shell-command-to-string "xdg-mime query default application/pdf")))))
+                                          (mapcar
+                                           #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
+                                           '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications")))))
+                             "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
+                         ((eq system-type 'windows-nt)
+                          "start")
+                         ((eq system-type 'darwin)
+                          "open")
+                         (t (message "unknown system!?"))) filepath)))
 
 (defun calibredb-query (sql-query)
   "Query calibre databse and return the result."
@@ -369,7 +350,7 @@ This function honors `shr-max-image-proportion' if possible."
   (interactive)
   (unless candidate
     (setq candidate calibredb-selected-entry))
-  (calibredb-open-with-default-opener (calibredb-getattr candidate :file-path)))
+  (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
 ;; add
 
