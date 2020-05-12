@@ -42,13 +42,25 @@
   "calibredb group"
   :group 'calibredb)
 
-(defvar calibredb-root-dir "~/Documents/Calibre/")
+(defvar calibredb-db-dir nil
+  "Location of \"metadata.db\" in your calibre library.")
 
-(defvar calibredb-db-dir
-  (concat (file-name-as-directory
-           calibredb-root-dir) "metadata.db"))
+(defcustom calibredb-root-dir "~/Documents/Calibre/"
+  "Directory containing your calibre library."
+  :type 'directory
+  :set (lambda (var value)
+         (set var value)
+         (setq calibredb-db-dir (expand-file-name "metadata.db"
+                                                  calibredb-root-dir))))
 
-(defvar calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+(defcustom calibredb-program
+  (cond
+   ((eq system-type 'darwin)
+    "/Applications/calibre.app/Contents/MacOS/calibredb")
+   (t
+    "calibredb"))
+  "Executable used to access the calibredb."
+  :type 'file)
 
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
