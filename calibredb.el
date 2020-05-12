@@ -144,6 +144,7 @@ time."
    "set_metadata, comments"      'calibredb-set-metadata--comments
    "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
    "show_metadata"               'calibredb-show-metadata
+   "Export"                      'calibredb-export
    "remove"                      'calibredb-remove)
   "Default actions for calibredb helm."
   :group 'calibredb
@@ -165,6 +166,8 @@ time."
           (calibredb-set-metadata--tags (cdr candidate)) ) "Tag ebook")
    ("c" (lambda (candidate)
           (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
+   ("e" (lambda (candidate)
+          (calibredb-export (cdr candidate)) )"Export ebook")
    ("q"
     (lambda ()
       (message "cancelled")) "(or anything else) to cancel")))
@@ -451,12 +454,13 @@ This function honors `shr-max-image-proportion' if possible."
 ;; export
 
 (defun calibredb-export (&optional candidate)
+  (interactive)
   "TODO: Export the selected candidate."
   (unless candidate
     (setq candidate calibredb-selected-entry))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
-                       :options 
+                       :input (format "--to-dir \"%s\"" (calibredb-complete-file))
                        :id id)))
 
 (defun calibredb-find-cover (candidate)
@@ -556,7 +560,8 @@ This function honors `shr-max-image-proportion' if possible."
     ("S" "show_metadata"         calibredb-show-metadata)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)]
-   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]]
+   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+   [("e" "Export" calibredb-export-dispatch)]]
   (interactive)
   (transient-setup 'calibredb-dispatch))
 
@@ -569,6 +574,28 @@ This function honors `shr-max-image-proportion' if possible."
     ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
   (interactive)
   (transient-setup 'calibredb-set-metadata-dispatch))
+
+(define-transient-command calibredb-export-dispatch ()
+  "TODO: Create a new commit or replace an existing commit."
+  ;; ["Arguments"
+  ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
+  ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
+  ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
+  ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
+  ;;  ("-e" "Do not write opf" "--dont-write-opf")
+  ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
+  ;;  ("-g" "Report progress"   ("-g" " --progress"))
+  ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
+  ;;  ("-i" "Export all books into a single directory" "--single-dir")
+  ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
+  ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
+  ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
+  ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
+  [["Export"
+    ("e" "Export"         calibredb-export)]]
+  (interactive)
+  (transient-setup 'calibredb-export-dispatch))
+
 
 (defun calibredb-show-mode ()
   "Mode for displaying book entry details.
