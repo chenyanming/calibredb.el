@@ -119,6 +119,12 @@ GROUP BY id"
     map)
   "Keymap for `calibredb-show-mode'.")
 
+(defvar calibredb-search-mode-map
+  (let ((map (make-sparse-keymap)))
+    (prog1 map
+      (suppress-keymap map)))
+  "TODO: Keymap for calibredb-search-mode.")
+
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
@@ -129,7 +135,8 @@ time."
 (defcustom calibredb-show-entry-switch #'switch-to-buffer
   "Function used to display the calibre entry buffer."
   :group 'calibredb
-  :type '(choice (function-item switch-to-buffer)
+  :type '(choice (function-item switch-to-buffer-other-window)
+                 (function-item switch-to-buffer)
                  (function-item pop-to-buffer)
                  function))
 
@@ -639,12 +646,50 @@ The result depends on the value of `calibredb-show-unique-buffers'."
       (setq calibredb-show-entry entry))
     (funcall calibredb-show-entry-switch buff)))
 
+(defun calibredb-search-buffer ()
+  (get-buffer-create "*calibredb-search*"))
+
+(defun calibredb-search-mode ()
+  "Major mode for listing calibre entries.
+\\{elfeed-search-mode-map}"
+  (interactive)
+  (kill-all-local-variables)
+  (use-local-map calibredb-search-mode-map)
+  (setq major-mode 'calibredb-search-mode
+        mode-name "calibredb-search"
+        truncate-lines t
+        buffer-read-only t)
+  (buffer-disable-undo)
+  (hl-line-mode))
+
+(defun calibredb ()
+  "Enter calibre Search Buffer."
+  (interactive)
+  (switch-to-buffer (calibredb-search-buffer))
+  (goto-char (point-min))
+  (dolist (item (calibredb-candidates))
+    (let (beg end)
+      (setq beg (point))
+      (insert (propertize (car item)
+                          'mouse-face 'mode-line-highlight
+                          'help-echo "RET to open"))
+      (setq end (point))
+      (let ((map (make-sparse-keymap)))
+        (define-key map (kbd "<RET>") '(lambda ()
+                                         (interactive)
+                                         (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry)))))
+        (put-text-property beg end 'keymap map))
+      (put-text-property beg end 'calibredb-entry item)
+      (insert "\n")))
+  (unless (eq major-mode 'calibredb-search-mode)
+    (calibredb-search-mode)))
+
 (defun calibredb-show-refresh (entry)
   "Refresh ENTRY in the current buffer."
   (setq calibredb-selected-entry entry)
   (let* ((inhibit-read-only t)
-        (buff (get-buffer-create (calibredb-show--buffer-name entry)))
-        (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
+         (buff (get-buffer-create (calibredb-show--buffer-name entry)))
+         (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
     (with-current-buffer buff
       (erase-buffer)
       ;; (setq start (point))
