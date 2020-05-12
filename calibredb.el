@@ -672,9 +672,10 @@ The result depends on the value of `calibredb-show-unique-buffers'."
       (setq beg (point))
       (insert (propertize (car item)
                           'mouse-face 'mode-line-highlight
-                          'help-echo "RET to open"))
+                          'help-echo "mouse-1 to open"))
       (setq end (point))
       (let ((map (make-sparse-keymap)))
+        (define-key map [mouse-1] 'calibredb-search-mouse-1)
         (define-key map (kbd "<RET>") '(lambda ()
                                          (interactive)
                                          (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry)))))
@@ -683,6 +684,16 @@ The result depends on the value of `calibredb-show-unique-buffers'."
       (insert "\n")))
   (unless (eq major-mode 'calibredb-search-mode)
     (calibredb-search-mode)))
+
+(defun calibredb-search-mouse-1 (event)
+  "Visit the calibredb-entry click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No ebook chosen"))
+    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry)))))
 
 (defun calibredb-show-refresh (entry)
   "Refresh ENTRY in the current buffer."
