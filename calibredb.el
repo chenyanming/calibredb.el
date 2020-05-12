@@ -373,11 +373,11 @@ This function honors `shr-max-image-proportion' if possible."
   "Add a file into calibre database."
   (interactive)
   (calibredb-command :command "add"
-                     :input (calibredb-complete-file)))
+                     :input (calibredb-complete-file "Add file to Calibre")))
 
 (defun calibredb-complete-file (&optional arg)
   "Get file name using completion."
-  (let ((file (read-file-name "File: ")))
+  (let ((file (read-file-name (format "%s: " arg))))
     (expand-file-name file)))
 
 ;; remove
@@ -460,7 +460,7 @@ This function honors `shr-max-image-proportion' if possible."
     (setq candidate calibredb-selected-entry))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
-                       :input (format "--to-dir \"%s\"" (calibredb-complete-file))
+                       :input (format "--to-dir \"%s\"" (calibredb-complete-file "Export to (select a path)"))
                        :id id)))
 
 (defun calibredb-find-cover (candidate)
