@@ -279,7 +279,7 @@ time."
 (defun calibredb-list ()
   "Generate an org buffer which contains all ebooks' cover image, title and the file link."
   (interactive)
-  (let* ((buf-name "*calibredb*")
+  (let* ((buf-name "*calibredb-list*")
          occur-buf)
     (when (get-buffer buf-name)
       (kill-buffer buf-name))

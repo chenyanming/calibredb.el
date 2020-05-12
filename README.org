@@ -6,11 +6,11 @@
 * Table of Contents :TOC_3:noexport:
 - [[#description][Description]]
 - [[#screenshots][Screenshots]]
+  - [[#dashboard][Dashboard]]
   - [[#quick-search-filter-with-helm-and-ivy][Quick search, filter with helm and ivy]]
   - [[#another-bookmarks-solution][Another bookmarks solution]]
     - [[#add-tags][Add tags]]
     - [[#add-comments][Add comments]]
-  - [[#dashboard][Dashboard]]
 - [[#installation][Installation]]
   - [[#install-calibredbel][Install calibredb.el]]
     - [[#ues-package][ues-package]]
@@ -18,11 +18,14 @@
     - [[#spacemacs-or-other-emacs-distributions][Spacemacs or other emacs distributions]]
 - [[#configuration][Configuration]]
   - [[#enable-calibredbel][Enable calibredb.el]]
-- [[#m-x][M-x]]
+- [[#workflows][Workflows]]
+- [[#supported-features][Supported Features]]
+  - [[#calibredb][calibredb]]
+  - [[#calibredb-find-helm][calibredb-find-helm]]
+  - [[#calibredb-find-counsel][calibredb-find-counsel]]
   - [[#calibredb-list][calibredb-list]]
-  - [[#add][add]]
-- [[#helmcounsel-actions][Helm/Counsel Actions]]
   - [[#show-details][Show details]]
+  - [[#add][add]]
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
   - [[#set_metadata][set_metadata]]
@@ -30,6 +33,7 @@
     - [[#--filed-comments][=--filed comments=]]
     - [[#--list-fields][=--list-fields=]]
   - [[#export][Export]]
+- [[#logs][Logs]]
   - [[#2020-05-10][=2020-05-10=]]
   - [[#2020-05-10-1][=2020-05-10=]]
   - [[#2020-05-09][=2020-05-09=]]
@@ -45,6 +49,10 @@ Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this pack
 4. Ebook dashboard, with an org buffer.
 
 * Screenshots
+** Dashboard
+[[img/search.png]]
+[[img/dashboard.png]]
+
 ** Quick search, filter with helm and ivy
 [[img/helm.png]]
 [[img/ivy.png]]
@@ -53,8 +61,6 @@ Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this pack
 [[img/tag.gif]]
 *** Add comments
 [[img/comment.gif]]
-** Dashboard
-[[img/dashboard.png]]
 
 * Installation
 
@@ -103,40 +109,56 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 #+END_SRC
 
-* M-x
-** calibredb-list
-Generate an org buffer which contains all files' cover image, title and the file link.
+* Workflows
+There are three ways to manage your ebooks at this moment:
+1. Start with =calibredb=
+    - =M-x calibredb= to enter ebook dashboard (buffer =*calibredb-search*=)
+    - =Enter= or =mouse-1= to enter ebook details (buffer =*calibredb-entry*=)
+2. Start with =calibredb-find-helm= or =calibredb-find-counsel=
+    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
+    - =C-i= (Helm) =C-o= (Counsel) to enter the action menus.
+3. Start with =calibredb-list=
+    - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
 
-You can use it as your ebook dashboard.
+PS:
+1. Keymapping could be configured in future versions.
+2. Workflows may be slightly changed in future versions.
 
-** add
-To add a file into calibre, call
-#+BEGIN_SRC emacs-lisp
-M-x calibredb-add
-#+END_SRC
-
-* Helm/Counsel Actions
-The following operations can only be trigger during helm buffer or counsel buffer.
-
-First, you have to fire
-#+BEGIN_SRC emacs-lisp
-M-x calibredb-find-helm or calibredb-find-counsel
-#+END_SRC
-
-I recommend to use =calibredb-find-helm=, which has more supports.
-
-Then,
-for helm, =C-i= to enter the action menus, =tab= to preview the cover page (if any).
-
-for ivy, =C-o= to enter the action menus.
+* Supported Features
 
 For more details on the actions, check the official calibre documents:
 https://manual.calibre-ebook.com/generated/en/calibredb.html
+
+** calibredb
+Enter calibre emacs client, a new buffer called =*calibredb-search*= with =calibredb-search-mode=
+#+BEGIN_SRC emacs-lisp
+M-x calibredb
+#+END_SRC
+=RET= or =mouse-1= to open the entry
+
+** calibredb-find-helm
+Use helm to list all ebooks
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-find-helm
+#+END_SRC
+
+** calibredb-find-counsel
+Use counsel to list all ebooks
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-find-counsel
+#+END_SRC
+
+** calibredb-list
+Generate an org buffer which contains all files' cover images, titles and the file links.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-list
+#+END_SRC
 
 ** Show details
 This action will get you to the book details buffer called =*calibredb-entry*=
 with =calibredb-show-mode=, you can make actions on it, just like =magit-dispatch=,
 
+Under =*calilbredb-entry*= buffer, call
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-dispatch
 #+END_SRC
@@ -144,6 +166,12 @@ Or fire with keybinding =C-c g=
 
 Demo:
 [[img/details.gif]]
+
+** add
+To add a file into calibre, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-add
+#+END_SRC
 
 ** remove
 Remove a item.
@@ -157,9 +185,11 @@ Remove a item.
 
 ** Export
 
+* Logs
 ** =2020-05-10=
 Version *1.2.0*:
 - =calibredb-export=
+- =calibredb=
 
 ** =2020-05-10=
 Version *1.1.0*:
