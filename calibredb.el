@@ -555,9 +555,12 @@ This function honors `shr-max-image-proportion' if possible."
 ;;;###autoload
 (define-transient-command calibredb-dispatch ()
   "Invoke a calibredb command from a list of available commands."
-  ["calibredb commands"
+  ["Metadata"
    [("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ("S" "show_metadata"         calibredb-show-metadata)]
+    ;; ("S" "show_metadata"         calibredb-show-metadata)
+    ]]
+  ["File operaion"
+   [("a" "Add a file"   calibredb-add)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)]
    [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
