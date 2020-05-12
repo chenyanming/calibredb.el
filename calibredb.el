@@ -228,15 +228,15 @@ time."
   "Query calibre databse and return the result."
   (interactive)
   (shell-command-to-string
-   (format "%s -separator \"\t\" \"%s\" \"%s\""
+   (format "%s \"%s\" \"%s\""
            sql-sqlite-program
-           (replace-regexp-in-string "\"" "\\\\\"" calibredb-db-dir)
+           (shell-quote-argument calibredb-db-dir)
            sql-query)))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full calibredb-query query record result."
   (if query-result
-      (let ((spl-query-result (split-string (calibredb-chomp query-result) "\t")))
+      (let ((spl-query-result (split-string (calibredb-chomp query-result) "|")))
         `((:id                     ,(nth 0 spl-query-result))
           (:author-sort            ,(nth 1 spl-query-result))
           (:book-dir               ,(nth 2 spl-query-result))
@@ -494,10 +494,15 @@ This function honors `shr-max-image-proportion' if possible."
          (line-list (split-string (calibredb-chomp query-result) "\n"))
          (num-result (length line-list)))
     (if (= 0 num-result)
-        (progn
-          (message "nothing found.")
-          (deactivate-mark))
-      (let ((res-list (mapcar #'(lambda (line) (calibredb-query-to-alist line)) line-list)))
+        (message "nothing found.")
+      (let (res-list)
+        (dolist (line line-list)
+          ;; validate if it is right format
+          (if (string-match-p "^[0-9]\\{1,10\\}|" line)
+              ;; decode and push to res-list
+              (push (calibredb-query-to-alist line) res-list)
+            ;; concat the invalid format strings into last line
+            (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
         (calibredb-getbooklist res-list)))))
 
 (defun calibredb-helm-read ()
