@@ -515,7 +515,7 @@ This function honors `shr-max-image-proportion' if possible."
               (push (calibredb-query-to-alist line) res-list)
             ;; concat the invalid format strings into last line
             (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
-        (calibredb-getbooklist res-list)))))
+        (calibredb-getbooklist (nreverse res-list))))))
 
 (defun calibredb-helm-read ()
   (helm :sources 'calibredb-helm-source
