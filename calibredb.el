@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: faces
 ;; Created: 9 May 2020
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -167,7 +167,7 @@ time."
    ("c" (lambda (candidate)
           (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
    ("e" (lambda (candidate)
-          (calibredb-export (cdr candidate)) )"Export ebook")
+          (calibredb-export (cdr candidate)) )"Export")
    ("q"
     (lambda ()
       (message "cancelled")) "(or anything else) to cancel")))

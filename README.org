@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    May 10, 2020
+#+DATE:    May 13, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 
@@ -18,7 +18,7 @@
     - [[#spacemacs-or-other-emacs-distributions][Spacemacs or other emacs distributions]]
 - [[#configuration][Configuration]]
   - [[#enable-calibredbel][Enable calibredb.el]]
-- [[#m-x-features][M-x Features]]
+- [[#m-x][M-x]]
   - [[#calibredb-list][calibredb-list]]
   - [[#add][add]]
 - [[#helmcounsel-actions][Helm/Counsel Actions]]
@@ -26,10 +26,12 @@
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
   - [[#set_metadata][set_metadata]]
-    - [[#--filed-tags][--filed tags]]
-    - [[#--filed-comments][--filed comments]]
-    - [[#--list-fields][--list-fields]]
+    - [[#--filed-tags][=--filed tags=]]
+    - [[#--filed-comments][=--filed comments=]]
+    - [[#--list-fields][=--list-fields=]]
+  - [[#export][Export]]
   - [[#2020-05-10][=2020-05-10=]]
+  - [[#2020-05-10-1][=2020-05-10=]]
   - [[#2020-05-09][=2020-05-09=]]
 
 * Description
@@ -101,7 +103,7 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 #+END_SRC
 
-* M-x Features
+* M-x
 ** calibredb-list
 Generate an org buffer which contains all files' cover image, title and the file link.
 
@@ -128,6 +130,9 @@ for helm, =C-i= to enter the action menus, =tab= to preview the cover page (if a
 
 for ivy, =C-o= to enter the action menus.
 
+For more details on the actions, check the official calibre documents:
+https://manual.calibre-ebook.com/generated/en/calibredb.html
+
 ** Show details
 This action will get you to the book details buffer called =*calibredb-entry*=
 with =calibredb-show-mode=, you can make actions on it, just like =magit-dispatch=,
@@ -146,16 +151,22 @@ Remove a item.
 ** show_metadata
 
 ** set_metadata
-*** --filed tags
-*** --filed comments
-*** --list-fields
+*** =--filed tags=
+*** =--filed comments=
+*** =--list-fields=
+
+** Export
 
 ** =2020-05-10=
-Version *1.1*:
+Version *1.2.0*:
+- =calibredb-export=
+
+** =2020-05-10=
+Version *1.1.0*:
 - =calibredb-dispatch=
 
 ** =2020-05-09=
-Version *1.0*:
+Version *1.0*.0:
 - =calibredb-find-helm=
 - =calibredb-find-counsel=
 - =calibredb-list=
