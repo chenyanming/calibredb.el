@@ -51,7 +51,12 @@
   :set (lambda (var value)
          (set var value)
          (setq calibredb-db-dir (expand-file-name "metadata.db"
-                                                  calibredb-root-dir))))
+                                                  calibredb-root-dir)))
+  :group 'calibredb)
+
+(defcustom calibredb-library-alist `(,calibredb-root-dir)
+  "Alist for all your calibre libraries."
+  :group 'calibredb)
 
 (defcustom calibredb-program
   (cond
@@ -60,7 +65,8 @@
    (t
     "calibredb"))
   "Executable used to access the calibredb."
-  :type 'file)
+  :type 'file
+  :group 'calibredb)
 
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
@@ -747,6 +753,13 @@ Argument EVENT mouse event."
   (setq calibredb-root-dir (calibredb-complete-file "Quick switch library" calibredb-root-dir))
   (setq calibredb-db-dir (expand-file-name "metadata.db"
                                            calibredb-root-dir)))
+(defun calibredb-library-list ()
+  "Switch library from list."
+  (interactive)
+  (setq calibredb-root-dir (completing-read "Quick switch library: " calibredb-library-alist))
+  (setq calibredb-db-dir (expand-file-name "metadata.db"
+                                           calibredb-root-dir))
+  (message (concat "Current Library: " calibredb-root-dir)))
 
 (provide 'calibredb)
 
