@@ -25,6 +25,7 @@
   - [[#calibredb-find-counsel][calibredb-find-counsel]]
   - [[#calibredb-list][calibredb-list]]
   - [[#calibredb-clone][calibredb-clone]]
+  - [[#calibredb-library-list][calibredb-library-list]]
   - [[#calibredb-switch-library][calibredb-switch-library]]
   - [[#show-details][Show details]]
   - [[#add][add]]
@@ -111,6 +112,11 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 (setq calibredb-root-dir (expand-file-name "~/OneDrive/Doc/Calibre"))
 (setq calibredb-db-dir (concat calibredb-root-dir "/metadata.db"))
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+(setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
+                                  ("/Users/damonchan/Documents/Books Library")
+                                  ("/Users/damonchan/Documents/HELLO")
+                                  ("/Users/damonchan/Documents/Books")
+                                  ("/Users/damonchan/Documents/World")))
 #+END_SRC
 
 * Workflows
@@ -173,16 +179,18 @@ M-x calibredb-clone
 Tips: Libraries can be used for any purposes, one for books, one for
 lecture notes, one for research references etc.
 
+** calibredb-library-list
+Switch library from library list defined in =calibredb-library-alist=.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-library-list
+#+END_SRC
+
 ** calibredb-switch-library
-Switch a library temporary. With this feature, you can manage as many libraries
-for any purpose as you want!
+Switch a library temporary by selecting a path.
 
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-switch-library
 #+END_SRC
-
-PS: Setting will lost after you reboot.
-TODO: Permanent switching.
 
 ** Show details
 This action will get you to the book details buffer called =*calibredb-entry*=
@@ -220,6 +228,7 @@ Remove a item.
 Version *1.3.0*:
 - =calibredb-clone=
 - =calibrede-switch-library=
+- =calibrede-library-list=
 
 ** =2020-05-13=
 Version *1.2.0*:
