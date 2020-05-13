@@ -181,6 +181,9 @@ lecture notes, one for research references etc.
 
 ** calibredb-library-list
 Switch library from library list defined in =calibredb-library-alist=.
+If under =*calibredb-search*= buffer, it will auto refresh after
+selecting the new item.
+
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-library-list
 #+END_SRC
