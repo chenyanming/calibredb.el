@@ -108,8 +108,6 @@ GROUP BY id"
     )
   "calibredb helm source.")
 
-(defvar calibredb-selected-entry nil)
-
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")
 
@@ -359,19 +357,19 @@ This function honors `shr-max-image-proportion' if possible."
 (defun calibredb-find-file (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (find-file (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-find-file-other-frame (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-open-file-with-default-tool (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
 ;; add
@@ -400,7 +398,7 @@ This function honors `shr-max-image-proportion' if possible."
   "Add tags, divided by comma, on marked candidates."
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
                         ((memq this-command '(helm-maybe-exit-minibuffer)) (helm-marked-candidates))
@@ -415,15 +413,15 @@ This function honors `shr-max-image-proportion' if possible."
                            :id id)
         (setq last-input input)
         (when (equal major-mode 'calibredb-show-mode)
-          ;; set the comments back, it is messy, will be improved later
-          (setf (car (cdr (assoc :tag (car calibredb-selected-entry)))) input)
-          (calibredb-show-refresh calibredb-selected-entry))))))
+          ;; set the comments back, calibredb-show-entry need a correct entry
+          (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+          (calibredb-show-refresh))))))
 
 (defun calibredb-set-metadata--comments (&optional candidate)
   "Add comments on one candidate."
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let* ((title (calibredb-getattr candidate :book-title))
          (comment (calibredb-getattr candidate :comment))
          (id (calibredb-getattr candidate :id))
@@ -433,15 +431,15 @@ This function honors `shr-max-image-proportion' if possible."
                        :input (format "comments:\"%s\"" input)
                        :id id)
     (when (equal major-mode 'calibredb-show-mode)
-      ;; set the comments back, it is messy, will be improved later
-      (setf (car (cdr (assoc :comment (car calibredb-selected-entry)))) input)
-      (calibredb-show-refresh calibredb-selected-entry))))
+      ;; set the comments back, calibredb-show-entry need a correct entry
+      (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+      (calibredb-show-refresh))))
 
 (defun calibredb-set-metadata--list-fields (&optional candidate)
   "List the selected candidate supported fileds."
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let* ((id (calibredb-getattr candidate :id)))
     (message (calibredb-command :command "set_metadata"
                        :option "--list-fields"
@@ -453,7 +451,7 @@ This function honors `shr-max-image-proportion' if possible."
   "Show selected candidate metadata."
   (interactive)
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let* ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "show_metadata"
                        :id id)))
@@ -464,7 +462,7 @@ This function honors `shr-max-image-proportion' if possible."
   (interactive)
   "TODO: Export the selected candidate."
   (unless candidate
-    (setq candidate calibredb-selected-entry))
+    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
                        :input (format "--to-dir \"%s\"" (calibredb-complete-file "Export to (select a path)"))
@@ -637,13 +635,12 @@ The result depends on the value of `calibredb-show-unique-buffers'."
   "Display ENTRY in the current buffer."
   (when (get-buffer (calibredb-show--buffer-name entry))
     (kill-buffer (calibredb-show--buffer-name entry)))
-  (setq calibredb-selected-entry entry)
   (let ((buff (get-buffer-create (calibredb-show--buffer-name entry)))
         (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
     (with-current-buffer buff
       ;; (setq start (point))
       ;; (insert title)
-      (insert (calibredb-show-metadata entry))
+      (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
       ;; (insert book)
       (insert "\n")
       (calibredb-insert-image cover "")
@@ -684,7 +681,7 @@ The result depends on the value of `calibredb-show-unique-buffers'."
         (define-key map [mouse-1] 'calibredb-search-mouse-1)
         (define-key map (kbd "<RET>") '(lambda ()
                                          (interactive)
-                                         (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry)))))
+                                         (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
         (put-text-property beg end 'keymap map))
       (put-text-property beg end 'calibredb-entry item)
       (insert "\n")))
@@ -699,25 +696,12 @@ Argument EVENT mouse event."
         (pos (posn-point (event-end event))))
     (if (not (windowp window))
         (error "No ebook chosen"))
-    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry)))))
+    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
 
-(defun calibredb-show-refresh (entry)
+(defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
-  (setq calibredb-selected-entry entry)
-  (let* ((inhibit-read-only t)
-         (buff (get-buffer-create (calibredb-show--buffer-name entry)))
-         (cover (concat (file-name-directory (calibredb-getattr entry :file-path)) "cover.jpg")))
-    (with-current-buffer buff
-      (erase-buffer)
-      ;; (setq start (point))
-      ;; (insert title)
-      (insert (calibredb-show-metadata entry))
-      ;; (insert book)
-      (calibredb-insert-image cover "")
-      ;; (setq end (point))
-      (calibredb-show-mode)
-      (setq calibredb-show-entry entry))
-    (funcall calibredb-show-entry-switch buff)))
+  (interactive)
+  (calibredb-show-entry (get-text-property (point-min) 'calibredb-entry nil)))
 
 (provide 'calibredb)
 
