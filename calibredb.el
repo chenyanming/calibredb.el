@@ -759,6 +759,8 @@ Argument EVENT mouse event."
   (setq calibredb-root-dir (completing-read "Quick switch library: " calibredb-library-alist))
   (setq calibredb-db-dir (expand-file-name "metadata.db"
                                            calibredb-root-dir))
+  (if (eq major-mode 'calibredb-search-mode)
+      (calibredb))
   (message (concat "Current Library: " calibredb-root-dir)))
 
 (provide 'calibredb)
