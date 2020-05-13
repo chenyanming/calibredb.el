@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: faces
 ;; Created: 9 May 2020
-;; Version: 1.2.0
+;; Version: 1.3.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -95,7 +95,7 @@ GROUP BY id"
 (defvar calibredb-helm-source
   (helm-build-sync-source "calibredb"
     :header-name (lambda (name)
-                   (concat name " in [" (helm-default-directory) "]"))
+                   (concat name " in [" calibredb-root-dir "]"))
     :candidates 'calibredb-candidates
     ;; :filtered-candidate-transformer 'helm-findutils-transformer
     ;; :action-transformer 'helm-transform-file-load-el
@@ -190,7 +190,7 @@ time."
 ;; Utility
 
 (cl-defstruct calibredb-struct
-  command option input id action)
+  command option input id library action)
 
 (defun calibredb-get-action (state)
   "Get the action function from STATE."
@@ -200,19 +200,21 @@ time."
           action
         (cadr (nth (car action) action))))))
 
-(cl-defun calibredb-command (&key command option input id action)
+(cl-defun calibredb-command (&key command option input id library action)
   (let* ((command-string (make-calibredb-struct
                           :command command
                           :option option
                           :input input
                           :id id
+                          :library library
                           :action action))
          (line (mapconcat 'identity
                           `(,calibredb-program
                             ,(calibredb-struct-command command-string)
                             ,(calibredb-struct-option command-string)
                             ,(calibredb-struct-input command-string)
-                            ,(calibredb-struct-id command-string)) " ")))
+                            ,(calibredb-struct-id command-string)
+                            ,(calibredb-struct-library command-string)) " ")))
     (message line)
     ;; (calibredb-get-action command-string)
     ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
@@ -258,7 +260,7 @@ time."
   "Query calibre databse and return the result."
   (interactive)
   (shell-command-to-string
-   (format "%s \"%s\" \"%s\""
+   (format "%s %s \"%s\""
            sql-sqlite-program
            (shell-quote-argument calibredb-db-dir)
            sql-query)))
@@ -388,11 +390,21 @@ This function honors `shr-max-image-proportion' if possible."
   "Add a file into calibre database."
   (interactive)
   (calibredb-command :command "add"
-                     :input (calibredb-complete-file "Add file to Calibre")))
+                     :input (calibredb-complete-file "Add file to Calibre")
+                     :library (format "--library-path \"%s\"" calibredb-root-dir)))
 
-(defun calibredb-complete-file (&optional arg)
+(defun calibredb-clone ()
+  "Create a clone of the current library.
+This creates a new, empty library that has all the same custom
+columns, Virtual libraries and other settings as the current
+library."
+  (interactive)
+  (calibredb-command :command "clone"
+                     :input (calibredb-complete-file "Path of the new library")))
+
+(defun calibredb-complete-file (&optional arg &rest rest)
   "Get file name using completion."
-  (let ((file (read-file-name (format "%s: " arg))))
+  (let ((file (read-file-name (format "%s: " arg) (pop rest))))
     (expand-file-name file)))
 
 ;; remove
@@ -400,7 +412,8 @@ This function honors `shr-max-image-proportion' if possible."
 (defun calibredb-remove (candidate)
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "remove"
-                       :id id)))
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
 
 ;; set_metadata
 
@@ -420,7 +433,8 @@ This function honors `shr-max-image-proportion' if possible."
         (calibredb-command :command "set_metadata"
                            :option "--field"
                            :input (format "tags:\"%s\"" input)
-                           :id id)
+                           :id id
+                           :library (format "--library-path \"%s\"" calibredb-root-dir))
         (setq last-input input)
         (when (equal major-mode 'calibredb-show-mode)
           ;; set the comments back, calibredb-show-entry need a correct entry
@@ -439,7 +453,8 @@ This function honors `shr-max-image-proportion' if possible."
     (calibredb-command :command "set_metadata"
                        :option "--field"
                        :input (format "comments:\"%s\"" input)
-                       :id id)
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))
     (when (equal major-mode 'calibredb-show-mode)
       ;; set the comments back, calibredb-show-entry need a correct entry
       (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
@@ -452,8 +467,9 @@ This function honors `shr-max-image-proportion' if possible."
     (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let* ((id (calibredb-getattr candidate :id)))
     (message (calibredb-command :command "set_metadata"
-                       :option "--list-fields"
-                       :id id) )))
+                                :option "--list-fields"
+                                :id id
+                                :library (format "--library-path \"%s\"" calibredb-root-dir)))))
 
 ;; show_metadata
 
@@ -464,7 +480,8 @@ This function honors `shr-max-image-proportion' if possible."
     (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
   (let* ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "show_metadata"
-                       :id id)))
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
 
 ;; export
 
@@ -476,7 +493,8 @@ This function honors `shr-max-image-proportion' if possible."
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
                        :input (format "--to-dir \"%s\"" (calibredb-complete-file "Export to (select a path)"))
-                       :id id)))
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
 
 (defun calibredb-find-cover (candidate)
   "Open the cover page image of selected candidate."
@@ -522,10 +540,9 @@ This function honors `shr-max-image-proportion' if possible."
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
-         (line-list (split-string (calibredb-chomp query-result) "\n"))
-         (num-result (length line-list)))
-    (if (= 0 num-result)
-        (message "nothing found.")
+         (line-list (split-string (calibredb-chomp query-result) "\n")))
+    (if (equal "" query-result)
+          '("")
       (let (res-list)
         (dolist (line line-list)
           ;; validate if it is right format
@@ -666,7 +683,7 @@ The result depends on the value of `calibredb-show-unique-buffers'."
 (defun calibredb-search-header ()
   "TODO: Returns the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "%s" "Personal Library"))
+  (format "%s %s" "Library: " calibredb-root-dir))
 
 (defun calibredb-search-mode ()
   "Major mode for listing calibre entries.
@@ -686,6 +703,8 @@ Indicating the library you use."
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
+  (when (get-buffer (calibredb-search-buffer))
+    (kill-buffer (calibredb-search-buffer)))
   (switch-to-buffer (calibredb-search-buffer))
   (goto-char (point-min))
   (dolist (item (calibredb-candidates))
@@ -721,6 +740,13 @@ Argument EVENT mouse event."
   "Refresh ENTRY in the current buffer."
   (interactive)
   (calibredb-show-entry (get-text-property (point-min) 'calibredb-entry nil)))
+
+(defun calibredb-switch-library ()
+  "Swich Calibre Library."
+  (interactive)
+  (setq calibredb-root-dir (calibredb-complete-file "Quick switch library" calibredb-root-dir))
+  (setq calibredb-db-dir (expand-file-name "metadata.db"
+                                           calibredb-root-dir)))
 
 (provide 'calibredb)
 
