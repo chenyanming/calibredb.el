@@ -560,51 +560,56 @@ This function honors `shr-max-image-proportion' if possible."
   (transient-args 'calibredb-dispatch))
 
 ;;;###autoload
-(define-transient-command calibredb-dispatch ()
-  "Invoke a calibredb command from a list of available commands."
-  ["Metadata"
-   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ;; ("S" "show_metadata"         calibredb-show-metadata)
-    ]]
-  ["File operaion"
-   [("a" "Add a file"   calibredb-add)]
-   [("o" "Open file"         calibredb-find-file)
-    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
-   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
-   [("e" "Export" calibredb-export-dispatch)]]
-  (interactive)
-  (transient-setup 'calibredb-dispatch))
 
-(define-transient-command calibredb-set-metadata-dispatch ()
-  "Create a new commit or replace an existing commit."
-  [["Field"
-    ("t" "tags"         calibredb-set-metadata--tags)
-    ("c" "comments"         calibredb-set-metadata--comments)]
-   ["List fields"
-    ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
-  (interactive)
-  (transient-setup 'calibredb-set-metadata-dispatch))
+(defun calibredb-transient ()
+  (when (fboundp 'define-transient-command)
 
-(define-transient-command calibredb-export-dispatch ()
-  "TODO: Create a new commit or replace an existing commit."
-  ;; ["Arguments"
-  ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
-  ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
-  ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
-  ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
-  ;;  ("-e" "Do not write opf" "--dont-write-opf")
-  ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
-  ;;  ("-g" "Report progress"   ("-g" " --progress"))
-  ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
-  ;;  ("-i" "Export all books into a single directory" "--single-dir")
-  ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
-  ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
-  ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
-  ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
-  [["Export"
-    ("e" "Export"         calibredb-export)]]
-  (interactive)
-  (transient-setup 'calibredb-export-dispatch))
+    (define-transient-command calibredb-dispatch ()
+      "Invoke a calibredb command from a list of available commands."
+      ["Metadata"
+       [("s" "set_metadata"   calibredb-set-metadata-dispatch)
+        ;; ("S" "show_metadata"         calibredb-show-metadata)
+        ]]
+      ["File operaion"
+       [("a" "Add a file"   calibredb-add)]
+       [("o" "Open file"         calibredb-find-file)
+        ("O" "Open file other frame"            calibredb-find-file-other-frame)]
+       [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+       [("e" "Export" calibredb-export-dispatch)]]
+      (interactive)
+      (transient-setup 'calibredb-dispatch))
+
+
+    (define-transient-command calibredb-set-metadata-dispatch ()
+      "Create a new commit or replace an existing commit."
+      [["Field"
+        ("t" "tags"         calibredb-set-metadata--tags)
+        ("c" "comments"         calibredb-set-metadata--comments)]
+       ["List fields"
+        ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
+      (interactive)
+      (transient-setup 'calibredb-set-metadata-dispatch))
+
+    (define-transient-command calibredb-export-dispatch ()
+      "TODO: Create a new commit or replace an existing commit."
+      ;; ["Arguments"
+      ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
+      ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
+      ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
+      ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
+      ;;  ("-e" "Do not write opf" "--dont-write-opf")
+      ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
+      ;;  ("-g" "Report progress"   ("-g" " --progress"))
+      ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
+      ;;  ("-i" "Export all books into a single directory" "--single-dir")
+      ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
+      ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
+      ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
+      ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
+      [["Export"
+        ("e" "Export"         calibredb-export)]]
+      (interactive)
+      (transient-setup 'calibredb-export-dispatch))))
 
 
 (defun calibredb-show-mode ()
@@ -617,6 +622,7 @@ This function honors `shr-max-image-proportion' if possible."
         mode-name "calibredb-show"
         buffer-read-only t)
   (buffer-disable-undo)
+  (calibredb-transient)
   (run-mode-hooks 'calibredb-show-mode-hook))
 
 (defun calibredb-show--buffer-name (entry)
