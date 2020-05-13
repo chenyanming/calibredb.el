@@ -117,7 +117,7 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 There are three ways to manage your ebooks at this moment:
 1. Start with =calibredb=
     - =M-x calibredb= to enter ebook dashboard (buffer =*calibredb-search*=)
-    - =Enter= or =mouse-1= to enter ebook details (buffer =*calibredb-entry*=)
+    - =Enter= or =mouse-3= to enter ebook details (buffer =*calibredb-entry*=)
 2. Start with =calibredb-find-helm= or =calibredb-find-counsel=
     - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
     - =C-i= (Helm) =C-o= (Counsel) to enter the action menus.
@@ -138,7 +138,7 @@ Enter calibre emacs client, a new buffer called =*calibredb-search*= with =calib
 #+BEGIN_SRC emacs-lisp
 M-x calibredb
 #+END_SRC
-=RET= or =mouse-1= to open the entry
+=RET= or =mouse-3= to open the entry
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
