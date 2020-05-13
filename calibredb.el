@@ -754,7 +754,9 @@ Argument EVENT mouse event."
   (setq calibredb-db-dir (expand-file-name "metadata.db"
                                            calibredb-root-dir)))
 (defun calibredb-library-list ()
-  "Switch library from list."
+  "Switch library from variable `calibredb-library-alist'.
+If under *calibredb-search* buffer, it will auto refresh after
+selecting the new item."
   (interactive)
   (setq calibredb-root-dir (completing-read "Quick switch library: " calibredb-library-alist))
   (setq calibredb-db-dir (expand-file-name "metadata.db"
