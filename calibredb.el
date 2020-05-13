@@ -123,6 +123,9 @@ GROUP BY id"
       (suppress-keymap map)))
   "TODO: Keymap for calibredb-search-mode.")
 
+(defvar calibredb-search-header-function #'calibredb-search-header
+  "Function that returns the string to be used for the Calibredb search header.")
+
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
@@ -176,6 +179,13 @@ time."
    ("q"
     (lambda ()
       (message "cancelled")) "(or anything else) to cancel")))
+
+;; faces
+
+(defface calibredb-search-header-highlight-face
+  '((t :inherit region :weight bold :underline t))
+  "Face for the header at point."
+  :group 'calibredb-faces)
 
 ;; Utility
 
@@ -652,6 +662,12 @@ The result depends on the value of `calibredb-show-unique-buffers'."
 (defun calibredb-search-buffer ()
   (get-buffer-create "*calibredb-search*"))
 
+
+(defun calibredb-search-header ()
+  "TODO: Returns the string to be used as the Calibredb header.
+Indicating the library you use."
+  (format "%s" "Personal Library"))
+
 (defun calibredb-search-mode ()
   "Major mode for listing calibre entries.
 \\{elfeed-search-mode-map}"
@@ -661,8 +677,10 @@ The result depends on the value of `calibredb-show-unique-buffers'."
   (setq major-mode 'calibredb-search-mode
         mode-name "calibredb-search"
         truncate-lines t
-        buffer-read-only t)
+        buffer-read-only t
+        header-line-format '(:eval (funcall calibredb-search-header-function)))
   (buffer-disable-undo)
+  (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
   (hl-line-mode))
 
 (defun calibredb ()
@@ -674,21 +692,22 @@ The result depends on the value of `calibredb-show-unique-buffers'."
     (let (beg end)
       (setq beg (point))
       (insert (propertize (car item)
-                          'mouse-face 'mode-line-highlight
-                          'help-echo "mouse-1 to open"))
+                          ;; 'mouse-face 'mode-line-highlight
+                          'help-echo "mouse-3 or RET to open"))
       (setq end (point))
       (let ((map (make-sparse-keymap)))
-        (define-key map [mouse-1] 'calibredb-search-mouse-1)
+        (define-key map [mouse-3] 'calibredb-search-mouse-3)
         (define-key map (kbd "<RET>") '(lambda ()
                                          (interactive)
                                          (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
         (put-text-property beg end 'keymap map))
       (put-text-property beg end 'calibredb-entry item)
       (insert "\n")))
+  (goto-char (point-min))
   (unless (eq major-mode 'calibredb-search-mode)
     (calibredb-search-mode)))
 
-(defun calibredb-search-mouse-1 (event)
+(defun calibredb-search-mouse-3 (event)
   "Visit the calibredb-entry click on.
 Argument EVENT mouse event."
   (interactive "e")
