@@ -214,9 +214,10 @@ GROUP BY id"
 
 (defvar calibredb-search-mode-map
   (let ((map (make-sparse-keymap)))
-    (prog1 map
-      (suppress-keymap map)))
-  "TODO: Keymap for calibredb-search-mode.")
+    (define-key map [mouse-3] #'calibredb-search-mouse)
+    (define-key map (kbd "<RET>") #'calibredb-search-ret)
+    map)
+  "Keymap for calibredb-search-mode.")
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
@@ -786,7 +787,6 @@ The result depends on the value of `calibredb-show-unique-buffers'."
 (defun calibredb-search-buffer ()
   (get-buffer-create "*calibredb-search*"))
 
-
 (defun calibredb-search-header ()
   "TODO: Returns the string to be used as the Calibredb header.
 Indicating the library you use."
@@ -824,19 +824,19 @@ Indicating the library you use."
       ;;                     ))
       (insert (car item))
       (setq end (point))
-      (let ((map (make-sparse-keymap)))
-        (define-key map [mouse-3] 'calibredb-search-mouse-3)
-        (define-key map (kbd "<RET>") '(lambda ()
-                                         (interactive)
-                                         (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
-        (put-text-property beg end 'keymap map))
+      ;; (let ((map (make-sparse-keymap)))
+      ;;   (define-key map [mouse-3] 'calibredb-search-mouse-3)
+      ;;   (define-key map (kbd "<RET>") '(lambda ()
+      ;;                                    (interactive)
+      ;;                                    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
+      ;;   (put-text-property beg end 'keymap map))
       (put-text-property beg end 'calibredb-entry item)
       (insert "\n")))
   (goto-char (point-min))
   (unless (eq major-mode 'calibredb-search-mode)
     (calibredb-search-mode)))
 
-(defun calibredb-search-mouse-3 (event)
+(defun calibredb-search-mouse (event)
   "Visit the calibredb-entry click on.
 Argument EVENT mouse event."
   (interactive "e")
@@ -847,6 +847,11 @@ Argument EVENT mouse event."
     (calibredb-show-entry (cdr (get-text-property pos 'calibredb-entry nil)))
     (select-window window)
     (goto-char pos)))
+
+(defun calibredb-search-ret ()
+  "Visit the calibredb-entry."
+  (interactive)
+  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil))))
 
 (defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
