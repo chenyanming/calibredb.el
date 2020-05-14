@@ -419,20 +419,6 @@ time."
       (org-mode)
       (goto-char (point-min)))))
 
-(defun calibredb-mouse-1 (event)
-  "TODO: Copy the url click on.
-Argument EVENT mouse event."
-  (interactive "e")
-  ;; (message "click mouse-2")
-  (let ((window (posn-window (event-end event)))
-        (pos (posn-point (event-end event))))
-    (if (not (windowp window))
-        (error "No URL chosen"))
-    (with-current-buffer (window-buffer window)
-      (goto-char pos)
-      (let ((url (get-text-property (point) 'help-echo)))
-        (find-file url)))))
-
 (defun calibredb-getattr (my-alist key)
   (cadr (assoc key (car my-alist))))
 
