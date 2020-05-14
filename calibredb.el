@@ -4,9 +4,9 @@
 
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
-;; Keywords: faces
+;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 1.3.0
+;; Version: 1.4.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -34,9 +34,10 @@
 (require 'cl-lib)
 (require 'sql)
 (ignore-errors
-  (require 'ivy)
   (require 'helm)
-  (require 'transient))
+  (require 'ivy)
+  (require 'transient)
+  (require 'all-the-icons))
 
 (defgroup calibredb nil
   "calibredb group"
@@ -54,8 +55,9 @@
                                                   calibredb-root-dir)))
   :group 'calibredb)
 
-(defcustom calibredb-library-alist `(,calibredb-root-dir)
+(defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
+  :type 'alist
   :group 'calibredb)
 
 (defcustom calibredb-program
@@ -67,6 +69,86 @@
   "Executable used to access the calibredb."
   :type 'file
   :group 'calibredb)
+
+(defcustom calibredb-id-width 4
+  "Width for id.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-format-width 4
+  "Width for file format.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-tag-width -1
+  "Width for tag.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-title-width 70
+  "Width for title.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-author-width -1
+  "Width for author.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-comment-width 70
+  "Width for width.
+Set 0 to hide,
+Set < 0 to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-size-show nil
+  "Set Non-nil to show size indicator."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-format-icons nil
+  "Set Non-nil to show file format icons."
+  :group 'calibredb
+  :type 'boolean)
+
+(defface calibredb-id-face '((t :inherit font-lock-keyword-face))
+  "Face used for id."
+  :group 'calibredb-faces)
+
+(defface calibredb-title-face '((t :inherit default))
+  "Face used for title."
+  :group 'calibredb-faces)
+
+(defface calibredb-author-face '((t :inherit font-lock-variable-name-face))
+  "Face used for author."
+  :group 'calibredb-faces)
+
+(defface calibredb-format-face '((t :inherit font-lock-string-face))
+  "Face used for format."
+  :group 'calibredb-faces)
+
+(defface calibredb-comment-face '((t :inherit font-lock-type-face))
+  "Face used for comment."
+  :group 'calibredb-faces)
+
+(defface calibredb-tag-face '((t :inherit font-lock-warning-face))
+  "Face used for tag."
+  :group 'calibredb-faces)
+
+(defface calibredb-size-face '((t :inherit font-lock-comment-face))
+  "Face used for size."
+  :group 'calibredb-faces)
 
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
@@ -91,27 +173,29 @@ GROUP BY id"
   "TODO calibre database query statement.")
 
 (defvar calibredb-helm-map
-  (let ((map (make-sparse-keymap)))
-    (set-keymap-parent map helm-map)
-    (define-key map (kbd "C-c t") #'calibredb-set-metadata--tags-1)
-    (define-key map (kbd "C-c c") #'calibredb-set-metadata--comments-1)
-    map)
+  (if (boundp 'helm-map)
+      (let ((map (make-sparse-keymap)))
+        (set-keymap-parent map helm-map)
+        (define-key map (kbd "C-c t") #'calibredb-set-metadata--tags-1)
+        (define-key map (kbd "C-c c") #'calibredb-set-metadata--comments-1)
+        map))
   "Keymap for `calibredb-find-helm'.")
 
 (defvar calibredb-helm-source
-  (helm-build-sync-source "calibredb"
-    :header-name (lambda (name)
-                   (concat name " in [" calibredb-root-dir "]"))
-    :candidates 'calibredb-candidates
-    ;; :filtered-candidate-transformer 'helm-findutils-transformer
-    ;; :action-transformer 'helm-transform-file-load-el
-    :persistent-action 'calibredb-find-cover
-    :action 'calibredb-helm-actions
-    ;; :help-message 'helm-generic-file-help-message
-    :keymap calibredb-helm-map
-    :candidate-number-limit 9999
-    ;; :requires-pattern 3
-    )
+  (if (fboundp 'helm-build-sync-source)
+      (helm-build-sync-source "calibredb"
+        :header-name (lambda (name)
+                       (concat name " in [" calibredb-root-dir "]"))
+        :candidates 'calibredb-candidates
+        ;; :filtered-candidate-transformer 'helm-findutils-transformer
+        ;; :action-transformer 'helm-transform-file-load-el
+        :persistent-action 'calibredb-find-cover
+        :action 'calibredb-helm-actions
+        ;; :help-message 'helm-generic-file-help-message
+        :keymap calibredb-helm-map
+        :candidate-number-limit 9999
+        ;; :requires-pattern 3
+        ))
   "calibredb helm source.")
 
 (defvar calibredb-show-entry nil
@@ -139,7 +223,7 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-show-entry-switch #'switch-to-buffer
+(defcustom calibredb-show-entry-switch #'switch-to-buffer-other-window
   "Function used to display the calibre entry buffer."
   :group 'calibredb
   :type '(choice (function-item switch-to-buffer-other-window)
@@ -148,43 +232,45 @@ time."
                  function))
 
 (defcustom calibredb-helm-actions
-  (helm-make-actions
-   "Open file"                   'calibredb-find-file
-   "Show details"                'calibredb-show-entry
-   "Open file other frame"       'calibredb-find-file-other-frame
-   "Open file with default tool" 'calibredb-open-file-with-default-tool
-   "Open Cover Page"             'calibredb-find-cover
-   "set_metadata, tags"          'calibredb-set-metadata--tags
-   "set_metadata, comments"      'calibredb-set-metadata--comments
-   "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
-   "show_metadata"               'calibredb-show-metadata
-   "Export"                      'calibredb-export
-   "remove"                      'calibredb-remove)
+  (if (fboundp 'helm-make-actions)
+      (helm-make-actions
+       "Open file"                   'calibredb-find-file
+       "Show details"                'calibredb-show-entry
+       "Open file other frame"       'calibredb-find-file-other-frame
+       "Open file with default tool" 'calibredb-open-file-with-default-tool
+       "Open Cover Page"             'calibredb-find-cover
+       "set_metadata, tags"          'calibredb-set-metadata--tags
+       "set_metadata, comments"      'calibredb-set-metadata--comments
+       "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
+       "show_metadata"               'calibredb-show-metadata
+       "Export"                      'calibredb-export
+       "remove"                      'calibredb-remove))
   "Default actions for calibredb helm."
   :group 'calibredb
   :type '(alist :key-type string :value-type function))
 
-(ivy-set-actions
- 'calibredb-ivy-read
- '(("o" (lambda (candidate)
-          (calibredb-find-file (cdr candidate)) ) "Open")
-   ("O" (lambda (candidate)
-          (calibredb-show-entry (cdr candidate)) ) "Show details")
-   ("v" (lambda (candidate)
-          (calibredb-open-file-with-default-tool (cdr candidate)) ) "Open with default tool")
-   ("V" (lambda (candidate)
-          (calibredb-find-file-other-frame (cdr candidate)) ) "Find file other frame")
-   ("d" (lambda ()
-          (calibredb-remove)) "Delete ebook")
-   ("t" (lambda (candidate)
-          (calibredb-set-metadata--tags (cdr candidate)) ) "Tag ebook")
-   ("c" (lambda (candidate)
-          (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
-   ("e" (lambda (candidate)
-          (calibredb-export (cdr candidate)) )"Export")
-   ("q"
-    (lambda ()
-      (message "cancelled")) "(or anything else) to cancel")))
+(if (fboundp 'ivy-set-actions)
+    (ivy-set-actions
+     'calibredb-ivy-read
+     '(("o" (lambda (candidate)
+              (calibredb-find-file (cdr candidate)) ) "Open")
+       ("O" (lambda (candidate)
+              (calibredb-show-entry (cdr candidate)) ) "Show details")
+       ("v" (lambda (candidate)
+              (calibredb-open-file-with-default-tool (cdr candidate)) ) "Open with default tool")
+       ("V" (lambda (candidate)
+              (calibredb-find-file-other-frame (cdr candidate)) ) "Find file other frame")
+       ("d" (lambda ()
+              (calibredb-remove)) "Delete ebook")
+       ("t" (lambda (candidate)
+              (calibredb-set-metadata--tags (cdr candidate)) ) "Tag ebook")
+       ("c" (lambda (candidate)
+              (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
+       ("e" (lambda (candidate)
+              (calibredb-export (cdr candidate)) )"Export")
+       ("q"
+        (lambda ()
+          (message "cancelled")) "(or anything else) to cancel"))))
 
 ;; faces
 
@@ -266,7 +352,7 @@ time."
   "Query calibre databse and return the result."
   (interactive)
   (shell-command-to-string
-   (format "%s %s \"%s\""
+   (format "%s -separator \1 %s \"%s\""
            sql-sqlite-program
            (shell-quote-argument calibredb-db-dir)
            sql-query)))
@@ -274,7 +360,7 @@ time."
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full calibredb-query query record result."
   (if query-result
-      (let ((spl-query-result (split-string (calibredb-chomp query-result) "|")))
+      (let ((spl-query-result (split-string (calibredb-chomp query-result) "\1")))
         `((:id                     ,(nth 0 spl-query-result))
           (:author-sort            ,(nth 1 spl-query-result))
           (:book-dir               ,(nth 2 spl-query-result))
@@ -358,13 +444,8 @@ This function honors `shr-max-image-proportion' if possible."
       (insert-image
        (create-image path 'imagemagick nil
                      :ascent 100
-                     :max-width 500 ;; (truncate (* shr-max-image-proportion
-                     ;;              (- (nth 2 edges)
-                     ;;                 (nth 0 edges))))
-                     :max-height 500;; (truncate (* shr-max-image-proportion
-                     ;;              (- (nth 3 edges)
-                     ;;                 (nth 1 edges))))
-                     ))))
+                     :max-width 500
+                     :max-height 500))))
    (t
     ;; `create-image' errors out for unsupported image types
     (let ((image (ignore-errors (create-image path nil nil :ascent 100))))
@@ -513,35 +594,47 @@ library."
       ;; (message "No cover")
       )))
 
-(defun calibredb-item-string (book-alist)
+(defun calibredb-format-column (string width &optional align)
+  "Return STRING truncated or padded to WIDTH following ALIGNment.
+Align should be a keyword :left or :right."
+  (cond ((< width 0) string)
+        ((= width 0) "")
+        (t (format (format "%%%s%d.%ds" (if (eq align :left) "-" "") width width)
+                   string))))
+
+(defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy."
   (format
-   "%s\t%s %s %s %s %s %s%s"
-   ;; (all-the-icons-icon-for-file (getattr book-alist :file-path))
-   ;; (all-the-icons-icon-for-file (getattr book-alist :file-path))
-   (propertize (calibredb-getattr (list book-alist) :id) 'face 'font-lock-keyword-face)
-   (propertize (calibredb-getattr (list book-alist) :tag) 'face 'font-lock-warning-face)
-   (propertize (calibredb-getattr (list book-alist) :book-format) 'face 'font-lock-string-face)
-   (propertize (calibredb-getattr (list book-alist) :book-title) 'face 'default)
-   (propertize (calibredb-getattr (list book-alist) :author-sort) 'face 'font-lock-variable-name-face)
+   "%s%s%s %s %s (%s) %s %s%s"
+   (if calibredb-format-icons
+       (concat (if (fboundp 'all-the-icons-icon-for-url)
+                   (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") "")
+   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :id) 'face 'calibredb-id-face) calibredb-id-width :left)
+   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :book-title) 'face 'calibredb-title-face) calibredb-title-width :left)
+   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :book-format) 'face 'calibredb-format-face) calibredb-format-width :left)
+   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :author-sort) 'face 'calibredb-author-face) calibredb-author-width :left)
+   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :tag) 'face 'calibredb-tag-face) calibredb-tag-width :left)
    (if (stringp (calibredb-getattr (list book-alist) :comment))
-       (propertize (calibredb-getattr (list book-alist) :comment) 'face 'font-lock-type-face)
+       (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :comment) 'face 'calibredb-comment-face) calibredb-comment-width :left)
      "")
-   (propertize (calibredb-getattr (list book-alist) :size) 'face 'font-lock-comment-face)
-   (propertize "Mb" 'face 'font-lock-comment-face)))
+   (if calibredb-size-show
+       (propertize (calibredb-getattr (list book-alist) :size) 'face 'calibredb-size-face) "")
+   (if calibredb-size-show
+       (propertize "Mb" 'face 'calibredb-size-face) "")))
 
 (defun calibredb-ivy-read ()
-  (ivy-read "Pick a book: "
-            (calibredb-candidates)
-            :sort nil           ; actually sort them
-            :caller 'calibredb-ivy-read))
+  (if (fboundp 'ivy-read)
+      (ivy-read "Pick a book: "
+                (calibredb-candidates)
+                :sort nil               ; actually sort them
+                :caller 'calibredb-ivy-read)))
 
 
 (defun calibredb-getbooklist (calibre-item-list)
   (let (display-alist)
     (dolist (item calibre-item-list display-alist)
       (setq display-alist
-            (cons (list (calibredb-item-string item) item) display-alist)))))
+            (cons (list (calibredb-format-item item) item) display-alist)))))
 
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
@@ -552,7 +645,7 @@ library."
       (let (res-list)
         (dolist (line line-list)
           ;; validate if it is right format
-          (if (string-match-p "^[0-9]\\{1,10\\}|" line)
+          (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
               ;; decode and push to res-list
               (push (calibredb-query-to-alist line) res-list)
             ;; concat the invalid format strings into last line
@@ -577,18 +670,21 @@ library."
 
 (defun calibredb-set-metadata--tags-1 ()
   (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action #'calibredb-set-metadata--tags)))
+  (if (fboundp 'with-helm-alive-p)
+      (with-helm-alive-p
+        (helm-exit-and-execute-action #'calibredb-set-metadata--tags)) ))
 
 (defun calibredb-set-metadata--comments-1 ()
   (interactive)
-  (with-helm-alive-p
-    (helm-exit-and-execute-action #'calibredb-set-metadata--comments)))
+  (if (fboundp 'with-helm-alive-p)
+      (with-helm-alive-p
+        (helm-exit-and-execute-action #'calibredb-set-metadata--comments)) ))
 
 ;; Transient dispatch
 
 (defun calibredb-dispatch nil
-  (transient-args 'calibredb-dispatch))
+  (if (fboundp 'transient-args)
+      (transient-args 'calibredb-dispatch)))
 
 ;;;###autoload
 
@@ -716,9 +812,12 @@ Indicating the library you use."
   (dolist (item (calibredb-candidates))
     (let (beg end)
       (setq beg (point))
-      (insert (propertize (car item)
-                          ;; 'mouse-face 'mode-line-highlight
-                          'help-echo "mouse-3 or RET to open"))
+      ;; (insert (propertize (car item)
+      ;;                     ;; 'mouse-face 'mode-line-highlight
+      ;;                     'help-echo "mouse-3 or RET to show details"
+      ;;                     ;; 'help-echo (calibredb-getattr (cdr item) :book-title)
+      ;;                     ))
+      (insert (car item))
       (setq end (point))
       (let ((map (make-sparse-keymap)))
         (define-key map [mouse-3] 'calibredb-search-mouse-3)
@@ -736,8 +835,7 @@ Indicating the library you use."
   "Visit the calibredb-entry click on.
 Argument EVENT mouse event."
   (interactive "e")
-  (let ((window (posn-window (event-end event)))
-        (pos (posn-point (event-end event))))
+  (let ((window (posn-window (event-end event))))
     (if (not (windowp window))
         (error "No ebook chosen"))
     (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
