@@ -209,6 +209,12 @@ GROUP BY id"
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map "\C-cg" 'calibredb-dispatch)
+    (define-key map "\C-co" 'calibredb-find-file)
+    (define-key map "\C-cO" 'calibredb-find-file-other-frame)
+    (define-key map "\C-cv" 'calibredb-open-file-with-default-tool)
+    (define-key map "\C-ct" 'calibredb-set-metadata--tags)
+    (define-key map "\C-cc" 'calibredb-set-metadata--comments)
+    (define-key map "\C-ce" 'calibredb-export)
     map)
   "Keymap for `calibredb-show-mode'.")
 
@@ -216,6 +222,10 @@ GROUP BY id"
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
     (define-key map (kbd "<RET>") #'calibredb-search-ret)
+    (define-key map "\C-ca" #'calibredb-add)
+    (define-key map "\C-cc" #'calibredb-clone)
+    (define-key map "\C-cd" #'calibredb-remove)
+    (define-key map "\C-cl" #'calibredb-library-list)
     map)
   "Keymap for calibredb-search-mode.")
 
@@ -470,7 +480,9 @@ This function honors `shr-max-image-proportion' if possible."
   (interactive)
   (calibredb-command :command "add"
                      :input (calibredb-complete-file "Add file to Calibre")
-                     :library (format "--library-path \"%s\"" calibredb-root-dir)))
+                     :library (format "--library-path \"%s\"" calibredb-root-dir))
+  (if (eq major-mode 'calibredb-search-mode)
+      (calibredb)))
 
 (defun calibredb-clone ()
   "Create a clone of the current library.
@@ -479,7 +491,7 @@ columns, Virtual libraries and other settings as the current
 library."
   (interactive)
   (calibredb-command :command "clone"
-                     :input (calibredb-complete-file "Path of the new library")))
+                     :input (calibredb-complete-file "Clone libary to ")))
 
 (defun calibredb-complete-file (&optional arg &rest rest)
   "Get file name using completion."
@@ -488,11 +500,18 @@ library."
 
 ;; remove
 
-(defun calibredb-remove (candidate)
-  (let ((id (calibredb-getattr candidate :id)))
-    (calibredb-command :command "remove"
-                       :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
+(defun calibredb-remove (&optional candidate)
+  (interactive)
+  (unless candidate
+    (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil))))
+  (let ((id (calibredb-getattr candidate :id))
+        (title (calibredb-getattr candidate :book-title)))
+    (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
+        (calibredb-command :command "remove"
+                           :id id
+                           :library (format "--library-path \"%s\"" calibredb-root-dir)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (calibredb))))
 
 ;; set_metadata
 
