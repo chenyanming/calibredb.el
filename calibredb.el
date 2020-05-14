@@ -24,9 +24,14 @@
 
 ;;; Commentary:
 
-;; This package is a wrapper for calibredb
-;; <https://manual.calibre-ebook.com/generated/en/calibredb.html> integrating
-;; with counsel/helm support.
+;; Yet another [[https://calibre-ebook.com/][calibre]] emacs client.
+;; This package integrates calibre (using *calibredb*) into emacs.
+;; 1. Manage ebooks, actually not only ebooks!
+;; 2. Manage libraries.
+;; 2. Another bookmarks solution, by setting the tags and comments.
+;; 3. Quick search, filter, make actions on items with ivy and helm.
+;; 4. Ebook dashboard.
+
 
 ;;; Code:
 

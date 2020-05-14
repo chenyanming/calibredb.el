@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    May 13, 2020
+#+DATE:    May 15, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 
@@ -37,15 +37,16 @@
     - [[#--list-fields][=--list-fields=]]
   - [[#export][Export]]
 - [[#logs][Logs]]
+  - [[#2020-05-15][=2020-05-15=]]
   - [[#2020-05-14][=2020-05-14=]]
   - [[#2020-05-13][=2020-05-13=]]
   - [[#2020-05-10][=2020-05-10=]]
   - [[#2020-05-09][=2020-05-09=]]
 
 * Description
-Yet another [[https://calibre-ebook.com/][calibre]] emacs client.
+Yet another [[https://calibre-ebook.com/][calibre]] client for emacs.
 
-Inspired by [[https://github.com/whacked/calibre-mode][calibre-mode]], this package integrates calibre (using *calibredb*) into emacs.
+This package integrates calibre (using *calibredb*) into emacs.
 
 1. Manage ebooks, actually not only ebooks!
 2. Manage libraries.
@@ -227,6 +228,11 @@ Remove a item.
 ** Export
 
 * Logs
+
+** =2020-05-15=
+Version *1.4.0*:
+- Add customization items, faces and formats for =*calibredb-search*= and completing list.
+
 ** =2020-05-14=
 Version *1.3.0*:
 - =calibredb-clone=
