@@ -794,7 +794,7 @@ Indicating the library you use."
 
 (defun calibredb-search-mode ()
   "Major mode for listing calibre entries.
-\\{elfeed-search-mode-map}"
+\\{calibredb-search-mode-map}"
   (interactive)
   (kill-all-local-variables)
   (use-local-map calibredb-search-mode-map)
