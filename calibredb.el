@@ -230,6 +230,7 @@ GROUP BY id"
     (define-key map "\C-co" #'calibredb-find-file)
     (define-key map "\C-cO" #'calibredb-find-file-other-frame)
     (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
+    (define-key map "\C-ce" #'calibredb-export)
     map)
   "Keymap for calibredb-search-mode.")
 
@@ -597,7 +598,9 @@ library."
   (interactive)
   "TODO: Export the selected candidate."
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
                        :input (format "--to-dir \"%s\"" (calibredb-complete-file "Export to (select a path)"))
