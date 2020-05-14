@@ -221,7 +221,7 @@ time."
                             ,(calibredb-struct-input command-string)
                             ,(calibredb-struct-id command-string)
                             ,(calibredb-struct-library command-string)) " ")))
-    (message line)
+    ;; (message line)
     ;; (calibredb-get-action command-string)
     ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
     ;; (let* ((output-buffer (get-buffer-create "*Async Shell Command*"))
