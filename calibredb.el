@@ -840,10 +840,13 @@ Indicating the library you use."
   "Visit the calibredb-entry click on.
 Argument EVENT mouse event."
   (interactive "e")
-  (let ((window (posn-window (event-end event))))
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
     (if (not (windowp window))
         (error "No ebook chosen"))
-    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
+    (calibredb-show-entry (cdr (get-text-property pos 'calibredb-entry nil)))
+    (select-window window)
+    (goto-char pos)))
 
 (defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
