@@ -226,6 +226,7 @@ GROUP BY id"
     (define-key map "\C-cc" #'calibredb-clone)
     (define-key map "\C-cd" #'calibredb-remove)
     (define-key map "\C-cl" #'calibredb-library-list)
+    (define-key map "\C-cs" #'calibredb-switch-library)
     map)
   "Keymap for calibredb-search-mode.")
 
