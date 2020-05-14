@@ -126,13 +126,13 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 #+BEGIN_SRC emacs-lisp
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-cg" 'calibredb-dispatch)
-    (define-key map "\C-co" 'calibredb-find-file)
-    (define-key map "\C-cO" 'calibredb-find-file-other-frame)
-    (define-key map "\C-cv" 'calibredb-open-file-with-default-tool)
-    (define-key map "\C-ct" 'calibredb-set-metadata--tags)
-    (define-key map "\C-cc" 'calibredb-set-metadata--comments)
-    (define-key map "\C-ce" 'calibredb-export)
+    (define-key map "\C-cg" #'calibredb-dispatch)
+    (define-key map "\C-co" #'calibredb-find-file)
+    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
+    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
+    (define-key map "\C-ct" #'calibredb-set-metadata--tags)
+    (define-key map "\C-cc" #'calibredb-set-metadata--comments)
+    (define-key map "\C-ce" #'calibredb-export)
     map)
   "Keymap for `calibredb-show-mode'.")
 
@@ -144,6 +144,10 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
     (define-key map "\C-cc" #'calibredb-clone)
     (define-key map "\C-cd" #'calibredb-remove)
     (define-key map "\C-cl" #'calibredb-library-list)
+    (define-key map "\C-cs" #'calibredb-switch-library)
+    (define-key map "\C-co" #'calibredb-find-file)
+    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
+    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
     map)
   "Keymap for calibredb-search-mode.")
 #+END_SRC

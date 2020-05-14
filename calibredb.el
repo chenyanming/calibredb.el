@@ -208,13 +208,13 @@ GROUP BY id"
 
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-cg" 'calibredb-dispatch)
-    (define-key map "\C-co" 'calibredb-find-file)
-    (define-key map "\C-cO" 'calibredb-find-file-other-frame)
-    (define-key map "\C-cv" 'calibredb-open-file-with-default-tool)
-    (define-key map "\C-ct" 'calibredb-set-metadata--tags)
-    (define-key map "\C-cc" 'calibredb-set-metadata--comments)
-    (define-key map "\C-ce" 'calibredb-export)
+    (define-key map "\C-cg" #'calibredb-dispatch)
+    (define-key map "\C-co" #'calibredb-find-file)
+    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
+    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
+    (define-key map "\C-ct" #'calibredb-set-metadata--tags)
+    (define-key map "\C-cc" #'calibredb-set-metadata--comments)
+    (define-key map "\C-ce" #'calibredb-export)
     map)
   "Keymap for `calibredb-show-mode'.")
 
@@ -227,6 +227,9 @@ GROUP BY id"
     (define-key map "\C-cd" #'calibredb-remove)
     (define-key map "\C-cl" #'calibredb-library-list)
     (define-key map "\C-cs" #'calibredb-switch-library)
+    (define-key map "\C-co" #'calibredb-find-file)
+    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
+    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
     map)
   "Keymap for calibredb-search-mode.")
 
@@ -459,19 +462,25 @@ This function honors `shr-max-image-proportion' if possible."
 (defun calibredb-find-file (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (find-file (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-find-file-other-frame (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-open-file-with-default-tool (&optional candidate)
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
 ;; add
