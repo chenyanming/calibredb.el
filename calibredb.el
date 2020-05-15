@@ -213,6 +213,8 @@ GROUP BY id"
     (define-key map "\C-cO" #'calibredb-find-file-other-frame)
     (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
     (define-key map "\C-ct" #'calibredb-set-metadata--tags)
+    (define-key map "\C-ca" #'calibredb-set-metadata--author)
+    (define-key map "\C-cT" #'calibredb-set-metadata--title)
     (define-key map "\C-cc" #'calibredb-set-metadata--comments)
     (define-key map "\C-ce" #'calibredb-export)
     map)
@@ -231,6 +233,7 @@ GROUP BY id"
     (define-key map "\C-cO" #'calibredb-find-file-other-frame)
     (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
     (define-key map "\C-ce" #'calibredb-export)
+    (define-key map "\C-cr" #'calibredb-refresh)
     map)
   "Keymap for calibredb-search-mode.")
 
@@ -244,7 +247,7 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-show-entry-switch #'switch-to-buffer-other-window
+(defcustom calibredb-show-entry-switch #'switch-to-buffer
   "Function used to display the calibre entry buffer."
   :group 'calibredb
   :type '(choice (function-item switch-to-buffer-other-window)
@@ -563,9 +566,53 @@ library."
                        :id id
                        :library (format "--library-path \"%s\"" calibredb-root-dir))
     (when (equal major-mode 'calibredb-show-mode)
-      ;; set the comments back, calibredb-show-entry need a correct entry
+      ;; set it back, calibredb-show-entry need a correct entry
       (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
       (calibredb-show-refresh))))
+
+(defun calibredb-set-metadata--title (&optional candidate)
+  "Change title on one candidate."
+  (interactive)
+  (unless candidate
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+  (let* ((title (calibredb-getattr candidate :book-title))
+         (id (calibredb-getattr candidate :id))
+         (input (read-string (concat "Change " title " to: ") title)))
+    (calibredb-command :command "set_metadata"
+                       :option "--field"
+                       :input (format "title:\"%s\"" input)
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           ;; set it back, calibredb-show-entry need a correct entry
+           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+           (calibredb-show-refresh) )
+          (t (eq major-mode 'calibredb-search-mode)
+             (calibredb)))))
+
+(defun calibredb-set-metadata--author (&optional candidate)
+  "Change author on one candidate."
+  (interactive)
+  (unless candidate
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+  (let* ((author (calibredb-getattr candidate :author-sort))
+         (id (calibredb-getattr candidate :id))
+         (input (read-string (concat "Change " author " to: ") author)))
+    (calibredb-command :command "set_metadata"
+                       :option (format "--field authors:\"%s\"" input)
+                       :input (format "--field author_sort:\"%s\"" input)
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           ;; set it back, calibredb-show-entry need a correct entry
+           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+           (calibredb-show-refresh) )
+          (t (eq major-mode 'calibredb-search-mode)
+             (calibredb)))))
 
 (defun calibredb-set-metadata--list-fields (&optional candidate)
   "List the selected candidate supported fileds."
@@ -733,6 +780,8 @@ Align should be a keyword :left or :right."
       "Create a new commit or replace an existing commit."
       [["Field"
         ("t" "tags"         calibredb-set-metadata--tags)
+        ("T" "title"         calibredb-set-metadata--title)
+        ("a" "author"         calibredb-set-metadata--author)
         ("c" "comments"         calibredb-set-metadata--comments)]
        ["List fields"
         ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
@@ -896,6 +945,12 @@ selecting the new item."
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb))
   (message (concat "Current Library: " calibredb-root-dir)))
+
+(defun calibredb-refresh ()
+  "Refresh the calibredb."
+  (interactive)
+  (if (eq major-mode 'calibredb-search-mode)
+      (calibredb)))
 
 (provide 'calibredb)
 
