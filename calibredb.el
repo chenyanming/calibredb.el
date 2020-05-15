@@ -826,6 +826,10 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
         ("O" "Open file other frame"            calibredb-find-file-other-frame)]
        [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
        [("e" "Export" calibredb-export-dispatch)]]
+      ["Library operaion"
+       [("l" "List Libraries"   calibredb-library-list)]
+       [("S" "Switch library"   calibredb-switch-library)]
+       [("c" "Clone library"   calibredb-clone)]]
       (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-dispatch))))
