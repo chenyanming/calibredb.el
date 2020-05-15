@@ -438,14 +438,12 @@ time."
   (cadr (assoc key (car my-alist))))
 
 (defun calibredb-insert-image (path alt)
-  "TODO: Insert an image for PATH at point, falling back to ALT.
-This function honors `shr-max-image-proportion' if possible."
+  "TODO: Insert an image for PATH at point, falling back to ALT."
   (cond
    ((not (display-graphic-p))
     (insert alt))
    ;; TODO: add native resizing support once it's official
    ((fboundp 'imagemagick-types)
-    ;; adapted from `shr-rescale-image'
     (let ((edges (window-inside-pixel-edges
                   (get-buffer-window (current-buffer)))))
       (insert-image
@@ -823,7 +821,8 @@ Indicating the library you use."
         header-line-format '(:eval (funcall calibredb-search-header-function)))
   (buffer-disable-undo)
   (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
-  (hl-line-mode))
+  (hl-line-mode)
+  (run-mode-hooks 'calibredb-search-mode-hook))
 
 (defun calibredb ()
   "Enter calibre Search Buffer."
