@@ -242,6 +242,10 @@ GROUP BY id"
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
 
+(defvar calibredb-dispatch nil)
+(defvar calibredb-set-metadata-dispatch nil)
+(defvar calibredb-export-dispatch nil)
+
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
@@ -536,7 +540,7 @@ library."
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
-                        ((memq this-command '(helm-maybe-exit-minibuffer)) (if (boundp 'helm-marked-candidates)
+                        ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
                                                                                (helm-marked-candidates) nil))
                         (t (list candidate))))
       (let* ((title (calibredb-getattr cand :book-title))
@@ -767,6 +771,7 @@ Align should be a keyword :left or :right."
   (if (fboundp 'transient-args)
       (transient-args 'calibredb-dispatch)))
 
+;;;###autoload (autoload 'calibredb-dispatch "calibredb-dispatch" nil t)
 (if (fboundp 'define-transient-command)
     (define-transient-command calibredb-dispatch ()
       "Invoke a calibredb command from a list of available commands."
@@ -780,9 +785,9 @@ Align should be a keyword :left or :right."
         ("O" "Open file other frame"            calibredb-find-file-other-frame)]
        [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
        [("e" "Export" calibredb-export-dispatch)]]
+      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-dispatch))))
-
 
 (if (fboundp 'define-transient-command)
     (define-transient-command calibredb-set-metadata-dispatch ()
@@ -794,6 +799,7 @@ Align should be a keyword :left or :right."
         ("c" "comments"         calibredb-set-metadata--comments)]
        ["List fields"
         ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
+      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-set-metadata-dispatch))))
 
@@ -816,6 +822,7 @@ Align should be a keyword :left or :right."
       ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
       [["Export"
         ("e" "Export"         calibredb-export)]]
+      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-export-dispatch))))
 
@@ -963,4 +970,4 @@ selecting the new item."
 
 (provide 'calibredb)
 
-;;; calibredb.el ends here
+;;; calibredb ends here
