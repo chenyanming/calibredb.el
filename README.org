@@ -146,6 +146,7 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
     (define-key map (kbd "<RET>") #'calibredb-search-ret)
     (define-key map "?" #'calibredb-dispatch)
     (define-key map "a" #'calibredb-add)
+    (define-key map "A" #'calibredb-add-dir)
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
     (define-key map "l" #'calibredb-library-list)
