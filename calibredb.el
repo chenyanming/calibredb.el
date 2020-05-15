@@ -264,6 +264,13 @@ time."
   :group 'calibredb
   :type 'boolean)
 
+(defcustom calibredb-search-unique-buffers nil
+  "When non-nil, every entry buffer gets a unique name.
+This allows for displaying multiple serch buffers at the same
+time."
+  :group 'calibredb
+  :type 'boolean)
+
 (defcustom calibredb-show-entry-switch #'switch-to-buffer
   "Function used to display the calibre entry buffer."
   :group 'calibredb
@@ -539,15 +546,19 @@ Optional argument REST is the rest."
 Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
-    (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil))))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((id (calibredb-getattr candidate :id))
         (title (calibredb-getattr candidate :book-title)))
     (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
         (calibredb-command :command "remove"
                            :id id
                            :library (format "--library-path \"%s\"" calibredb-root-dir)))
-    (if (eq major-mode 'calibredb-search-mode)
-        (calibredb))))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           (kill-buffer (calibredb-show--buffer-name candidate)) (calibredb-refresh))
+          (t (eq major-mode 'calibredb-search-mode)
+             (calibredb-refresh)))))
 
 ;; set_metadata
 
@@ -809,7 +820,8 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
         ;; ("S" "show_metadata"         calibredb-show-metadata)
         ]]
       ["File operaion"
-       [("a" "Add a file"   calibredb-add)]
+       [("a" "Add a file"   calibredb-add)
+        ("d" "Remove a file"   calibredb-remove)]
        [("o" "Open file"         calibredb-find-file)
         ("O" "Open file other frame"            calibredb-find-file-other-frame)]
        [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
@@ -875,6 +887,13 @@ The result depends on the value of `calibredb-show-unique-buffers'."
       (format "*calibredb-entry-<%s>*"
               (calibredb-getattr entry :book-title))
     "*calibredb-entry*"))
+
+(defun calibredb-search--buffer-name ()
+  "Return the appropriate buffer name for ENTRY.
+The result depends on the value of `calibredb-search-unique-buffers'."
+  (if calibredb-search-unique-buffers
+      (format "*calibredb-search-<%s>*" calibredb-root-dir)
+    "*calibredb-search*"))
 
 (defun calibredb-show-entry (entry)
   "Display ENTRY in the current buffer."
@@ -995,8 +1014,10 @@ selecting the new item."
 (defun calibredb-refresh ()
   "Refresh the calibredb."
   (interactive)
+  (set-buffer (calibredb-search--buffer-name))
   (if (eq major-mode 'calibredb-search-mode)
-      (calibredb)))
+      (calibredb))
+  (message "calibredb-search refreshed."))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
