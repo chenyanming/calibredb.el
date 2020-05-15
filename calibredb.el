@@ -234,6 +234,7 @@ GROUP BY id"
     (define-key map (kbd "<RET>") #'calibredb-search-ret)
     (define-key map "?" #'calibredb-dispatch)
     (define-key map "a" #'calibredb-add)
+    (define-key map "A" #'calibredb-add-dir)
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
     (define-key map "l" #'calibredb-library-list)
@@ -519,6 +520,18 @@ Optional argument CANDIDATE is the selected item."
   (interactive)
   (calibredb-command :command "add"
                      :input (calibredb-complete-file "Add file to Calibre")
+                     :library (format "--library-path \"%s\"" calibredb-root-dir))
+  (if (eq major-mode 'calibredb-search-mode)
+      (calibredb)))
+
+(defun calibredb-add-dir (&optional option)
+  "Add all files in a directory into calibre database.
+By default only files that have extensions of known e-book file
+types are added."
+  (interactive)
+  (calibredb-command :command "add"
+                     :input (format "--add %s/*.*" (calibredb-complete-file "Add an directory to Calibre"))
+                     :option (or option "")
                      :library (format "--library-path \"%s\"" calibredb-root-dir))
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb)))
@@ -821,6 +834,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
         ]]
       ["File operaion"
        [("a" "Add a file"   calibredb-add)
+        ("A" "Add a directory"   calibredb-add-dir)
         ("d" "Remove a file"   calibredb-remove)]
        [("o" "Open file"         calibredb-find-file)
         ("O" "Open file other frame"            calibredb-find-file-other-frame)]
