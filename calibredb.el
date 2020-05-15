@@ -537,7 +537,7 @@ library."
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
                         ((memq this-command '(helm-maybe-exit-minibuffer)) (if (boundp 'helm-marked-candidates)
-                                                                               (helm-marked-candidates)))
+                                                                               (helm-marked-candidates) nil))
                         (t (list candidate))))
       (let* ((title (calibredb-getattr cand :book-title))
              (tag (calibredb-getattr cand :tag))
@@ -751,7 +751,8 @@ Align should be a keyword :left or :right."
   (interactive)
   (if (fboundp 'with-helm-alive-p)
       (with-helm-alive-p
-        (helm-exit-and-execute-action #'calibredb-set-metadata--tags)) ))
+        (if (fboundp 'helm-exit-and-execute-action)
+            (helm-exit-and-execute-action #'calibredb-set-metadata--tags)))))
 
 (defun calibredb-set-metadata--comments-1 ()
   (interactive)
@@ -779,7 +780,6 @@ Align should be a keyword :left or :right."
         ("O" "Open file other frame"            calibredb-find-file-other-frame)]
        [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
        [("e" "Export" calibredb-export-dispatch)]]
-      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-dispatch))))
 
@@ -794,7 +794,6 @@ Align should be a keyword :left or :right."
         ("c" "comments"         calibredb-set-metadata--comments)]
        ["List fields"
         ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
-      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-set-metadata-dispatch))))
 
@@ -817,7 +816,6 @@ Align should be a keyword :left or :right."
       ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
       [["Export"
         ("e" "Export"         calibredb-export)]]
-      (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-export-dispatch))))
 
