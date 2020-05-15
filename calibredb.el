@@ -829,7 +829,8 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       ["Library operaion"
        [("l" "List Libraries"   calibredb-library-list)]
        [("S" "Switch library"   calibredb-switch-library)]
-       [("c" "Clone library"   calibredb-clone)]]
+       [("c" "Clone library"   calibredb-clone)]
+       [("r" "Refresh Library"   calibredb-refresh)]]
       (interactive)
       (if (fboundp 'transient-setup)
           (transient-setup 'calibredb-dispatch))))
