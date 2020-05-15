@@ -24,8 +24,8 @@
 
 ;;; Commentary:
 
-;; Yet another [[https://calibre-ebook.com/][calibre]] emacs client.
-;; This package integrates calibre (using *calibredb*) into emacs.
+;; Yet another [[https://calibre-ebook.com/][calibre]] Emacs client.
+;; This package integrates calibre (using *calibredb*) into Emacs.
 ;; 1. Ebook dashboard.
 ;; 2. Manage ebooks, actually not only ebooks!
 ;; 3. Manage libraries.
@@ -202,7 +202,7 @@ GROUP BY id"
         :candidate-number-limit 9999
         ;; :requires-pattern 3
         ))
-  "calibredb helm source.")
+  "Calibredb helm source.")
 
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")
@@ -213,11 +213,11 @@ GROUP BY id"
     (define-key map "\C-co" #'calibredb-find-file)
     (define-key map "\C-cO" #'calibredb-find-file-other-frame)
     (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
-    (define-key map "\C-ct" #'calibredb-set-metadata--tags)
-    (define-key map "\C-ca" #'calibredb-set-metadata--author)
-    (define-key map "\C-cT" #'calibredb-set-metadata--title)
-    (define-key map "\C-cc" #'calibredb-set-metadata--comments)
     (define-key map "\C-ce" #'calibredb-export)
+    (define-key map "\M-t" #'calibredb-set-metadata--tags)
+    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-T" #'calibredb-set-metadata--title)
+    (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
   "Keymap for `calibredb-show-mode'.")
 
@@ -236,8 +236,12 @@ GROUP BY id"
     (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
     (define-key map "\C-ce" #'calibredb-export)
     (define-key map "\C-cr" #'calibredb-refresh)
+    (define-key map "\M-t" #'calibredb-set-metadata--tags)
+    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-T" #'calibredb-set-metadata--title)
+    (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
-  "Keymap for calibredb-search-mode.")
+  "Keymap for `calibredb-search-mode'.")
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
@@ -351,10 +355,12 @@ time."
     (shell-command-to-string line)))
 
 (defun calibredb-chomp (s)
+  "Argument S is string."
   (replace-regexp-in-string "[\s\n]+$" "" s))
 
 (defun calibredb-open-with-default-tool (filepath)
-  ;; TODO: consolidate default-opener with dispatcher
+  "TODO: consolidate default-opener with dispatcher.
+Argument FILEPATH is the file path."
   (if (eq system-type 'windows-nt)
       (start-process "shell-process" "*Messages*"
                      "cmd.exe" "/c" filepath)
@@ -380,7 +386,8 @@ time."
                          (t (message "unknown system!?"))) filepath)))
 
 (defun calibredb-query (sql-query)
-  "Query calibre databse and return the result."
+  "Query calibre databse and return the result.
+Argument SQL-QUERY is the sqlite sql query string."
   (interactive)
   (shell-command-to-string
    (format "%s -separator \1 %s \"%s\""
@@ -389,7 +396,8 @@ time."
            sql-query)))
 
 (defun calibredb-query-to-alist (query-result)
-  "Builds alist out of a full calibredb-query query record result."
+  "Builds alist out of a full `calibredb-query' query record result.
+Argument QUERY-RESULT is the query result generate by sqlite."
   (if query-result
       (let ((spl-query-result (split-string (calibredb-chomp query-result) "\1")))
         `((:id                     ,(nth 0 spl-query-result))
@@ -410,7 +418,7 @@ time."
                                               (nth 9 spl-query-result))))))))
 
 (defun calibredb-list ()
-  "Generate an org buffer which contains all ebooks' cover image, title and the file link."
+  "Generate an org buffer which contain all ebooks' cover image, title and the file link."
   (interactive)
   (let* ((buf-name "*calibredb-list*")
          occur-buf)
@@ -445,6 +453,9 @@ time."
       (goto-char (point-min)))))
 
 (defun calibredb-getattr (my-alist key)
+  "Get the attribute.
+Argument MY-ALIST is the alist.
+Argument KEY is the key."
   (cadr (assoc key (car my-alist))))
 
 (defun calibredb-insert-image (path alt)
@@ -467,6 +478,8 @@ time."
         (insert alt))))))
 
 (defun calibredb-find-file (&optional candidate)
+  "Open file of the selected item.
+Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -475,6 +488,8 @@ time."
   (find-file (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-find-file-other-frame (&optional candidate)
+  "Open file in other frame of the selected item.
+Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -483,6 +498,8 @@ time."
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-open-file-with-default-tool (&optional candidate)
+  "Open file with the system default tool.
+Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -511,13 +528,17 @@ library."
                      :input (calibredb-complete-file "Clone libary to ")))
 
 (defun calibredb-complete-file (&optional arg &rest rest)
-  "Get file name using completion."
+  "Get file name using completion.
+Optional argument ARG is the prompt.
+Optional argument REST is the rest."
   (let ((file (read-file-name (format "%s: " arg) (pop rest))))
     (expand-file-name file)))
 
 ;; remove
 
 (defun calibredb-remove (&optional candidate)
+  "Remove the slected item.
+Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil))))
@@ -533,7 +554,7 @@ library."
 ;; set_metadata
 
 (defun calibredb-set-metadata--tags (&optional candidate)
-  "Add tags, divided by comma, on marked candidates."
+  "Add tags, divided by comma, on marked CANDIDATEs."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -562,7 +583,7 @@ library."
                  (calibredb)))))))
 
 (defun calibredb-set-metadata--comments (&optional candidate)
-  "Add comments on one candidate."
+  "Add comments on one CANDIDATE."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -585,7 +606,7 @@ library."
              (calibredb)))))
 
 (defun calibredb-set-metadata--title (&optional candidate)
-  "Change title on one candidate."
+  "Change title on one CANDIDATE."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -607,7 +628,7 @@ library."
              (calibredb)))))
 
 (defun calibredb-set-metadata--author (&optional candidate)
-  "Change author on one candidate."
+  "Change author on one CANDIDATE."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
@@ -629,7 +650,7 @@ library."
              (calibredb)))))
 
 (defun calibredb-set-metadata--list-fields (&optional candidate)
-  "List the selected candidate supported fileds."
+  "List the selected CANDIDATE supported fileds."
   (interactive)
   (unless candidate
     (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
@@ -642,7 +663,7 @@ library."
 ;; show_metadata
 
 (defun calibredb-show-metadata (&optional candidate)
-  "Show selected candidate metadata."
+  "Show selected CANDIDATE metadata."
   (interactive)
   (unless candidate
     (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
@@ -654,6 +675,7 @@ library."
 ;; export
 
 (defun calibredb-export (&optional candidate)
+  "Export the slected CANDIDATE."
   (interactive)
   "TODO: Export the selected candidate."
   (unless candidate
@@ -667,7 +689,7 @@ library."
                        :library (format "--library-path \"%s\"" calibredb-root-dir))))
 
 (defun calibredb-find-cover (candidate)
-  "Open the cover page image of selected candidate."
+  "Open the cover page image of selected CANDIDATE."
   (if (get-buffer "cover.jpg")
       (kill-buffer "cover.jpg"))
   (let* ((path (calibredb-getattr candidate :file-path))
@@ -679,14 +701,15 @@ library."
 
 (defun calibredb-format-column (string width &optional align)
   "Return STRING truncated or padded to WIDTH following ALIGNment.
-Align should be a keyword :left or :right."
+ALIGN should be a keyword :left or :right."
   (cond ((< width 0) string)
         ((= width 0) "")
         (t (format (format "%%%s%d.%ds" (if (eq align :left) "-" "") width width)
                    string))))
 
 (defun calibredb-format-item (book-alist)
-  "Format the candidate string shown in helm or ivy."
+  "Format the candidate string shown in helm or ivy.
+Argument BOOK-ALIST ."
   (format
    "%s%s%s %s %s (%s) %s %s%s"
    (if calibredb-format-icons
@@ -706,6 +729,7 @@ Align should be a keyword :left or :right."
        (propertize "Mb" 'face 'calibredb-size-face) "")))
 
 (defun calibredb-ivy-read ()
+  "Ivy read for calibredb."
   (if (fboundp 'ivy-read)
       (ivy-read "Pick a book: "
                 (calibredb-candidates)
@@ -714,6 +738,8 @@ Align should be a keyword :left or :right."
 
 
 (defun calibredb-getbooklist (calibre-item-list)
+  "Get book list.
+Argument CALIBRE-ITEM-LIST is the calibred item list."
   (let (display-alist)
     (dolist (item calibre-item-list display-alist)
       (setq display-alist
@@ -736,6 +762,7 @@ Align should be a keyword :left or :right."
         (calibredb-getbooklist (nreverse res-list))))))
 
 (defun calibredb-helm-read ()
+  "Helm read for calibredb."
   (if (fboundp 'helm)
       (helm :sources 'calibredb-helm-source
             :buffer "*helm calibredb*")))
@@ -753,6 +780,7 @@ Align should be a keyword :left or :right."
 ;; calibredb-mode-map functions
 
 (defun calibredb-set-metadata--tags-1 ()
+  "Set metadata tag function used in helm action."
   (interactive)
   (if (fboundp 'with-helm-alive-p)
       (with-helm-alive-p
@@ -760,6 +788,7 @@ Align should be a keyword :left or :right."
             (helm-exit-and-execute-action #'calibredb-set-metadata--tags)))))
 
 (defun calibredb-set-metadata--comments-1 ()
+  "Set metadata comments function used in helm actions."
   (interactive)
   (if (fboundp 'with-helm-alive-p)
       (with-helm-alive-p
@@ -769,6 +798,7 @@ Align should be a keyword :left or :right."
 ;; Transient dispatch
 
 (defun calibredb-dispatch nil
+  "Invoke a calibredb command from a list of available commands."
   (if (fboundp 'transient-args)
       (transient-args 'calibredb-dispatch)))
 
@@ -871,10 +901,11 @@ The result depends on the value of `calibredb-show-unique-buffers'."
     (funcall calibredb-show-entry-switch buff)))
 
 (defun calibredb-search-buffer ()
+  "Create buffer calibredb-search."
   (get-buffer-create "*calibredb-search*"))
 
 (defun calibredb-search-header ()
-  "TODO: Returns the string to be used as the Calibredb header.
+  "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
   (format "%s %s" "Library: " calibredb-root-dir))
 
