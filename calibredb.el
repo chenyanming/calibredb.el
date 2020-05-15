@@ -224,6 +224,7 @@ GROUP BY id"
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
     (define-key map (kbd "<RET>") #'calibredb-search-ret)
+    (define-key map "\C-cg" #'calibredb-dispatch)
     (define-key map "\C-ca" #'calibredb-add)
     (define-key map "\C-cc" #'calibredb-clone)
     (define-key map "\C-cd" #'calibredb-remove)
@@ -531,7 +532,9 @@ library."
   "Add tags, divided by comma, on marked candidates."
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
                         ((memq this-command '(helm-maybe-exit-minibuffer)) (helm-marked-candidates))
@@ -546,16 +549,20 @@ library."
                            :id id
                            :library (format "--library-path \"%s\"" calibredb-root-dir))
         (setq last-input input)
-        (when (equal major-mode 'calibredb-show-mode)
-          ;; set the comments back, calibredb-show-entry need a correct entry
-          (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-          (calibredb-show-refresh))))))
+        (cond ((equal major-mode 'calibredb-show-mode)
+               ;; set it back, calibredb-show-entry need a correct entry
+               (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+               (calibredb-show-refresh) )
+              (t (eq major-mode 'calibredb-search-mode)
+                 (calibredb)))))))
 
 (defun calibredb-set-metadata--comments (&optional candidate)
   "Add comments on one candidate."
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let* ((title (calibredb-getattr candidate :book-title))
          (comment (calibredb-getattr candidate :comment))
          (id (calibredb-getattr candidate :id))
@@ -565,10 +572,12 @@ library."
                        :input (format "comments:\"%s\"" input)
                        :id id
                        :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (when (equal major-mode 'calibredb-show-mode)
-      ;; set it back, calibredb-show-entry need a correct entry
-      (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-      (calibredb-show-refresh))))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           ;; set it back, calibredb-show-entry need a correct entry
+           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
+           (calibredb-show-refresh) )
+          (t (eq major-mode 'calibredb-search-mode)
+             (calibredb)))))
 
 (defun calibredb-set-metadata--title (&optional candidate)
   "Change title on one candidate."
