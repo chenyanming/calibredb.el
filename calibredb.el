@@ -438,7 +438,10 @@ Argument QUERY-RESULT is the query result generate by sqlite."
       (dolist (res res-list)
         (let ((cover (concat (file-name-directory (calibredb-getattr (cdr res) :file-path)) "cover.jpg"))
               (title (calibredb-getattr (cdr res) :book-title))
+              (format (calibredb-getattr (cdr res) :book-format))
               (book (calibredb-getattr (cdr res) :file-path)))
+          (if (image-type-available-p (intern format))
+              (setq cover book))
           (if (file-exists-p cover)
               (with-current-buffer occur-buf
                 (insert "\n")
