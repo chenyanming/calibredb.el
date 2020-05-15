@@ -248,7 +248,7 @@ selected item with =calibredb-dispatch=, just like =magit-dispatch=.
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-dispatch
 #+END_SRC
-Or fire with keybinding =C-c g=
+Or fire with keybinding ~?~
 
 Demo:
 [[img/details.gif]]
@@ -260,7 +260,7 @@ M-x calibredb-add
 #+END_SRC
 
 ** remove
-Remove a item.
+Remove an item.
 
 ** show_metadata
 
