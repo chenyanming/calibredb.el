@@ -287,24 +287,21 @@ time."
     (ivy-set-actions
      'calibredb-ivy-read
      '(("o" (lambda (candidate)
-              (calibredb-find-file (cdr candidate)) ) "Open")
+              (calibredb-find-file (cdr candidate))) "Open")
        ("O" (lambda (candidate)
-              (calibredb-show-entry (cdr candidate)) ) "Show details")
+              (calibredb-find-file-other-frame (cdr candidate))) "Find file other frame")
        ("v" (lambda (candidate)
-              (calibredb-open-file-with-default-tool (cdr candidate)) ) "Open with default tool")
-       ("V" (lambda (candidate)
-              (calibredb-find-file-other-frame (cdr candidate)) ) "Find file other frame")
-       ("d" (lambda ()
-              (calibredb-remove)) "Delete ebook")
+              (calibredb-open-file-with-default-tool (cdr candidate))) "Open with default tool")
+       ("s" (lambda (candidate)
+              (calibredb-show-entry (cdr candidate))) "Show details")
+       ("d" (lambda (candidate)
+              (calibredb-remove (cdr candidate))) "Delete ebook")
        ("t" (lambda (candidate)
-              (calibredb-set-metadata--tags (cdr candidate)) ) "Tag ebook")
+              (calibredb-set-metadata--tags (cdr candidate))) "Tag ebook")
        ("c" (lambda (candidate)
-              (calibredb-set-metadata--comments (cdr candidate)) )"Comment ebook")
+              (calibredb-set-metadata--comments (cdr candidate)))"Comment ebook")
        ("e" (lambda (candidate)
-              (calibredb-export (cdr candidate)) )"Export")
-       ("q"
-        (lambda ()
-          (message "cancelled")) "(or anything else) to cancel"))))
+              (calibredb-export (cdr candidate))) "Export"))))
 
 ;; faces
 
