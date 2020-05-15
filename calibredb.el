@@ -96,7 +96,7 @@ Set < 0 to keep original length."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-title-width 70
+(defcustom calibredb-title-width 50
   "Width for title.
 Set 0 to hide,
 Set < 0 to keep original length."
@@ -110,7 +110,7 @@ Set < 0 to keep original length."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-comment-width 70
+(defcustom calibredb-comment-width -1
   "Width for width.
 Set 0 to hide,
 Set < 0 to keep original length."
