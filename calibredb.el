@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 9 May 2020
 ;; Version: 1.4.0
-;; Package-Requires: ((emacs "25.1") (org "9.0"))
+;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.2.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,10 +39,10 @@
 (require 'cl-lib)
 (require 'sql)
 (require 'hl-line)
+(require 'transient)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
-  (require 'transient)
   (require 'all-the-icons))
 
 (defgroup calibredb nil
