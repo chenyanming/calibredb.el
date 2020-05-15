@@ -127,11 +127,11 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 #+BEGIN_SRC emacs-lisp
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "\C-cg" #'calibredb-dispatch)
-    (define-key map "\C-co" #'calibredb-find-file)
-    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
-    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
-    (define-key map "\C-ce" #'calibredb-export)
+    (define-key map "?" #'calibredb-dispatch)
+    (define-key map "o" #'calibredb-find-file)
+    (define-key map "O" #'calibredb-find-file-other-frame)
+    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "e" #'calibredb-export)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -143,17 +143,17 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
     (define-key map (kbd "<RET>") #'calibredb-search-ret)
-    (define-key map "\C-cg" #'calibredb-dispatch)
-    (define-key map "\C-ca" #'calibredb-add)
-    (define-key map "\C-cc" #'calibredb-clone)
-    (define-key map "\C-cd" #'calibredb-remove)
-    (define-key map "\C-cl" #'calibredb-library-list)
-    (define-key map "\C-cs" #'calibredb-switch-library)
-    (define-key map "\C-co" #'calibredb-find-file)
-    (define-key map "\C-cO" #'calibredb-find-file-other-frame)
-    (define-key map "\C-cv" #'calibredb-open-file-with-default-tool)
-    (define-key map "\C-ce" #'calibredb-export)
-    (define-key map "\C-cr" #'calibredb-refresh)
+    (define-key map "?" #'calibredb-dispatch)
+    (define-key map "a" #'calibredb-add)
+    (define-key map "c" #'calibredb-clone)
+    (define-key map "d" #'calibredb-remove)
+    (define-key map "l" #'calibredb-library-list)
+    (define-key map "s" #'calibredb-switch-library)
+    (define-key map "o" #'calibredb-find-file)
+    (define-key map "O" #'calibredb-find-file-other-frame)
+    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "e" #'calibredb-export)
+    (define-key map "r" #'calibredb-refresh)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -175,8 +175,7 @@ There are three ways to manage your ebooks at this moment:
     - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
 
 PS:
-1. Keymapping could be configured in future versions.
-2. Workflows may be slightly changed in future versions.
+1. Workflows may be slightly changed in future versions.
 
 * Supported Features
 
