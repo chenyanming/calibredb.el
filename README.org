@@ -29,6 +29,7 @@
   - [[#calibredb-library-list][calibredb-library-list]]
   - [[#calibredb-switch-library][calibredb-switch-library]]
   - [[#show-details][Show details]]
+  - [[#calibredb-dispatch][calibredb-dispatch]]
   - [[#add][add]]
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
@@ -49,11 +50,11 @@ Yet another [[https://calibre-ebook.com/][calibre]] client for emacs.
 
 This package integrates calibre (using *calibredb*) into emacs.
 
-1. Manage ebooks, actually not only ebooks!
-2. Manage libraries.
-2. Another bookmarks solution, by setting the tags and comments.
-3. Quick search, filter, make actions on items with ivy and helm.
-4. Ebook dashboard.
+1. Ebook dashboard.
+2. Manage ebooks, actually not only ebooks!
+3. Manage libraries.
+4. Another bookmarks solution, by setting the tags and comments.
+5. Quick search, filter, make actions on items with ivy and helm.
 
 * Screenshots
 ** Dashboard
@@ -231,9 +232,11 @@ M-x calibredb-switch-library
 
 ** Show details
 This action will get you to the book details buffer called =*calibredb-entry*=
-with =calibredb-show-mode=, you can make actions on it, just like =magit-dispatch=,
 
-Under =*calilbredb-entry*= buffer, call
+** calibredb-dispatch
+Under =*calilbredb-search*= or =*calilbredb-entry*= buffer, you can make actions on
+selected item with =calibredb-dispatch=, just like =magit-dispatch=.
+
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-dispatch
 #+END_SRC
