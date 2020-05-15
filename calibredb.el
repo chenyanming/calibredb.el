@@ -519,7 +519,7 @@ Optional argument CANDIDATE is the selected item."
   "Add a file into calibre database."
   (interactive)
   (calibredb-command :command "add"
-                     :input (calibredb-complete-file "Add file to Calibre")
+                     :input (calibredb-complete-file "Add a file to Calibre")
                      :library (format "--library-path \"%s\"" calibredb-root-dir))
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb)))
@@ -530,7 +530,7 @@ By default only files that have extensions of known e-book file
 types are added."
   (interactive)
   (calibredb-command :command "add"
-                     :input (format "--add %s/*.*" (calibredb-complete-file "Add an directory to Calibre"))
+                     :input (format "--add %s/*.*" (calibredb-complete-file "Add a directory to Calibre"))
                      :option (or option "")
                      :library (format "--library-path \"%s\"" calibredb-root-dir))
   (if (eq major-mode 'calibredb-search-mode)
