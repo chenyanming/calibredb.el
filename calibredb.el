@@ -38,6 +38,7 @@
 (require 'org)
 (require 'cl-lib)
 (require 'sql)
+(require 'hl-line)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
@@ -448,13 +449,11 @@ time."
     (insert alt))
    ;; TODO: add native resizing support once it's official
    ((fboundp 'imagemagick-types)
-    (let ((edges (window-inside-pixel-edges
-                  (get-buffer-window (current-buffer)))))
-      (insert-image
-       (create-image path 'imagemagick nil
-                     :ascent 100
-                     :max-width 500
-                     :max-height 500))))
+    (insert-image
+     (create-image path 'imagemagick nil
+                   :ascent 100
+                   :max-width 500
+                   :max-height 500)))
    (t
     ;; `create-image' errors out for unsupported image types
     (let ((image (ignore-errors (create-image path nil nil :ascent 100))))
@@ -537,7 +536,8 @@ library."
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((last-input))
     (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
-                        ((memq this-command '(helm-maybe-exit-minibuffer)) (helm-marked-candidates))
+                        ((memq this-command '(helm-maybe-exit-minibuffer)) (if (boundp 'helm-marked-candidates)
+                                                                               (helm-marked-candidates)))
                         (t (list candidate))))
       (let* ((title (calibredb-getattr cand :book-title))
              (tag (calibredb-getattr cand :tag))
@@ -685,7 +685,7 @@ Align should be a keyword :left or :right."
   (format
    "%s%s%s %s %s (%s) %s %s%s"
    (if calibredb-format-icons
-       (concat (if (fboundp 'all-the-icons-icon-for-url)
+       (concat (if (fboundp 'all-the-icons-icon-for-file)
                    (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") "")
    (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :id) 'face 'calibredb-id-face) calibredb-id-width :left)
    (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :book-title) 'face 'calibredb-title-face) calibredb-title-width :left)
@@ -731,8 +731,9 @@ Align should be a keyword :left or :right."
         (calibredb-getbooklist (nreverse res-list))))))
 
 (defun calibredb-helm-read ()
-  (helm :sources 'calibredb-helm-source
-        :buffer "*helm calibredb*"))
+  (if (fboundp 'helm)
+      (helm :sources 'calibredb-helm-source
+            :buffer "*helm calibredb*")))
 
 (defun calibredb-find-helm ()
   "Use helm to list all ebooks details."
@@ -756,7 +757,8 @@ Align should be a keyword :left or :right."
   (interactive)
   (if (fboundp 'with-helm-alive-p)
       (with-helm-alive-p
-        (helm-exit-and-execute-action #'calibredb-set-metadata--comments)) ))
+        (if (fboundp 'helm-exit-and-execute-action)
+            (helm-exit-and-execute-action #'calibredb-set-metadata--comments)))))
 
 ;; Transient dispatch
 
@@ -764,11 +766,7 @@ Align should be a keyword :left or :right."
   (if (fboundp 'transient-args)
       (transient-args 'calibredb-dispatch)))
 
-;;;###autoload
-
-(defun calibredb-transient ()
-  (when (fboundp 'define-transient-command)
-
+(if (fboundp 'define-transient-command)
     (define-transient-command calibredb-dispatch ()
       "Invoke a calibredb command from a list of available commands."
       ["Metadata"
@@ -782,9 +780,11 @@ Align should be a keyword :left or :right."
        [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
        [("e" "Export" calibredb-export-dispatch)]]
       (interactive)
-      (transient-setup 'calibredb-dispatch))
+      (if (fboundp 'transient-setup)
+          (transient-setup 'calibredb-dispatch))))
 
 
+(if (fboundp 'define-transient-command)
     (define-transient-command calibredb-set-metadata-dispatch ()
       "Create a new commit or replace an existing commit."
       [["Field"
@@ -795,8 +795,10 @@ Align should be a keyword :left or :right."
        ["List fields"
         ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
       (interactive)
-      (transient-setup 'calibredb-set-metadata-dispatch))
+      (if (fboundp 'transient-setup)
+          (transient-setup 'calibredb-set-metadata-dispatch))))
 
+(if (fboundp 'define-transient-command)
     (define-transient-command calibredb-export-dispatch ()
       "TODO: Create a new commit or replace an existing commit."
       ;; ["Arguments"
@@ -816,7 +818,8 @@ Align should be a keyword :left or :right."
       [["Export"
         ("e" "Export"         calibredb-export)]]
       (interactive)
-      (transient-setup 'calibredb-export-dispatch))))
+      (if (fboundp 'transient-setup)
+          (transient-setup 'calibredb-export-dispatch))))
 
 
 (defun calibredb-show-mode ()
@@ -829,7 +832,6 @@ Align should be a keyword :left or :right."
         mode-name "calibredb-show"
         buffer-read-only t)
   (buffer-disable-undo)
-  (calibredb-transient)
   (run-mode-hooks 'calibredb-show-mode-hook))
 
 (defun calibredb-show--buffer-name (entry)
