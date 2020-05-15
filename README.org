@@ -261,6 +261,11 @@ To add a file into calibre, call
 M-x calibredb-add
 #+END_SRC
 
+To add a directory into calibre, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-add-dir
+#+END_SRC
+
 ** remove
 Remove an item.
 
