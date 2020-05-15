@@ -128,6 +128,13 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
+;; faces
+
+(defface calibredb-search-header-highlight-face
+  '((t :inherit region :weight bold :underline t))
+  "Face for the header at point."
+  :group 'calibredb-faces)
+
 (defface calibredb-id-face '((t :inherit font-lock-keyword-face))
   "Face used for id."
   :group 'calibredb-faces)
@@ -303,12 +310,6 @@ time."
        ("e" (lambda (candidate)
               (calibredb-export (cdr candidate))) "Export"))))
 
-;; faces
-
-(defface calibredb-search-header-highlight-face
-  '((t :inherit region :weight bold :underline t))
-  "Face for the header at point."
-  :group 'calibredb-faces)
 
 ;; Utility
 
