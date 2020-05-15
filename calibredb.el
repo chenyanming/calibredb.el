@@ -364,13 +364,14 @@ time."
                            (shell-command-to-string
                             (concat
                              "grep Exec "
-                             (first
-                              (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
-                                                                              "kde4-" "kde4/"
-                                                                              (shell-command-to-string "xdg-mime query default application/pdf")))))
-                                          (mapcar
-                                           #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
-                                           '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications")))))
+                             (if (fboundp 'first)
+                                 (first
+                                  (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
+                                                                                  "kde4-" "kde4/"
+                                                                                  (shell-command-to-string "xdg-mime query default application/pdf")))))
+                                              (mapcar
+                                               #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
+                                               '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications"))))) )
                              "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
                          ((eq system-type 'windows-nt)
                           "start")
