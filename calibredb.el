@@ -78,42 +78,42 @@
 (defcustom calibredb-id-width 4
   "Width for id.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-format-width 4
   "Width for file format.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-tag-width -1
   "Width for tag.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-title-width 50
   "Width for title.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-author-width -1
   "Width for author.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-comment-width -1
   "Width for width.
 Set 0 to hide,
-Set < 0 to keep original length."
+Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
