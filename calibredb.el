@@ -272,7 +272,7 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-show-entry-switch #'switch-to-buffer
+(defcustom calibredb-show-entry-switch #'switch-to-buffer-other-window
   "Function used to display the calibre entry buffer."
   :group 'calibredb
   :type '(choice (function-item switch-to-buffer-other-window)
@@ -578,9 +578,18 @@ Optional argument CANDIDATE is the selected item."
 
 ;; set_metadata
 
-(defun calibredb-set-metadata--tags (&optional candidate)
-  "Add tags, divided by comma, on marked CANDIDATEs."
-  (interactive)
+(defun calibredb-get-init (name cand)
+  "Get the initial value in completing prompt."
+  (cond ((equal name "tags") (calibredb-getattr cand :tag))
+        ((equal name "comments") (calibredb-getattr cand :comment))
+        ((equal name "author_sort") (calibredb-getattr cand :author-sort))
+        ((equal name "authors") (calibredb-getattr cand :author-sort))
+        ((equal name "title") (calibredb-getattr cand :book-title))))
+
+(defun calibredb-set-metadata (name &rest props)
+  "Set metadata on filed NAME on amrked candidates.
+Argument PROPS are the additional parameters."
+  (setq candidate (plist-get props :candidate))
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
@@ -591,88 +600,60 @@ Optional argument CANDIDATE is the selected item."
                                                                                (helm-marked-candidates) nil))
                         (t (list candidate))))
       (let* ((title (calibredb-getattr cand :book-title))
-             (tag (calibredb-getattr cand :tag))
              (id (calibredb-getattr cand :id))
-             (input (or last-input (read-string (concat "Add tags for " title ": ") tag))))
+             (prompt (plist-get props :prompt))
+             (field name)
+             (init (calibredb-get-init field cand))
+             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
         (calibredb-command :command "set_metadata"
                            :option "--field"
-                           :input (format "tags:\"%s\"" input)
+                           :input (format "%s:\"%s\"" field input)
                            :id id
                            :library (format "--library-path \"%s\"" calibredb-root-dir))
+        ;; set the input as last input, so that all items use the same input
         (setq last-input input)
         (cond ((equal major-mode 'calibredb-show-mode)
                ;; set it back, calibredb-show-entry need a correct entry
                (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
                (calibredb-show-refresh) )
-              (t (eq major-mode 'calibredb-search-mode)
-                 (calibredb)))))))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb))
+              (t nil))))))
+
+(defun calibredb-set-metadata--tags (&optional candidate)
+  "Add tags, divided by comma, on marked CANDIDATEs."
+  (interactive)
+  (calibredb-set-metadata "tags"
+                          :prompt "Add tags for "
+                          :candidate candidate))
 
 (defun calibredb-set-metadata--comments (&optional candidate)
-  "Add comments on one CANDIDATE."
+  "Add comments on marked CANDIDATEs."
   (interactive)
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let* ((title (calibredb-getattr candidate :book-title))
-         (comment (calibredb-getattr candidate :comment))
-         (id (calibredb-getattr candidate :id))
-         (input (read-string (concat "Add comments for " title ": ") comment)))
-    (calibredb-command :command "set_metadata"
-                       :option "--field"
-                       :input (format "comments:\"%s\"" input)
-                       :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (cond ((equal major-mode 'calibredb-show-mode)
-           ;; set it back, calibredb-show-entry need a correct entry
-           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-           (calibredb-show-refresh) )
-          (t (eq major-mode 'calibredb-search-mode)
-             (calibredb)))))
+  (calibredb-set-metadata "comments"
+                          :prompt "Add comments for "
+                          :candidate candidate))
 
 (defun calibredb-set-metadata--title (&optional candidate)
-  "Change title on one CANDIDATE."
+  "Change title on marked CANDIDATEs."
   (interactive)
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let* ((title (calibredb-getattr candidate :book-title))
-         (id (calibredb-getattr candidate :id))
-         (input (read-string (concat "Change " title " to: ") title)))
-    (calibredb-command :command "set_metadata"
-                       :option "--field"
-                       :input (format "title:\"%s\"" input)
-                       :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (cond ((equal major-mode 'calibredb-show-mode)
-           ;; set it back, calibredb-show-entry need a correct entry
-           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-           (calibredb-show-refresh) )
-          (t (eq major-mode 'calibredb-search-mode)
-             (calibredb)))))
+  (calibredb-set-metadata "title"
+                          :prompt "Change title for "
+                          :candidate candidate))
+
+(defun calibredb-set-metadata--author_sort (&optional candidate)
+  "Change author on marked CANDIDATEs."
+  (interactive)
+  (calibredb-set-metadata "author_sort"
+                          :prompt "Change author for "
+                          :candidate candidate))
 
 (defun calibredb-set-metadata--author (&optional candidate)
-  "Change author on one CANDIDATE."
+  "Change author on marked CANDIDATEs."
   (interactive)
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let* ((author (calibredb-getattr candidate :author-sort))
-         (id (calibredb-getattr candidate :id))
-         (input (read-string (concat "Change " author " to: ") author)))
-    (calibredb-command :command "set_metadata"
-                       :option (format "--field authors:\"%s\"" input)
-                       :input (format "--field author_sort:\"%s\"" input)
-                       :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (cond ((equal major-mode 'calibredb-show-mode)
-           ;; set it back, calibredb-show-entry need a correct entry
-           (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-           (calibredb-show-refresh) )
-          (t (eq major-mode 'calibredb-search-mode)
-             (calibredb)))))
+  (calibredb-set-metadata "authors"
+                          :prompt "Change author for "
+                          :candidate candidate))
 
 (defun calibredb-set-metadata--list-fields (&optional candidate)
   "List the selected CANDIDATE supported fileds."
@@ -939,6 +920,28 @@ The result depends on the value of `calibredb-search-unique-buffers'."
       (setq calibredb-show-entry entry))
     (funcall calibredb-show-entry-switch buff)))
 
+(defun calibredb-show-refresh ()
+  "Refresh ENTRY in the current buffer."
+  (interactive)
+  (let* ((entry (get-text-property (point-min) 'calibredb-entry nil))
+         (buff (get-buffer-create (calibredb-show--buffer-name entry)))
+         (file (calibredb-getattr entry :file-path))
+         (cover (concat (file-name-directory file) "cover.jpg"))
+         (format (calibredb-getattr entry :book-format)))
+    (with-current-buffer buff
+      (read-only-mode -1)
+      (erase-buffer)
+      ;; (setq start (point))
+      ;; (insert title)
+      (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
+      ;; (insert book)
+      (insert "\n")
+      (if (image-type-available-p (intern format))
+          (calibredb-insert-image file "")
+        (calibredb-insert-image cover ""))
+      (calibredb-show-mode)
+      (setq calibredb-show-entry entry))))
+
 (defun calibredb-search-buffer ()
   "Create buffer calibredb-search."
   (get-buffer-create "*calibredb-search*"))
@@ -1009,11 +1012,6 @@ Argument EVENT mouse event."
   "Visit the calibredb-entry."
   (interactive)
   (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil))))
-
-(defun calibredb-show-refresh ()
-  "Refresh ENTRY in the current buffer."
-  (interactive)
-  (calibredb-show-entry (get-text-property (point-min) 'calibredb-entry nil)))
 
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
