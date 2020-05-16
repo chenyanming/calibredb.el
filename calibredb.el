@@ -586,6 +586,14 @@ Optional argument CANDIDATE is the selected item."
         ((equal name "authors") (calibredb-getattr cand :author-sort))
         ((equal name "title") (calibredb-getattr cand :book-title))))
 
+(defun calibredb-set-property (name input)
+  "Set the text property."
+  (cond ((equal name "tags") (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
+        ((equal name "comments") (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
+        ((equal name "author_sort") (setf (car (cdr (assoc :author-sort (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
+        ((equal name "authors") (setf (car (cdr (assoc :author-sort (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
+        ((equal name "title") (setf (car (cdr (assoc :book-title (car (get-text-property (point-min) 'calibredb-entry nil))))) input))))
+
 (defun calibredb-set-metadata (name &rest props)
   "Set metadata on filed NAME on amrked candidates.
 Argument PROPS are the additional parameters."
@@ -614,8 +622,8 @@ Argument PROPS are the additional parameters."
         (setq last-input input)
         (cond ((equal major-mode 'calibredb-show-mode)
                ;; set it back, calibredb-show-entry need a correct entry
-               (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input)
-               (calibredb-show-refresh) )
+               (calibredb-set-property field input)
+               (calibredb-show-refresh))
               ((eq major-mode 'calibredb-search-mode)
                (calibredb))
               (t nil))))))
@@ -903,9 +911,9 @@ The result depends on the value of `calibredb-search-unique-buffers'."
   (when (get-buffer (calibredb-show--buffer-name entry))
     (kill-buffer (calibredb-show--buffer-name entry)))
   (let* ((buff (get-buffer-create (calibredb-show--buffer-name entry)))
-        (file (calibredb-getattr entry :file-path))
-        (cover (concat (file-name-directory file) "cover.jpg"))
-        (format (calibredb-getattr entry :book-format)))
+         (file (calibredb-getattr entry :file-path))
+         (cover (concat (file-name-directory file) "cover.jpg"))
+         (format (calibredb-getattr entry :book-format)))
     (with-current-buffer buff
       ;; (setq start (point))
       ;; (insert title)
@@ -917,7 +925,8 @@ The result depends on the value of `calibredb-search-unique-buffers'."
         (calibredb-insert-image cover ""))
       ;; (setq end (point))
       (calibredb-show-mode)
-      (setq calibredb-show-entry entry))
+      (setq calibredb-show-entry entry)
+      (goto-char (point-min)))
     (funcall calibredb-show-entry-switch buff)))
 
 (defun calibredb-show-refresh ()
@@ -940,7 +949,8 @@ The result depends on the value of `calibredb-search-unique-buffers'."
           (calibredb-insert-image file "")
         (calibredb-insert-image cover ""))
       (calibredb-show-mode)
-      (setq calibredb-show-entry entry))))
+      (setq calibredb-show-entry entry)
+      (goto-char (point-min)))))
 
 (defun calibredb-search-buffer ()
   "Create buffer calibredb-search."
