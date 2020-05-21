@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 9 May 2020
 ;; Version: 1.5.0
-;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.2.0"))
+;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -39,11 +39,11 @@
 (require 'cl-lib)
 (require 'sql)
 (require 'hl-line)
-(require 'transient)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
-  (require 'all-the-icons))
+  (require 'all-the-icons)
+  (require 'transient))
 
 (defgroup calibredb nil
   "calibredb group"
@@ -236,10 +236,6 @@ GROUP BY id"
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
-
-(defvar calibredb-dispatch nil)
-(defvar calibredb-set-metadata-dispatch nil)
-(defvar calibredb-export-dispatch nil)
 
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
@@ -812,73 +808,58 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 
 ;; Transient dispatch
 
-(defun calibredb-dispatch nil
-  "Invoke a calibredb command from a list of available commands."
-  (if (fboundp 'transient-args)
-      (transient-args 'calibredb-dispatch)))
-
 ;;;###autoload (autoload 'calibredb-dispatch "calibredb-dispatch" nil t)
-(if (fboundp 'define-transient-command)
-    (define-transient-command calibredb-dispatch ()
-      "Invoke a calibredb command from a list of available commands."
-      ["Metadata"
-       [("s" "set_metadata"   calibredb-set-metadata-dispatch)
-        ;; ("S" "show_metadata"         calibredb-show-metadata)
-        ]]
-      ["File operaion"
-       [("a" "Add a file"   calibredb-add)
-        ("A" "Add a directory"   calibredb-add-dir)
-        ("d" "Remove a file"   calibredb-remove)]
-       [("o" "Open file"         calibredb-find-file)
-        ("O" "Open file other frame"            calibredb-find-file-other-frame)]
-       [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
-       [("e" "Export" calibredb-export-dispatch)]]
-      ["Library operaion"
-       [("l" "List Libraries"   calibredb-library-list)]
-       [("S" "Switch library"   calibredb-switch-library)]
-       [("c" "Clone library"   calibredb-clone)]
-       [("r" "Refresh Library"   calibredb-refresh)]]
-      (interactive)
-      (if (fboundp 'transient-setup)
-          (transient-setup 'calibredb-dispatch))))
+(define-transient-command calibredb-dispatch ()
+  "Invoke a calibredb command from a list of available commands."
+  :man-page "calibredb"
+  ["Metadata"
+   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ;; ("S" "show_metadata"         calibredb-show-metadata)
+    ]]
+  ["File operaion"
+   [("a" "Add a file"   calibredb-add)
+    ("A" "Add a directory"   calibredb-add-dir)
+    ("d" "Remove a file"   calibredb-remove)]
+   [("o" "Open file"         calibredb-find-file)
+    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
+   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+   [("e" "Export" calibredb-export-dispatch)]]
+  ["Library operaion"
+   [("l" "List Libraries"   calibredb-library-list)]
+   [("S" "Switch library"   calibredb-switch-library)]
+   [("c" "Clone library"   calibredb-clone)]
+   [("r" "Refresh Library"   calibredb-refresh)]])
 
-(if (fboundp 'define-transient-command)
-    (define-transient-command calibredb-set-metadata-dispatch ()
-      "Create a new commit or replace an existing commit."
-      [["Field"
-        ("t" "tags"         calibredb-set-metadata--tags)
-        ("T" "title"         calibredb-set-metadata--title)
-        ("a" "author"         calibredb-set-metadata--author)
-        ("c" "comments"         calibredb-set-metadata--comments)]
-       ["List fields"
-        ("l" "list fileds"         calibredb-set-metadata--list-fields)]]
-      (interactive)
-      (if (fboundp 'transient-setup)
-          (transient-setup 'calibredb-set-metadata-dispatch))))
 
-(if (fboundp 'define-transient-command)
-    (define-transient-command calibredb-export-dispatch ()
-      "TODO: Create a new commit or replace an existing commit."
-      ;; ["Arguments"
-      ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
-      ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
-      ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
-      ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
-      ;;  ("-e" "Do not write opf" "--dont-write-opf")
-      ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
-      ;;  ("-g" "Report progress"   ("-g" " --progress"))
-      ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
-      ;;  ("-i" "Export all books into a single directory" "--single-dir")
-      ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
-      ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
-      ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
-      ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
-      [["Export"
-        ("e" "Export"         calibredb-export)]]
-      (interactive)
-      (if (fboundp 'transient-setup)
-          (transient-setup 'calibredb-export-dispatch))))
+(define-transient-command calibredb-set-metadata-dispatch ()
+  "Create a new commit or replace an existing commit."
+  [["Field"
+    ("t" "tags"         calibredb-set-metadata--tags)
+    ("T" "title"         calibredb-set-metadata--title)
+    ("a" "author"         calibredb-set-metadata--author)
+    ("c" "comments"         calibredb-set-metadata--comments)]
+   ["List fields"
+    ("l" "list fileds"         calibredb-set-metadata--list-fields)]])
 
+
+(define-transient-command calibredb-export-dispatch ()
+  "TODO: Create a new commit or replace an existing commit."
+  ;; ["Arguments"
+  ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
+  ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
+  ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
+  ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
+  ;;  ("-e" "Do not write opf" "--dont-write-opf")
+  ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
+  ;;  ("-g" "Report progress"   ("-g" " --progress"))
+  ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
+  ;;  ("-i" "Export all books into a single directory" "--single-dir")
+  ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
+  ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
+  ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
+  ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
+  [["Export"
+    ("e" "Export"         calibredb-export)]])
 
 (defun calibredb-show-mode ()
   "Mode for displaying book entry details.
