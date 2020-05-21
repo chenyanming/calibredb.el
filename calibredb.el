@@ -530,7 +530,8 @@ Optional argument CANDIDATE is the selected item."
 (defun calibredb-add-dir (&optional option)
   "Add all files in a directory into calibre database.
 By default only files that have extensions of known e-book file
-types are added."
+types are added.
+Optional argument OPTION is additional options."
   (interactive)
   (calibredb-command :command "add"
                      :input (format "--add %s/*.*" (calibredb-complete-file "Add a directory to Calibre"))
@@ -579,7 +580,9 @@ Optional argument CANDIDATE is the selected item."
 ;; set_metadata
 
 (defun calibredb-get-init (name cand)
-  "Get the initial value in completing prompt."
+  "Get the initial value in completing prompt.
+Argument NAME is the metadata field name string.
+Argument CAND is the candidate."
   (cond ((equal name "tags") (calibredb-getattr cand :tag))
         ((equal name "comments") (calibredb-getattr cand :comment))
         ((equal name "author_sort") (calibredb-getattr cand :author-sort))
@@ -587,7 +590,9 @@ Optional argument CANDIDATE is the selected item."
         ((equal name "title") (calibredb-getattr cand :book-title))))
 
 (defun calibredb-set-property (name input)
-  "Set the text property."
+  "Set the text property.
+Argument NAME is the metadata field name string.
+Argument INPUT is the candidate."
   (cond ((equal name "tags") (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
         ((equal name "comments") (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
         ((equal name "author_sort") (setf (car (cdr (assoc :author-sort (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
@@ -597,36 +602,36 @@ Optional argument CANDIDATE is the selected item."
 (defun calibredb-set-metadata (name &rest props)
   "Set metadata on filed NAME on amrked candidates.
 Argument PROPS are the additional parameters."
-  (setq candidate (plist-get props :candidate))
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let ((last-input))
-    (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
-                        ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
-                                                                               (helm-marked-candidates) nil))
-                        (t (list candidate))))
-      (let* ((title (calibredb-getattr cand :book-title))
-             (id (calibredb-getattr cand :id))
-             (prompt (plist-get props :prompt))
-             (field name)
-             (init (calibredb-get-init field cand))
-             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
-        (calibredb-command :command "set_metadata"
-                           :option "--field"
-                           :input (format "%s:\"%s\"" field input)
-                           :id id
-                           :library (format "--library-path \"%s\"" calibredb-root-dir))
-        ;; set the input as last input, so that all items use the same input
-        (setq last-input input)
-        (cond ((equal major-mode 'calibredb-show-mode)
-               ;; set it back, calibredb-show-entry need a correct entry
-               (calibredb-set-property field input)
-               (calibredb-show-refresh))
-              ((eq major-mode 'calibredb-search-mode)
-               (calibredb))
-              (t nil))))))
+  (let ((candidate (plist-get props :candidate)))
+    (unless candidate
+      (if (eq major-mode 'calibredb-search-mode)
+          (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+        (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (let ((last-input))
+      (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
+                          ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
+                                                                                 (helm-marked-candidates) nil))
+                          (t (list candidate))))
+        (let* ((title (calibredb-getattr cand :book-title))
+               (id (calibredb-getattr cand :id))
+               (prompt (plist-get props :prompt))
+               (field name)
+               (init (calibredb-get-init field cand))
+               (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+          (calibredb-command :command "set_metadata"
+                             :option "--field"
+                             :input (format "%s:\"%s\"" field input)
+                             :id id
+                             :library (format "--library-path \"%s\"" calibredb-root-dir))
+          ;; set the input as last input, so that all items use the same input
+          (setq last-input input)
+          (cond ((equal major-mode 'calibredb-show-mode)
+                 ;; set it back, calibredb-show-entry need a correct entry
+                 (calibredb-set-property field input)
+                 (calibredb-show-refresh))
+                ((eq major-mode 'calibredb-search-mode)
+                 (calibredb))
+                (t nil)))))))
 
 (defun calibredb-set-metadata--tags (&optional candidate)
   "Add tags, divided by comma, on marked CANDIDATEs."
