@@ -39,11 +39,11 @@
 (require 'cl-lib)
 (require 'sql)
 (require 'hl-line)
+(require 'transient)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
-  (require 'all-the-icons)
-  (require 'transient))
+  (require 'all-the-icons))
 
 (defgroup calibredb nil
   "calibredb group"
