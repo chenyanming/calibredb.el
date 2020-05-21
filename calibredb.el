@@ -194,23 +194,6 @@ GROUP BY id"
         map))
   "Keymap for `calibredb-find-helm'.")
 
-(defvar calibredb-helm-source
-  (if (fboundp 'helm-build-sync-source)
-      (helm-build-sync-source "calibredb"
-        :header-name (lambda (name)
-                       (concat name " in [" calibredb-root-dir "]"))
-        :candidates 'calibredb-candidates
-        ;; :filtered-candidate-transformer 'helm-findutils-transformer
-        ;; :action-transformer 'helm-transform-file-load-el
-        :persistent-action 'calibredb-find-cover
-        :action 'calibredb-helm-actions
-        ;; :help-message 'helm-generic-file-help-message
-        :keymap calibredb-helm-map
-        :candidate-number-limit 9999
-        ;; :requires-pattern 3
-        ))
-  "Calibredb helm source.")
-
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")
 
@@ -783,7 +766,20 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-helm-read ()
   "Helm read for calibredb."
   (if (fboundp 'helm)
-      (helm :sources 'calibredb-helm-source
+      (helm :sources (if (fboundp 'helm-build-sync-source)
+                          (helm-build-sync-source "calibredb"
+                            :header-name (lambda (name)
+                                           (concat name " in [" calibredb-root-dir "]"))
+                            :candidates 'calibredb-candidates
+                            ;; :filtered-candidate-transformer 'helm-findutils-transformer
+                            ;; :action-transformer 'helm-transform-file-load-el
+                            :persistent-action 'calibredb-find-cover
+                            :action 'calibredb-helm-actions
+                            ;; :help-message 'helm-generic-file-help-message
+                            :keymap calibredb-helm-map
+                            :candidate-number-limit 9999
+                            ;; :requires-pattern 3
+                            ))
             :buffer "*helm calibredb*")))
 
 (defun calibredb-find-helm ()
