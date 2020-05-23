@@ -59,17 +59,20 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 * Screenshots
 ** Dashboard
-[[img/search.png]]
-[[img/dashboard.png]]
+#+attr_org: :width 600px
+[[file:img/dashboard.jpg]]
 
 ** Quick search, filter with helm and ivy
-[[img/helm.png]]
-[[img/ivy.png]]
+#+attr_org: :width 600px
+[[file:img/helm.png]]
+[[file:img/ivy.png]]
 ** Another bookmarks solution
 *** Add tags
-[[img/tag.gif]]
+#+attr_org: :width 600px
+[[file:img/tag.gif]]
 *** Add comments
-[[img/comment.gif]]
+#+attr_org: :width 600px
+[[file:img/comment.gif]]
 
 * Installation
 
@@ -253,7 +256,8 @@ M-x calibredb-dispatch
 Or fire with keybinding ~?~
 
 Demo:
-[[img/details.gif]]
+#+attr_org: :width 600px
+[[file:img/details.gif]]
 
 ** add
 To add a file into calibre, call
