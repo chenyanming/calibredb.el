@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 1.5.0
+;; Version: 1.5.1
 ;; Package-Requires: ((emacs "24.3") (org "9.0") (transient "0.1.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -204,6 +204,7 @@ GROUP BY id"
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
     (define-key map "e" #'calibredb-export)
+    (define-key map "q" #'calibredb-entry-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -227,6 +228,7 @@ GROUP BY id"
     (define-key map "v" #'calibredb-open-file-with-default-tool)
     (define-key map "e" #'calibredb-export)
     (define-key map "r" #'calibredb-refresh)
+    (define-key map "q" #'calibredb-search-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -1030,6 +1032,20 @@ selecting the new item."
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb))
   (message "calibredb-search refreshed."))
+
+(defun calibredb-search-quit ()
+  "Quit the *calibredb-search*."
+  (interactive)
+  (when (eq major-mode 'calibredb-search-mode)
+    (if (get-buffer "*calibredb-search*")
+        (kill-buffer "*calibredb-search*"))))
+
+(defun calibredb-entry-quit ()
+  "Quit the *calibredb-entry*."
+  (interactive)
+  (when (eq major-mode 'calibredb-show-mode)
+    (if (get-buffer "*calibredb-entry*")
+        (kill-buffer "*calibredb-entry*"))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
