@@ -328,7 +328,6 @@ time."
                             ,(calibredb-struct-input command-string)
                             ,(calibredb-struct-id command-string)
                             ,(calibredb-struct-library command-string)) " ")))
-    ;; (message line)
     ;; (calibredb-get-action command-string)
     ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
     ;; (let* ((output-buffer (get-buffer-create "*Async Shell Command*"))
@@ -339,7 +338,9 @@ time."
     ;;       ;; (set-process-sentinel proc #'do-something)
     ;;       nil
     ;;     (message "No process running.")))
-    (shell-command-to-string line)))
+    (setq-local inhibit-message t)
+    (message line)
+    (message (shell-command-to-string line))))
 
 (defun calibredb-chomp (s)
   "Argument S is string."
@@ -535,7 +536,7 @@ library."
 Optional argument ARG is the prompt.
 Optional argument REST is the rest."
   (let ((file (read-file-name (format "%s: " arg) (pop rest))))
-    (expand-file-name file)))
+    (format "\"%s\"" (expand-file-name file))))
 
 ;; remove
 
