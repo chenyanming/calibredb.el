@@ -20,7 +20,7 @@
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
@@ -321,7 +321,7 @@ time."
                           :id id
                           :library library
                           :action action))
-         (line (mapconcat 'identity
+         (line (mapconcat #'identity
                           `(,calibredb-program
                             ,(calibredb-struct-command command-string)
                             ,(calibredb-struct-option command-string)
@@ -364,7 +364,7 @@ Argument FILEPATH is the file path."
                                                                                   "kde4-" "kde4/"
                                                                                   (shell-command-to-string "xdg-mime query default application/pdf")))))
                                               (mapcar
-                                               #'(lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
+                                               (lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
                                                '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications"))))) )
                              "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
                          ((eq system-type 'windows-nt)
@@ -864,17 +864,11 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
   [["Export"
     ("e" "Export"         calibredb-export)]])
 
-(defun calibredb-show-mode ()
+(define-derived-mode calibredb-show-mode fundamental-mode "calibredb-show"
   "Mode for displaying book entry details.
 \\{calibredb-show-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map calibredb-show-mode-map)
-  (setq major-mode 'calibredb-show-mode
-        mode-name "calibredb-show"
-        buffer-read-only t)
-  (buffer-disable-undo)
-  (run-mode-hooks 'calibredb-show-mode-hook))
+  (setq buffer-read-only t)
+  (buffer-disable-undo))
 
 (defun calibredb-show--buffer-name (entry)
   "Return the appropriate buffer name for ENTRY.
@@ -946,21 +940,15 @@ The result depends on the value of `calibredb-search-unique-buffers'."
 Indicating the library you use."
   (format "%s %s" "Library: " calibredb-root-dir))
 
-(defun calibredb-search-mode ()
+(define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.
 \\{calibredb-search-mode-map}"
-  (interactive)
-  (kill-all-local-variables)
-  (use-local-map calibredb-search-mode-map)
-  (setq major-mode 'calibredb-search-mode
-        mode-name "calibredb-search"
-        truncate-lines t
+  (setq truncate-lines t
         buffer-read-only t
         header-line-format '(:eval (funcall calibredb-search-header-function)))
   (buffer-disable-undo)
   (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
-  (hl-line-mode)
-  (run-mode-hooks 'calibredb-search-mode-hook))
+  (hl-line-mode))
 
 (defun calibredb ()
   "Enter calibre Search Buffer."
@@ -981,7 +969,7 @@ Indicating the library you use."
       (setq end (point))
       ;; (let ((map (make-sparse-keymap)))
       ;;   (define-key map [mouse-3] 'calibredb-search-mouse-3)
-      ;;   (define-key map (kbd "<RET>") '(lambda ()
+      ;;   (define-key map (kbd "<RET>") (lambda ()
       ;;                                    (interactive)
       ;;                                    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
       ;;   (put-text-property beg end 'keymap map))
