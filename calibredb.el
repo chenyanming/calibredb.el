@@ -380,7 +380,7 @@ Argument FILEPATH is the file path."
                           "start")
                          ((eq system-type 'darwin)
                           "open")
-                         (t (message "unknown system!?"))) filepath)))
+                         (t (message "unknown system!?"))) (expand-file-name filepath))))
 
 (defun calibredb-query (sql-query)
   "Query calibre databse and return the result.
