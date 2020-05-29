@@ -49,8 +49,13 @@
   "calibredb group"
   :group 'calibredb)
 
-(defvar calibredb-db-dir nil
-  "Location of \"metadata.db\" in your calibre library.")
+(defcustom calibredb-db-dir nil
+  "Location of \"metadata.db\" in your calibre library."
+  :type 'file
+  :group 'calibredb)
+
+(defvar calibredb-root-dir-quote nil
+  "Location of in your calibre library (expanded and quoted).")
 
 (defcustom calibredb-root-dir "~/Documents/Calibre/"
   "Directory containing your calibre library."
@@ -302,6 +307,10 @@ time."
 
 ;; Utility
 
+(defun calibredb-root-dir-quote ()
+  "Return expanded and quoted calibredb root dir."
+  (setq calibredb-root-dir-quote (shell-quote-argument (expand-file-name calibredb-root-dir))))
+
 (cl-defstruct calibredb-struct
   command option input id library action)
 
@@ -377,11 +386,12 @@ Argument FILEPATH is the file path."
   "Query calibre databse and return the result.
 Argument SQL-QUERY is the sqlite sql query string."
   (interactive)
-  (shell-command-to-string
-   (format "%s -separator \1 %s \"%s\""
-           sql-sqlite-program
-           (shell-quote-argument calibredb-db-dir)
-           sql-query)))
+  (if (file-exists-p calibredb-db-dir)
+      (shell-command-to-string
+       (format "%s -separator \1 %s \"%s\""
+               sql-sqlite-program
+               (shell-quote-argument (expand-file-name calibredb-db-dir))
+               sql-query)) nil))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
@@ -504,8 +514,8 @@ Optional argument CANDIDATE is the selected item."
   "Add a file into calibre database."
   (interactive)
   (calibredb-command :command "add"
-                     :input (calibredb-complete-file "Add a file to Calibre")
-                     :library (format "--library-path \"%s\"" calibredb-root-dir))
+                     :input (calibredb-complete-file-quote "Add a file to Calibre")
+                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb)))
 
@@ -516,9 +526,9 @@ types are added.
 Optional argument OPTION is additional options."
   (interactive)
   (calibredb-command :command "add"
-                     :input (format "--add %s/*.*" (calibredb-complete-file "Add a directory to Calibre"))
+                     :input (format "--add %s" (concat (file-name-as-directory (calibredb-complete-file-quote "Add a directory to Calibre")) "*.*"))
                      :option (or option "")
-                     :library (format "--library-path \"%s\"" calibredb-root-dir))
+                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
   (if (eq major-mode 'calibredb-search-mode)
       (calibredb)))
 
@@ -529,14 +539,14 @@ columns, Virtual libraries and other settings as the current
 library."
   (interactive)
   (calibredb-command :command "clone"
-                     :input (calibredb-complete-file "Clone libary to ")))
+                     :input (calibredb-complete-file-quote "Clone libary to ")))
 
-(defun calibredb-complete-file (&optional arg &rest rest)
-  "Get file name using completion.
+(defun calibredb-complete-file-quote (&optional arg &rest rest)
+  "Get quoted file name using completion.
 Optional argument ARG is the prompt.
 Optional argument REST is the rest."
   (let ((file (read-file-name (format "%s: " arg) (pop rest))))
-    (format "\"%s\"" (expand-file-name file))))
+    (shell-quote-argument (expand-file-name file))))
 
 ;; remove
 
@@ -553,7 +563,7 @@ Optional argument CANDIDATE is the selected item."
     (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
         (calibredb-command :command "remove"
                            :id id
-                           :library (format "--library-path \"%s\"" calibredb-root-dir)))
+                           :library (format "--library-path %s" (calibredb-root-dir-quote))))
     (cond ((equal major-mode 'calibredb-show-mode)
            (kill-buffer (calibredb-show--buffer-name candidate)) (calibredb-refresh))
           (t (eq major-mode 'calibredb-search-mode)
@@ -654,12 +664,14 @@ Argument PROPS are the additional parameters."
   "List the selected CANDIDATE supported fileds."
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let* ((id (calibredb-getattr candidate :id)))
     (message (calibredb-command :command "set_metadata"
                                 :option "--list-fields"
                                 :id id
-                                :library (format "--library-path \"%s\"" calibredb-root-dir)))))
+                                :library (format "--library-path %s" (calibredb-root-dir-quote))))))
 
 ;; show_metadata
 
@@ -671,7 +683,7 @@ Argument PROPS are the additional parameters."
   (let* ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "show_metadata"
                        :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
+                       :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
 ;; export
 
@@ -685,9 +697,9 @@ Argument PROPS are the additional parameters."
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
-                       :input (format "--to-dir \"%s\"" (calibredb-complete-file "Export to (select a path)"))
+                       :input (format "--to-dir %s" (calibredb-complete-file-quote "Export to (select a path)"))
                        :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))))
+                       :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
 (defun calibredb-find-cover (candidate)
   "Open the cover page image of selected CANDIDATE."
@@ -732,11 +744,13 @@ Argument BOOK-ALIST ."
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
   (if (fboundp 'ivy-read)
-      (ivy-read "Pick a book: "
-                (calibredb-candidates)
-                :sort nil               ; actually sort them
-                :caller 'calibredb-ivy-read)))
-
+      (let ((cand (calibredb-candidates)))
+        (if cand
+            (ivy-read "Pick a book: "
+                      cand
+                      :sort nil         ; actually sort them
+                      :caller 'calibredb-ivy-read)
+          (message "INVALID LIBRARY")))))
 
 (defun calibredb-getbooklist (calibre-item-list)
   "Get book list.
@@ -749,18 +763,17 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
-         (line-list (split-string (calibredb-chomp query-result) "\n")))
-    (if (equal "" query-result)
-          '("")
-      (let (res-list)
-        (dolist (line line-list)
-          ;; validate if it is right format
-          (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
-              ;; decode and push to res-list
-              (push (calibredb-query-to-alist line) res-list)
-            ;; concat the invalid format strings into last line
-            (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
-        (calibredb-getbooklist (nreverse res-list))))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+    (cond ((equal "" query-result) '(""))
+          (t (let (res-list)
+               (dolist (line line-list)
+                 ;; validate if it is right format
+                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                     ;; decode and push to res-list
+                     (push (calibredb-query-to-alist line) res-list)
+                   ;; concat the invalid format strings into last line
+                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+               (calibredb-getbooklist (nreverse res-list))) ))))
 
 (defun calibredb-helm-read ()
   "Helm read for calibredb."
@@ -953,31 +966,25 @@ Indicating the library you use."
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (when (get-buffer (calibredb-search-buffer))
-    (kill-buffer (calibredb-search-buffer)))
-  (switch-to-buffer (calibredb-search-buffer))
-  (goto-char (point-min))
-  (dolist (item (calibredb-candidates))
-    (let (beg end)
-      (setq beg (point))
-      ;; (insert (propertize (car item)
-      ;;                     ;; 'mouse-face 'mode-line-highlight
-      ;;                     'help-echo "mouse-3 or RET to show details"
-      ;;                     ;; 'help-echo (calibredb-getattr (cdr item) :book-title)
-      ;;                     ))
-      (insert (car item))
-      (setq end (point))
-      ;; (let ((map (make-sparse-keymap)))
-      ;;   (define-key map [mouse-3] 'calibredb-search-mouse-3)
-      ;;   (define-key map (kbd "<RET>") (lambda ()
-      ;;                                    (interactive)
-      ;;                                    (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)))))
-      ;;   (put-text-property beg end 'keymap map))
-      (put-text-property beg end 'calibredb-entry item)
-      (insert "\n")))
-  (goto-char (point-min))
-  (unless (eq major-mode 'calibredb-search-mode)
-    (calibredb-search-mode)))
+  (let ((cand (calibredb-candidates)))
+    (cond ((not cand)
+           (message "INVALID LIBRARY"))
+          (t
+           (when (get-buffer (calibredb-search-buffer))
+             (kill-buffer (calibredb-search-buffer)))
+           (switch-to-buffer (calibredb-search-buffer))
+           (goto-char (point-min))
+           (unless (equal cand '(""))   ; not empty library
+             (dolist (item cand)
+               (let (beg end)
+                 (setq beg (point))
+                 (insert (car item))
+                 (setq end (point))
+                 (put-text-property beg end 'calibredb-entry item)
+                 (insert "\n")))
+             (goto-char (point-min))
+             (unless (eq major-mode 'calibredb-search-mode)
+               (calibredb-search-mode)))))))
 
 (defun calibredb-search-mouse (event)
   "Visit the calibredb-entry click on.
@@ -999,20 +1006,28 @@ Argument EVENT mouse event."
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
   (interactive)
-  (setq calibredb-root-dir (calibredb-complete-file "Quick switch library" calibredb-root-dir))
-  (setq calibredb-db-dir (expand-file-name "metadata.db"
-                                           calibredb-root-dir)))
+  (let ((result (read-file-name "Quick switch library: ")) )
+    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+        (progn
+          (setq calibredb-root-dir result)
+          (calibredb-root-dir-quote)
+          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (calibredb))
+      (message "INVALID LIBRARY"))))
+
 (defun calibredb-library-list ()
   "Switch library from variable `calibredb-library-alist'.
 If under *calibredb-search* buffer, it will auto refresh after
 selecting the new item."
   (interactive)
-  (setq calibredb-root-dir (completing-read "Quick switch library: " calibredb-library-alist))
-  (setq calibredb-db-dir (expand-file-name "metadata.db"
-                                           calibredb-root-dir))
-  (if (eq major-mode 'calibredb-search-mode)
-      (calibredb))
-  (message (concat "Current Library: " calibredb-root-dir)))
+  (let ((result (completing-read "Quick switch library: " calibredb-library-alist)) )
+    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+        (progn
+         (setq calibredb-root-dir result)
+         (calibredb-root-dir-quote)
+         (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+         (calibredb))
+      (message "INVALID LIBRARY"))))
 
 (defun calibredb-refresh ()
   "Refresh the calibredb."
