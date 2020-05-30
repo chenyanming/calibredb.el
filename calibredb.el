@@ -225,7 +225,7 @@ FROM
 
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "?" #'calibredb-dispatch)
+    (define-key map "?" #'calibredb-entry-dispatch)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
@@ -887,7 +887,7 @@ ARGUMENT ID is the id of the ebook in string."
 
 ;;;###autoload (autoload 'calibredb-dispatch "calibredb-dispatch" nil t)
 (define-transient-command calibredb-dispatch ()
-  "Invoke a calibredb command from a list of available commands."
+  "Invoke a calibredb command from a list of available commands in *calibredb-search*."
   :man-page "calibredb"
   ["Metadata"
    [("s" "set_metadata"   calibredb-set-metadata-dispatch)
@@ -908,6 +908,19 @@ ARGUMENT ID is the id of the ebook in string."
    [("r" "Refresh Library"   calibredb-refresh)]
    [("n" "Next Library"   calibredb-library-next)]
    [("p" "Previous Library"   calibredb-library-previous)]])
+
+(define-transient-command calibredb-entry-dispatch ()
+  "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
+  :man-page "calibredb"
+  ["Metadata"
+   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ;; ("S" "show_metadata"         calibredb-show-metadata)
+    ]]
+  ["File operaion"
+   [("o" "Open file"         calibredb-find-file)
+    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
+   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+   [("e" "Export" calibredb-export-dispatch)]])
 
 (define-transient-command calibredb-set-metadata-dispatch ()
   "Create a new commit or replace an existing commit."
