@@ -190,6 +190,27 @@ FROM
 GROUP BY id"
   "TODO calibre database query statement.")
 
+(defvar calibredb-query-one-entry-string "
+SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
+FROM
+  (SELECT sub2.id, sub2.author_sort, sub2.path, sub2.name, sub2.format, sub2.pubdate, sub2.title, sub2.tag, sub2.uncompressed_size, comments.text, sub2.last_modified
+  FROM
+    (SELECT child.id, child.author_sort, child.path, child.name, child.format, child.pubdate, child.title, child.last_modified, tags.name AS tag, child.uncompressed_size
+    FROM
+      (SELECT sub.id, sub.author_sort, sub.path, sub.name, sub.format, sub.pubdate, sub.title, sub.last_modified, sub.uncompressed_size, books_tags_link.tag
+      FROM
+        (SELECT b.id, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, b.last_modified, d.uncompressed_size
+        FROM data AS d
+        LEFT OUTER JOIN books AS b
+        ON d.book = b.id) AS sub
+        LEFT OUTER JOIN books_tags_link
+        ON sub.id = books_tags_link.book) AS child
+      LEFT OUTER JOIN tags
+      ON child.tag = tags.id) as sub2
+    LEFT OUTER JOIN comments
+    ON sub2.id = comments.book) "
+  "TODO calibre database query one entry prefix statement.")
+
 (defvar calibredb-helm-map
   (if (boundp 'helm-map)
       (let ((map (make-sparse-keymap)))
@@ -208,7 +229,8 @@ GROUP BY id"
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
-    (define-key map "e" #'calibredb-export)
+    (define-key map "s" #'calibredb-set-metadata-dispatch)
+    (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
@@ -227,11 +249,12 @@ GROUP BY id"
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
     (define-key map "l" #'calibredb-library-list)
-    (define-key map "s" #'calibredb-switch-library)
+    (define-key map "s" #'calibredb-set-metadata-dispatch)
+    (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
-    (define-key map "e" #'calibredb-export)
+    (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-refresh)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
@@ -582,7 +605,7 @@ Argument CAND is the candidate."
         ((equal name "title") (calibredb-getattr cand :book-title))))
 
 (defun calibredb-set-property (name input)
-  "Set the text property.
+  "OBSELETE: Set the text property.
 Argument NAME is the metadata field name string.
 Argument INPUT is the candidate."
   (cond ((equal name "tags") (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
@@ -619,7 +642,7 @@ Argument PROPS are the additional parameters."
           (setq last-input input)
           (cond ((equal major-mode 'calibredb-show-mode)
                  ;; set it back, calibredb-show-entry need a correct entry
-                 (calibredb-set-property field input)
+                 ;; (calibredb-set-property field input)
                  (calibredb-show-refresh))
                 ((eq major-mode 'calibredb-search-mode)
                  (calibredb))
@@ -673,6 +696,26 @@ Argument PROPS are the additional parameters."
                                 :id id
                                 :library (format "--library-path %s" (calibredb-root-dir-quote))))))
 
+(defun calibredb-set-metadata--transient (&optional candidate)
+  "Set metadata for the selected CANDIDATE with transient arguments."
+  (interactive)
+  (unless candidate
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+  (let ((id (calibredb-getattr candidate :id)))
+    (calibredb-command :command "set_metadata"
+                       :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
+                       :id id
+                       :library (format "--library-path \"%s\"" calibredb-root-dir))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           ;; TODO: set it back, calibredb-show-entry need a correct entry
+           ;; (calibredb-set-property field input)
+           (calibredb-show-refresh))
+          ((eq major-mode 'calibredb-search-mode)
+           (calibredb))
+          (t nil))))
+
 ;; show_metadata
 
 (defun calibredb-show-metadata (&optional candidate)
@@ -690,13 +733,13 @@ Argument PROPS are the additional parameters."
 (defun calibredb-export (&optional candidate)
   "Export the slected CANDIDATE."
   (interactive)
-  "TODO: Export the selected candidate."
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "export"
+                       :option (s-join " " (-remove 's-blank? (-flatten (calibredb-export-arguments))))
                        :input (format "--to-dir %s" (calibredb-complete-file-quote "Export to (select a path)"))
                        :id id
                        :library (format "--library-path %s" (calibredb-root-dir-quote)))))
@@ -763,6 +806,22 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+    (cond ((equal "" query-result) '(""))
+          (t (let (res-list)
+               (dolist (line line-list)
+                 ;; validate if it is right format
+                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                     ;; decode and push to res-list
+                     (push (calibredb-query-to-alist line) res-list)
+                   ;; concat the invalid format strings into last line
+                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+               (calibredb-getbooklist (nreverse res-list))) ))))
+
+(defun calibredb-candidate(id)
+  "Generate one ebook candidate alist.
+ARGUMENT ID is the id of the ebook in string."
+  (let* ((query-result (calibredb-query (concat calibredb-query-one-entry-string "WHERE id = " id)))
          (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
@@ -846,36 +905,145 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
    [("c" "Clone library"   calibredb-clone)]
    [("r" "Refresh Library"   calibredb-refresh)]])
 
-
 (define-transient-command calibredb-set-metadata-dispatch ()
   "Create a new commit or replace an existing commit."
-  [["Field"
+  ["Arguments"
+   ("-a" "author_sort"  "author_sort:" calibredb-transient-read-metadata-author-sort)
+   ("-A" "authors"  "authors:" calibredb-transient-read-metadata-authors)
+   ("-c" "comments"  "comments:" calibredb-transient-read-metadata-comments)
+   ("-C" "cover" "cover:" calibredb-transient-read-file)
+   ("-i" "identifiers"  "identifiers:" read-string)
+   ("-l" "languages"  "languages:" read-string)
+   ("-p" "pubdate" "pubdate:" transient-read-date)
+   ("-P" "publisher" "publisher:" read-string)
+   ("-r" "rating"  "rating:" read-string)
+   ("-s" "series" "series:" read-string)
+   ("-S" "series_index" "series_index:" read-string)
+   ("-h" "size" "size:" read-string)
+   ("-H" "sort" "sort:" read-string)
+   ("-t" "tags" "tags:" calibredb-transient-read-metadata-tags)
+   ("-T" "title" "title:" calibredb-transient-read-metadata-title)
+   ("-d" "timestamp" "timestamp:" transient-read-date)]
+  [["Single Field"
     ("t" "tags"         calibredb-set-metadata--tags)
     ("T" "title"         calibredb-set-metadata--title)
     ("a" "author"         calibredb-set-metadata--author)
     ("c" "comments"         calibredb-set-metadata--comments)]
    ["List fields"
-    ("l" "list fileds"         calibredb-set-metadata--list-fields)]])
-
+    ("l" "list fileds"         calibredb-set-metadata--list-fields)]
+   ["Set metadata"
+    ("s" "Set metadata"         calibredb-set-metadata--transient)]])
 
 (define-transient-command calibredb-export-dispatch ()
   "TODO: Create a new commit or replace an existing commit."
-  ;; ["Arguments"
-  ;;  ("-a" "Export all books in database, ignoring the list of ids"   ("-a" "--all"))
-  ;;  ("-b" "Do not convert non English characters for the file names"  "--dont-asciiize")
-  ;;  ("-c" "Do not save cover"   ("-c" " --dont-save-cover"))
-  ;;  ("-d" "Do not update metadata"  ("-d" "--dont-update-metadata"))
-  ;;  ("-e" "Do not write opf" "--dont-write-opf")
-  ;;  ("-f" "Comma separated list of formats to save for each book."  "--formats")
-  ;;  ("-g" "Report progress"   ("-g" " --progress"))
-  ;;  ("-h" "Replace whitespace with underscores."  ("-h" "--replace-whitespace"))
-  ;;  ("-i" "Export all books into a single directory" "--single-dir")
-  ;;  ("-k" "Do not convert non English characters for the file names"  "--template")
-  ;;  ("-l" "The format in which to display dates. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y"   ("-l" " --timefmt"))
-  ;;  ("-m" "Export books to the specified directory. Default is ."  ("-m" "--to-dir"))
-  ;;  ("-l" "Convert paths to lowercase." "--to-lowercase")]
+  ["Arguments"
+   ("-a" "Do not convert non English characters for the file names"  "--dont-asciiize")
+   ("-c" "Do not save cover"  "--dont-save-cover")
+   ("-m" "Do not update metadata"  "--dont-update-metadata")
+   ("-o" "Do not write opf" "--dont-write-opf")
+   ("-f" "Formats to save for each book, comma separated."  "--formats " read-string)
+   ("-p" "Progress Reporting"  " --progress")
+   ("-r" "Replace whitespace with underscores." "--replace-whitespace")
+   ("-s" "Single directory to export all files." "--single-dir")
+   ("-t" "Template to control the filename and directory structure."  "--template" read-string)
+   ("-d" "Dates format. %d - day, %b - month, %m - month number, %Y - year. Default is: %b, %Y" "--timefmt" read-string)
+   ;; ("-m" "Export books to the specified directory. Default is ."  "--to-dir")
+   ("-l" "Convert paths to lowercase." "--to-lowercase")
+   ("-A" "Export all books in database, ignoring the list of ids" "--all")]
   [["Export"
     ("e" "Export"         calibredb-export)]])
+
+;; Readers
+
+(defun calibredb-transient-read-file (prompt _initial-input _history)
+  "Read a file path.
+Argument PROMPT prompt to show."
+  (expand-file-name (read-file-name prompt)))
+
+(defun calibredb-transient-read-metadata-tags (prompt _initial-input _history)
+  "Read metadata - tags.
+Argument PROMPT prompt to show."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
+    (let ((last-input))
+        (let* ((title (calibredb-getattr cand :book-title))
+               (id (calibredb-getattr cand :id))
+               (init (calibredb-get-init "tags" cand))
+               (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+          ;; set the input as last input, so that all items use the same input
+          (setq last-input input)))))
+
+(defun calibredb-transient-read-metadata-comments (prompt _initial-input _history)
+  "Read metadata - comments.
+Argument PROMPT prompt to show."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
+    (let ((last-input))
+      (let* ((title (calibredb-getattr cand :book-title))
+             (id (calibredb-getattr cand :id))
+             (init (calibredb-get-init "comments" cand))
+             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+        ;; set the input as last input, so that all items use the same input
+        (setq last-input input)))))
+
+(defun calibredb-transient-read-metadata-author-sort (prompt _initial-input _history)
+  "Read metadata - author_sort.
+Argument PROMPT prompt to show."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
+    (let ((last-input))
+      (let* ((title (calibredb-getattr cand :book-title))
+             (id (calibredb-getattr cand :id))
+             (init (calibredb-get-init "author_sort" cand))
+             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+        ;; set the input as last input, so that all items use the same input
+        (setq last-input input)))))
+
+(defun calibredb-transient-read-metadata-authors (prompt _initial-input _history)
+  "Read metadata - authors.
+Argument PROMPT prompt to show."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
+    (let ((last-input))
+      (let* ((title (calibredb-getattr cand :book-title))
+             (id (calibredb-getattr cand :id))
+             (init (calibredb-get-init "authors" cand))
+             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+        ;; set the input as last input, so that all items use the same input
+        (setq last-input input)))))
+
+(defun calibredb-transient-read-metadata-title (prompt _initial-input _history)
+  "Read metadata - title.
+Argument PROMPT prompt to show."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
+    (let ((last-input))
+      (let* ((title (calibredb-getattr cand :book-title))
+             (id (calibredb-getattr cand :id))
+             (init (calibredb-get-init "title" cand))
+             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+        ;; set the input as last input, so that all items use the same input
+        (setq last-input input)))))
+
+;; Get
+
+(defun calibredb-set-metadata-arguments ()
+  "Return the latest used arguments in the `calibredb-set-metadata-dispatch' transient."
+  (car (alist-get 'calibredb-set-metadata-dispatch transient-history)))
+
+(defun calibredb-export-arguments ()
+  "Return the latest used arguments in the `calibredb-export-dispatch' transient."
+  (car (alist-get 'calibredb-export-dispatch transient-history)))
 
 (define-derived-mode calibredb-show-mode fundamental-mode "calibredb-show"
   "Mode for displaying book entry details.
@@ -924,24 +1092,26 @@ The result depends on the value of `calibredb-search-unique-buffers'."
 (defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
   (interactive)
-  (let* ((entry (get-text-property (point-min) 'calibredb-entry nil))
-         (buff (get-buffer-create (calibredb-show--buffer-name entry)))
-         (file (calibredb-getattr entry :file-path))
+  (let* ((entry (get-text-property (point-min) 'calibredb-entry nil)) ; old entry
+         (id (calibredb-getattr entry :id))                           ; only get the id
+         (query-result (cdr (car (calibredb-candidate id))))          ; get the new entry through SQL query
+         (buff (get-buffer-create (calibredb-show--buffer-name query-result)))
+         (file (calibredb-getattr query-result :file-path))
          (cover (concat (file-name-directory file) "cover.jpg"))
-         (format (calibredb-getattr entry :book-format)))
+         (format (calibredb-getattr query-result :book-format)))
     (with-current-buffer buff
       (read-only-mode -1)
       (erase-buffer)
       ;; (setq start (point))
       ;; (insert title)
-      (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
+      (insert (propertize (calibredb-show-metadata query-result) 'calibredb-entry query-result))
       ;; (insert book)
       (insert "\n")
       (if (image-type-available-p (intern format))
           (calibredb-insert-image file "")
         (calibredb-insert-image cover ""))
       (calibredb-show-mode)
-      (setq calibredb-show-entry entry)
+      (setq calibredb-show-entry query-result)
       (goto-char (point-min)))))
 
 (defun calibredb-search-buffer ()
