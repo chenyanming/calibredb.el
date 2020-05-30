@@ -168,6 +168,10 @@ Set negative to keep original length."
   "Face used for size."
   :group 'calibredb-faces)
 
+(defface calibredb-mark-face '((t :inherit highlight))
+  "Face for the mark candidate."
+  :group 'calibredb-faces)
+
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
@@ -259,6 +263,11 @@ FROM
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-refresh)
     (define-key map "q" #'calibredb-search-quit)
+    (define-key map "m" #'calibredb-mark-and-forward)
+    (define-key map "u" #'calibredb-unmark-and-forward)
+    (define-key map "U" #'calibredb-unmark-and-backward)
+    (define-key map "j" #'next-line)
+    (define-key map "k" #'previous-line)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -619,16 +628,14 @@ Argument INPUT is the candidate."
 (defun calibredb-set-metadata (name &rest props)
   "Set metadata on filed NAME on amrked candidates.
 Argument PROPS are the additional parameters."
-  (let ((candidate (plist-get props :candidate)))
-    (unless candidate
-      (if (eq major-mode 'calibredb-search-mode)
-          (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-        (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+  (let ((candidates (plist-get props :candidate)))
+    (unless candidates
+      (setq candidates (or (calibredb-find-marked-candidates) (calibredb-find-candidate-at-point))))
     (let ((last-input))
-      (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidate))
+      (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidates))
                           ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
                                                                                  (helm-marked-candidates) nil))
-                          (t (list candidate))))
+                          (t candidates)))
         (let* ((title (calibredb-getattr cand :book-title))
                (id (calibredb-getattr cand :id))
                (prompt (plist-get props :prompt))
@@ -698,25 +705,46 @@ Argument PROPS are the additional parameters."
                                 :id id
                                 :library (format "--library-path %s" (calibredb-root-dir-quote))))))
 
-(defun calibredb-set-metadata--transient (&optional candidate)
-  "Set metadata for the selected CANDIDATE with transient arguments."
+(defun calibredb-set-metadata--transient ()
+  "Set metadata for candidate at point or marked candidates with transient arguments."
   (interactive)
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let ((id (calibredb-getattr candidate :id)))
-    (calibredb-command :command "set_metadata"
-                       :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
-                       :id id
-                       :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (cond ((equal major-mode 'calibredb-show-mode)
-           ;; TODO: set it back, calibredb-show-entry need a correct entry
-           ;; (calibredb-set-property field input)
-           (calibredb-show-refresh))
-          ((eq major-mode 'calibredb-search-mode)
-           (calibredb))
-          (t nil))))
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (dolist (cand candidates)
+      (let ((id (calibredb-getattr cand :id)))
+        (calibredb-command :command "set_metadata"
+                           :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
+                           :id id
+                           :library (format "--library-path \"%s\"" calibredb-root-dir))
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb))
+              (t nil))))))
+
+(defun calibredb-find-candidate-at-point ()
+  "Find candidate at point and return the list."
+  (interactive)
+  (if (eq major-mode 'calibredb-search-mode)
+      (list (cdr (get-text-property (point) 'calibredb-entry nil)))
+    (list (get-text-property (point-min) 'calibredb-entry nil) )))
+
+(defun calibredb-find-marked-candidates ()
+  "Find marked candidates and return the alist."
+  (interactive)
+  (save-excursion
+    (let (beg end cand-list)
+      (when (text-property-not-all (point-min) (point-max) 'calibredb-mark nil)
+        (setq end (text-property-any (point-min) (point-max) 'calibredb-mark ?>))
+        (while (setq beg (text-property-any end (point-max) 'calibredb-mark ?>) )
+          (goto-char beg)
+          (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+          (push candidate cand-list)
+          ;; (message (number-to-string beg))
+          (forward-line 1)
+          (setq end (point)))
+        cand-list))))
 
 ;; show_metadata
 
@@ -1272,6 +1300,44 @@ selecting the new item."
   (when (eq major-mode 'calibredb-show-mode)
     (if (get-buffer "*calibredb-entry*")
         (kill-buffer "*calibredb-entry*"))))
+
+(defun calibredb-mark-at-point ()
+  "Mark the current line."
+  (interactive)
+  (remove-overlays (line-beginning-position) (line-end-position))
+  (let* ((beg (line-beginning-position))
+         (end (line-end-position))
+         (inhibit-read-only t)
+         (overlay (make-overlay beg end)))
+    (overlay-put overlay 'face 'calibredb-mark-face)
+    (put-text-property beg end 'calibredb-mark ?>)))
+
+(defun calibredb-mark-and-forward ()
+  "Mark the current line and forward."
+  (interactive)
+  (calibredb-mark-at-point)
+  (forward-line 1))
+
+(defun calibredb-unmark-and-forward ()
+  "Unmark the current line and forward."
+  (interactive)
+  (calibredb-unmark-at-point)
+  (forward-line 1))
+
+(defun calibredb-unmark-and-backward ()
+  "Unmark the current line and backward."
+  (interactive)
+  (calibredb-unmark-at-point)
+  (forward-line -1))
+
+(defun calibredb-unmark-at-point ()
+  "Unmark the current line."
+  (interactive)
+  (let* ((beg (line-beginning-position))
+         (end (line-end-position))
+         (inhibit-read-only t))
+    (remove-overlays (line-beginning-position) (line-end-position))
+    (remove-text-properties beg end '(calibredb-mark nil))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
