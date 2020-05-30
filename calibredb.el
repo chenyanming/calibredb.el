@@ -631,7 +631,7 @@ Argument PROPS are the additional parameters."
                (num (length (calibredb-find-marked-candidates)))
                (input (or last-input (read-string (if (> num 0)
                                                       (concat "Set " field " for " (number-to-string num) " items: ")
-                                                    (concat prompt id " " title ": ") ) init))) beg)
+                                                    (concat prompt id " " title ": ") ) init))) beg pos)
           (calibredb-command :command "set_metadata"
                              :option "--field"
                              :input (format "%s:\"%s\"" field input)
