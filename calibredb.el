@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 9 May 2020
 ;; Version: 1.5.1
-;; Package-Requires: ((emacs "24.3") (org "9.0") (transient "0.1.0"))
+;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -249,6 +249,8 @@ FROM
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
     (define-key map "l" #'calibredb-library-list)
+    (define-key map "n" #'calibredb-library-next)
+    (define-key map "p" #'calibredb-library-previous)
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
@@ -1197,6 +1199,41 @@ selecting the new item."
          (calibredb-root-dir-quote)
          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
          (calibredb))
+      (message "INVALID LIBRARY"))))
+
+(defvar calibredb-library-index 0)
+
+(defun calibredb-library-previous ()
+  "Next library from variable `calibredb-library-alist'.
+If under *calibredb-search* buffer, it will auto refresh after
+selecting the new item."
+  (interactive)
+  (let* ((index (setq calibredb-library-index (if (> calibredb-library-index 0)
+                                                  (1- calibredb-library-index)
+                                                (1- (length calibredb-library-alist)))))
+        (result (car (nth index calibredb-library-alist))))
+    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+        (progn
+          (setq calibredb-root-dir result)
+          (calibredb-root-dir-quote)
+          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (calibredb))
+      (message "INVALID LIBRARY"))))
+
+(defun calibredb-library-next ()
+  "Next library from variable `calibredb-library-alist'.
+If under *calibredb-search* buffer, it will auto refresh after
+selecting the new item."
+  (interactive)
+  (let* ((index (setq calibredb-library-index (if (< calibredb-library-index (1- (length calibredb-library-alist)))
+                                                  (1+ calibredb-library-index) 0)))
+        (result (car (nth index calibredb-library-alist))))
+    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+        (progn
+          (setq calibredb-root-dir result)
+          (calibredb-root-dir-quote)
+          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (calibredb))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-refresh ()
