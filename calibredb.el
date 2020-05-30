@@ -905,7 +905,9 @@ ARGUMENT ID is the id of the ebook in string."
    [("l" "List Libraries"   calibredb-library-list)]
    [("S" "Switch library"   calibredb-switch-library)]
    [("c" "Clone library"   calibredb-clone)]
-   [("r" "Refresh Library"   calibredb-refresh)]])
+   [("r" "Refresh Library"   calibredb-refresh)]
+   [("n" "Next Library"   calibredb-library-next)]
+   [("p" "Previous Library"   calibredb-library-previous)]])
 
 (define-transient-command calibredb-set-metadata-dispatch ()
   "Create a new commit or replace an existing commit."
