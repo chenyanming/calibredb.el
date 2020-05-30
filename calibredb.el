@@ -628,7 +628,10 @@ Argument PROPS are the additional parameters."
                (prompt (plist-get props :prompt))
                (field name)
                (init (calibredb-get-init field cand))
-               (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+               (num (length (calibredb-find-marked-candidates)))
+               (input (or last-input (read-string (if (> num 0)
+                                                      (concat "Set " field " for " (number-to-string num) " items: ")
+                                                    (concat prompt id " " title ": ") ) init))))
           (calibredb-command :command "set_metadata"
                              :option "--field"
                              :input (format "%s:\"%s\"" field input)
@@ -1001,7 +1004,10 @@ Argument PROMPT prompt to show."
         (let* ((title (calibredb-getattr cand :book-title))
                (id (calibredb-getattr cand :id))
                (init (calibredb-get-init "tags" cand))
-               (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+               (num (length (calibredb-find-marked-candidates)))
+               (input (or last-input (read-string (if (> num 0)
+                                                      (concat "Set tags for " (number-to-string num) " items: ")
+                                                    (concat prompt id " " title ": ") ) init))))
           ;; set the input as last input, so that all items use the same input
           (setq last-input input)))))
 
@@ -1016,7 +1022,10 @@ Argument PROMPT prompt to show."
       (let* ((title (calibredb-getattr cand :book-title))
              (id (calibredb-getattr cand :id))
              (init (calibredb-get-init "comments" cand))
-             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+             (num (length (calibredb-find-marked-candidates)))
+             (input (or last-input (read-string (if (> num 0)
+                                                    (concat "Set comments for " (number-to-string num) " items: ")
+                                                  (concat prompt id " " title ": ") ) init))))
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
 
@@ -1031,7 +1040,10 @@ Argument PROMPT prompt to show."
       (let* ((title (calibredb-getattr cand :book-title))
              (id (calibredb-getattr cand :id))
              (init (calibredb-get-init "author_sort" cand))
-             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+             (num (length (calibredb-find-marked-candidates)))
+             (input (or last-input (read-string (if (> num 0)
+                                                    (concat "Set author_sort for " (number-to-string num) " items: ")
+                                                  (concat prompt id " " title ": ") ) init))))
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
 
@@ -1046,7 +1058,10 @@ Argument PROMPT prompt to show."
       (let* ((title (calibredb-getattr cand :book-title))
              (id (calibredb-getattr cand :id))
              (init (calibredb-get-init "authors" cand))
-             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+             (num (length (calibredb-find-marked-candidates)))
+             (input (or last-input (read-string (if (> num 0)
+                                                    (concat "Set authors for " (number-to-string num) " items: ")
+                                                  (concat prompt id " " title ": ") ) init))))
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
 
@@ -1061,7 +1076,10 @@ Argument PROMPT prompt to show."
       (let* ((title (calibredb-getattr cand :book-title))
              (id (calibredb-getattr cand :id))
              (init (calibredb-get-init "title" cand))
-             (input (or last-input (read-string (concat prompt id " " title ": ") init))))
+             (num (length (calibredb-find-marked-candidates)))
+             (input (or last-input (read-string (if (> num 0)
+                                                    (concat "Set title for " (number-to-string num) " items: ")
+                                                  (concat prompt id " " title ": ") ) init))))
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
 
