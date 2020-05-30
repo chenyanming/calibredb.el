@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    May 15, 2020
+#+DATE:    May 30, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 
@@ -20,6 +20,18 @@
   - [[#enable-calibredbel][Enable calibredb.el]]
   - [[#keybindings][keybindings]]
 - [[#workflows][Workflows]]
+  - [[#start-with-calibredb][Start with =calibredb=]]
+  - [[#start-with-calibredb-find-helm-or-calibredb-find-counsel][Start with =calibredb-find-helm= or =calibredb-find-counsel=]]
+  - [[#start-with-calibredb-list][Start with =calibredb-list=]]
+- [[#qa][Q&A]]
+  - [[#what-is-my-current-library][What is my current library?]]
+  - [[#how-to-open-an-ebook][How to open an ebook?]]
+  - [[#how-to-add-ebooks][How to add ebooks?]]
+  - [[#how-to-remove-ebooks][How to remove ebooks?]]
+  - [[#how-to-switch-to-different-library][How to switch to different library?]]
+  - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
+  - [[#can-not-remember-so-many-keybindings][Can not remember so many keybindings?]]
+  - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
   - [[#calibredb][calibredb]]
   - [[#calibredb-find-helm][calibredb-find-helm]]
@@ -39,6 +51,7 @@
     - [[#--list-fields][=--list-fields=]]
   - [[#export][Export]]
 - [[#logs][Logs]]
+  - [[#2020-05-30][=2020-05-30=]]
   - [[#2020-05-16][=2020-05-16=]]
   - [[#2020-05-15][=2020-05-15=]]
   - [[#2020-05-14][=2020-05-14=]]
@@ -131,56 +144,140 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 #+BEGIN_SRC emacs-lisp
 (defvar calibredb-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "?" #'calibredb-dispatch)
-    (define-key map "o" #'calibredb-find-file)
-    (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
-    (define-key map "e" #'calibredb-export)
-    (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
-    (define-key map "\M-T" #'calibredb-set-metadata--title)
-    (define-key map "\M-c" #'calibredb-set-metadata--comments)
+    (deine-key map "?" #'calibredb-entry-dispatch)
+    (deine-key map "o" #'calibredb-find-file)
+    (deine-key map "O" #'calibredb-find-file-other-frame)
+    (deine-key map "v" #'calibredb-open-file-with-default-tool)
+    (deine-key map "s" #'calibredb-set-metadata-dispatch)
+    (deine-key map "e" #'calibredb-export-dispatch)
+    (deine-key map "q" #'calibredb-entry-quit)
+    (deine-key map "\M-t" #'calibredb-set-metadata--tags)
+    (deine-key map "\M-a" #'calibredb-set-metadata--author)
+    (deine-key map "\M-T" #'calibredb-set-metadata--title)
+    (deine-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
   "Keymap for `calibredb-show-mode'.")
 
 (defvar calibredb-search-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [mouse-3] #'calibredb-search-mouse)
-    (define-key map (kbd "<RET>") #'calibredb-search-ret)
-    (define-key map "?" #'calibredb-dispatch)
-    (define-key map "a" #'calibredb-add)
-    (define-key map "A" #'calibredb-add-dir)
-    (define-key map "c" #'calibredb-clone)
-    (define-key map "d" #'calibredb-remove)
-    (define-key map "l" #'calibredb-library-list)
-    (define-key map "s" #'calibredb-switch-library)
-    (define-key map "o" #'calibredb-find-file)
-    (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
-    (define-key map "e" #'calibredb-export)
-    (define-key map "r" #'calibredb-refresh)
-    (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
-    (define-key map "\M-T" #'calibredb-set-metadata--title)
-    (define-key map "\M-c" #'calibredb-set-metadata--comments)
+    (deine-key map [mouse-3] #'calibredb-search-mouse)
+    (deine-key map (kbd "<RET>") #'calibredb-search-ret)
+    (deine-key map "?" #'calibredb-dispatch)
+    (deine-key map "a" #'calibredb-add)
+    (deine-key map "A" #'calibredb-add-dir)
+    (deine-key map "c" #'calibredb-clone)
+    (deine-key map "d" #'calibredb-remove)
+    (deine-key map "l" #'calibredb-library-list)
+    (deine-key map "n" #'calibredb-library-next)
+    (deine-key map "p" #'calibredb-library-previous)
+    (deine-key map "s" #'calibredb-set-metadata-dispatch)
+    (deine-key map "S" #'calibredb-switch-library)
+    (deine-key map "o" #'calibredb-find-file)
+    (deine-key map "O" #'calibredb-find-file-other-frame)
+    (deine-key map "v" #'calibredb-open-file-with-default-tool)
+    (deine-key map "e" #'calibredb-export-dispatch)
+    (deine-key map "r" #'calibredb-refresh)
+    (deine-key map "q" #'calibredb-search-quit)
+    (deine-key map "m" #'calibredb-mark-and-forward)
+    (deine-key map "u" #'calibredb-unmark-and-forward)
+    (deine-key map "U" #'calibredb-unmark-and-backward)
+    (deine-key map "j" #'next-line)
+    (deine-key map "k" #'previous-line)
+    (deine-key map "\M-t" #'calibredb-set-metadata--tags)
+    (deine-key map "\M-a" #'calibredb-set-metadata--author)
+    (deine-key map "\M-T" #'calibredb-set-metadata--title)
+    (deine-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
   "Keymap for `calibredb-search-mode'.")
 #+END_SRC
 
 
 * Workflows
-There are three ways to manage your ebooks at this moment:
-1. Start with =calibredb=
-    - =M-x calibredb= to enter ebook dashboard (buffer =*calibredb-search*=)
-    - =Enter= or =mouse-3= to enter ebook details (buffer =*calibredb-entry*=)
-2. Start with =calibredb-find-helm= or =calibredb-find-counsel=
-    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
-    - =C-i= (Helm) =C-o= (Counsel) to enter the action menus.
-3. Start with =calibredb-list=
-    - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
+There are three ways to manage your ebooks:
+** Start with =calibredb=
+First  =M-x calibredb= to enter ebook dashboard.
+You can perform the following actions:
+ - Open the ebook
+ - Set metadata on the ebook under cursor
+ - Set metadata on marked ebooks
+ - Add/remove ebooks into current library
+ - Export the ebook under cursor
+ - Clone/Switch/Jump to different libraries
+
+** Start with =calibredb-find-helm= or =calibredb-find-counsel=
+   - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
+   - =C-i= (Helm) =C-o= (Counsel) to enter the action menus.
+** Start with =calibredb-list=
+   - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
 
 PS:
-1. Workflows may be slightly changed in future versions.
+Workflows may be slightly changed in future versions.
+
+* Q&A
+The keybindings mentioned below are referred from [[keybindings]].
+
+** What is my current library?
+=M-x calibredb=, your current library shows in the header in buffer =*calibredb-search*=
+Besides, variable =calibredb-root-dir= also save the current library location.
+
+** How to open an ebook?
+1. =M-x calibredb=
+   - In =*calibredb-search*= buffer, move the cursor to the ebook you want to open.
+   - Press =o/O/v= to open it.
+
+2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
+   - Select to the ebook you want to open in the list
+   - Press =Enter= to open it.
+
+3. =M-x calibredb=
+   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =Enter=, or just Right Click on the ebook.
+   - In =*calibredb-entry*= buffer, press =o/O/v= to open it.
+    
+** How to add ebooks?
+=M-x calibredb-add= and select one ebook file to add.
+=M-x calibredb-add-dir= and select one directory to add, every supported formats will be added into current library.
+
+** How to remove ebooks?
+1. =M-x calibredb=
+   - move the cursor to the ebook you want to delete, press =d=, calibredb will ask you to delete or not.
+
+2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
+   - Select to the ebook you want to delete in the list
+   - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
+   - Perform action according as shown in menu.
+
+** How to switch to different library?
+First, set =calibredb-library-alist= to include the calibre libraries.
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
+                                  ("/Users/damonchan/Documents/Books Library")
+                                  ("/Users/damonchan/Documents/HELLO")
+                                  ("/Users/damonchan/Documents/Books")
+                                  ("/Users/damonchan/Documents/World")))
+#+END_SRC
+Then, in =*calibredb-search*= buffer,
+ - Press =l= to open the library list and select the library you want to switch to.
+ - Press =n= or =p= to switch to next or previous library.
+
+If you are not in =*calibredb-search*= buffer, you can call =calibredb-library-list=
+directly and select the library to jump.
+
+If the library is not defined in =calibredb-library-alist=, you can call
+=calibredb-switch-library= to select the path of the library that you want to
+switch temporary.
+
+** How to set metadata on ebooks?
+- If you are in =*calibredb-search*= buffer, =m/u= to mark/unmark items, and =s= to
+  set metadata in bulk. If you do not mark any items, actions will be performed
+  to the item under cursor.
+- If you are in =*calibredb-entry*= buffer, press =s= to set metadata.
+
+** Can not remember so many keybindings?
+You can preform every actions starting from ~?~.
+
+** More examples?
+Please check [[keybindings]]. You can play with every keybindings to perform
+different actions. All are self documented.
 
 * Supported Features
 
@@ -283,6 +380,13 @@ Remove an item.
 ** Export
 
 * Logs
+
+** =2020-05-30=
+Version *1.6.0*:
+- Add mark/unmark features in =*calibredb-search*=
+- Upgrade =calibredb-set-metadata-dispatch= and =calibredb-export-dispatch.=
+- Add =calibredb-library-next= and =calibredb-library-previous=
+- Improve the library management experience.
 
 ** =2020-05-16=
 Version *1.5.0*:
