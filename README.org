@@ -214,7 +214,8 @@ PS:
 Workflows may be slightly changed in future versions.
 
 * Q&A
-The keybindings mentioned below are referred from [[keybindings]].
+The keybindings mentioned below are referred from
+#+html: <a href="#keybindings">keybindings</a>.
 
 ** What is my current library?
 =M-x calibredb=, your current library shows in the header in buffer =*calibredb-search*=
@@ -276,7 +277,9 @@ switch temporary.
 You can preform every actions starting from ~?~.
 
 ** More examples?
-Please check [[keybindings]]. You can play with every keybindings to perform
+Please check
+#+html: <a href="#keybindings">keybindings</a>
+. You can play with every keybindings to perform
 different actions. All are self documented.
 
 * Supported Features
