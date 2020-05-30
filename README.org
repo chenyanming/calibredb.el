@@ -129,8 +129,7 @@ git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibre
 #+BEGIN_SRC emacs-lisp
 (require 'calibredb)
 (setq sql-sqlite-program "/usr/bin/sqlite3")
-(setq calibredb-root-dir (expand-file-name "~/OneDrive/Doc/Calibre"))
-(setq calibredb-db-dir (concat calibredb-root-dir "/metadata.db"))
+(setq calibredb-root-dir "~/OneDrive/Doc/Calibre")
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 (setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
                                   ("/Users/damonchan/Documents/Books Library")
