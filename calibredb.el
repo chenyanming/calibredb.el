@@ -383,7 +383,7 @@ time."
     ;;     (message "No process running.")))
     (setq-local inhibit-message t)
     (message line)
-    (message (shell-command-to-string line))))
+    (message "%s" (shell-command-to-string line))))
 
 (defun calibredb-chomp (s)
   "Argument S is string."
@@ -517,9 +517,7 @@ Argument KEY is the key."
 Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (setq candidate (car (calibredb-find-candidate-at-point))))
   (find-file (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-find-file-other-frame (&optional candidate)
@@ -527,9 +525,7 @@ Optional argument CANDIDATE is the selected item."
 Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (setq candidate (car (calibredb-find-candidate-at-point))))
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
 (defun calibredb-open-file-with-default-tool (&optional candidate)
@@ -537,9 +533,7 @@ Optional argument CANDIDATE is the selected item."
 Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (setq candidate (car (calibredb-find-candidate-at-point))))
   (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
 ;; add
@@ -589,9 +583,7 @@ Optional argument REST is the rest."
 Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (setq candidate (car (calibredb-find-candidate-at-point))))
   (let ((id (calibredb-getattr candidate :id))
         (title (calibredb-getattr candidate :book-title)))
     (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
@@ -696,9 +688,7 @@ Argument PROPS are the additional parameters."
   "List the selected CANDIDATE supported fileds."
   (interactive)
   (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (setq candidate (car (calibredb-find-candidate-at-point))))
   (let* ((id (calibredb-getattr candidate :id)))
     (message (calibredb-command :command "set_metadata"
                                 :option "--list-fields"
