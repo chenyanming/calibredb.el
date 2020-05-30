@@ -644,8 +644,10 @@ Argument PROPS are the additional parameters."
                  ;; (calibredb-set-property field input)
                  (calibredb-show-refresh))
                 ((eq major-mode 'calibredb-search-mode)
+                 (setq pos (window-start))
                  (setq beg (point))
                  (calibredb)
+                 (set-window-start (selected-window) pos)
                  (goto-char beg))
                 (t nil)))))))
 
@@ -702,7 +704,7 @@ Argument PROPS are the additional parameters."
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
     (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id)) beg)
+      (let ((id (calibredb-getattr cand :id)) beg pos)
         (calibredb-command :command "set_metadata"
                            :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
                            :id id
@@ -711,7 +713,9 @@ Argument PROPS are the additional parameters."
                (calibredb-show-refresh))
               ((eq major-mode 'calibredb-search-mode)
                (setq beg (point))
+               (setq pos (window-start))
                (calibredb)
+               (set-window-start (selected-window) pos)
                (goto-char beg))
               (t nil))))))
 
