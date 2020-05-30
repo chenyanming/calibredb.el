@@ -631,7 +631,7 @@ Argument PROPS are the additional parameters."
                (num (length (calibredb-find-marked-candidates)))
                (input (or last-input (read-string (if (> num 0)
                                                       (concat "Set " field " for " (number-to-string num) " items: ")
-                                                    (concat prompt id " " title ": ") ) init))))
+                                                    (concat prompt id " " title ": ") ) init))) beg)
           (calibredb-command :command "set_metadata"
                              :option "--field"
                              :input (format "%s:\"%s\"" field input)
@@ -644,7 +644,9 @@ Argument PROPS are the additional parameters."
                  ;; (calibredb-set-property field input)
                  (calibredb-show-refresh))
                 ((eq major-mode 'calibredb-search-mode)
-                 (calibredb))
+                 (setq beg (point))
+                 (calibredb)
+                 (goto-char beg))
                 (t nil)))))))
 
 (defun calibredb-set-metadata--tags (&optional candidate)
@@ -700,7 +702,7 @@ Argument PROPS are the additional parameters."
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
     (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id)))
+      (let ((id (calibredb-getattr cand :id)) beg)
         (calibredb-command :command "set_metadata"
                            :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
                            :id id
@@ -708,7 +710,9 @@ Argument PROPS are the additional parameters."
         (cond ((equal major-mode 'calibredb-show-mode)
                (calibredb-show-refresh))
               ((eq major-mode 'calibredb-search-mode)
-               (calibredb))
+               (setq beg (point))
+               (calibredb)
+               (goto-char beg))
               (t nil))))))
 
 (defun calibredb-find-candidate-at-point ()
