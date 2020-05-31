@@ -222,17 +222,12 @@ FROM
   (format
    "
 WHERE id LIKE '%%%s%%'
-OR last_modified LIKE '%%%s%%'
 OR text LIKE '%%%s%%'
-OR uncompressed_size LIKE '%%%s%%'
 OR tag LIKE '%%%s%%'
 OR title LIKE '%%%s%%'
-OR pubdate LIKE '%%%s%%'
 OR format LIKE '%%%s%%'
-OR name LIKE '%%%s%%'
-OR path LIKE '%%%s%%'
 OR author_sort LIKE '%%%s%%'
-" filter filter filter filter filter filter filter filter filter filter filter))
+" filter filter filter filter filter filter))
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
