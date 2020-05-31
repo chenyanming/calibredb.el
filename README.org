@@ -306,6 +306,28 @@ perform live filtering:
 M-x calibredb-search-live-filter
 #+END_SRC
 
+Please notice: currently, the filtering is column-oriented, not buffer oriented.
+The following columns will be searched:
+- id
+- last_modified
+- text
+- uncompressed_size
+- tag
+- title
+- pubdate
+- format
+- name
+- path
+- author_sort
+
+If the keyword occurs in any of the columns above, the matched ebook record will
+be shown.
+
+Here is the example data:
+[[file:img/filter-data.png]]
+
+
+Here is the demo:
 [[file:img/filter.gif]]
 
 ** calibredb-find-helm
