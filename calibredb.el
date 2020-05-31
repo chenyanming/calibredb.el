@@ -684,7 +684,12 @@ Argument PROPS are the additional parameters."
                 ((eq major-mode 'calibredb-search-mode)
                  (setq pos (window-start))
                  (setq beg (point))
-                 (calibredb)
+                 (if calibredb-search-entries
+                     (progn
+                       (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
+                       (calibredb)
+                       (calibredb-search-update :force))
+                   (calibredb))
                  (set-window-start (selected-window) pos)
                  (goto-char beg))
                 (t nil)))))))
@@ -752,7 +757,12 @@ Argument PROPS are the additional parameters."
               ((eq major-mode 'calibredb-search-mode)
                (setq beg (point))
                (setq pos (window-start))
-               (calibredb)
+               (if calibredb-search-entries
+                   (progn
+                     (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
+                     (calibredb)
+                     (calibredb-search-update :force))
+                 (calibredb))
                (set-window-start (selected-window) pos)
                (goto-char beg))
               (t nil))))))
@@ -1472,6 +1482,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
           (funcall calibredb-search-print-entry-function entry)
           (insert "\n"))
         ;; (insert "End of entries.\n")
+        (goto-char (point-min))         ; back to point-min after filtering
         (setf calibredb-search-last-update (float-time))))))
 
 (provide 'calibredb)
