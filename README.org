@@ -34,6 +34,7 @@
   - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
   - [[#calibredb][calibredb]]
+  - [[#calibredb-search-live-filter][calibredb-search-live-filter]]
   - [[#calibredb-find-helm][calibredb-find-helm]]
   - [[#calibredb-find-counsel][calibredb-find-counsel]]
   - [[#calibredb-list][calibredb-list]]
@@ -51,6 +52,7 @@
     - [[#--list-fields][=--list-fields=]]
   - [[#export][Export]]
 - [[#logs][Logs]]
+  - [[#2020-05-31][=2020-05-31=]]
   - [[#2020-05-30][=2020-05-30=]]
   - [[#2020-05-16][=2020-05-16=]]
   - [[#2020-05-15][=2020-05-15=]]
@@ -203,6 +205,7 @@ You can perform the following actions:
  - Add/remove ebooks into current library
  - Export the ebook under cursor
  - Clone/Switch/Jump to different libraries
+ - Live filter the results
 
 ** Start with =calibredb-find-helm= or =calibredb-find-counsel=
    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
@@ -218,8 +221,8 @@ The keybindings mentioned below are referred from
 #+html: <a href="#keybindings">keybindings</a>.
 
 ** What is my current library?
-=M-x calibredb=, your current library shows in the header in buffer =*calibredb-search*=
-Besides, variable =calibredb-root-dir= also save the current library location.
+=M-x calibredb=, your current library path shows in the header in buffer =*calibredb-search*=
+Besides, variable =calibredb-root-dir= also saves the current library location.
 
 ** How to open an ebook?
 1. =M-x calibredb=
@@ -231,12 +234,12 @@ Besides, variable =calibredb-root-dir= also save the current library location.
    - Press =Enter= to open it.
 
 3. =M-x calibredb=
-   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =Enter=, or just Right Click on the ebook.
+   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =Enter=, or just =Right Click= on the ebook.
    - In =*calibredb-entry*= buffer, press =o/O/v= to open it.
     
 ** How to add ebooks?
 =M-x calibredb-add= and select one ebook file to add.
-=M-x calibredb-add-dir= and select one directory to add, every supported formats will be added into current library.
+=M-x calibredb-add-dir= and select one directory to add, all supported formats will be added into current library.
 
 ** How to remove ebooks?
 1. =M-x calibredb=
@@ -245,7 +248,7 @@ Besides, variable =calibredb-root-dir= also save the current library location.
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
    - Select to the ebook you want to delete in the list
    - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
-   - Perform action according as shown in menu.
+   - Perform remove action as shown in the menu.
 
 ** How to switch to different library?
 First, set =calibredb-library-alist= to include the calibre libraries.
@@ -257,30 +260,29 @@ First, set =calibredb-library-alist= to include the calibre libraries.
                                   ("/Users/damonchan/Documents/World")))
 #+END_SRC
 Then, in =*calibredb-search*= buffer,
- - Press =l= to open the library list and select the library you want to switch to.
+ - Press =l= to open the library list and select the library.
  - Press =n= or =p= to switch to next or previous library.
 
-If you are not in =*calibredb-search*= buffer, you can call =calibredb-library-list=
-directly and select the library to jump.
+In =*calibredb-search*= buffer, call =calibredb-library-list= directly and select
+the library.
 
 If the library is not defined in =calibredb-library-alist=, you can call
-=calibredb-switch-library= to select the path of the library that you want to
-switch temporary.
+=calibredb-switch-library= and select the path of the library that you want to
+switch temporarily.
 
 ** How to set metadata on ebooks?
-- If you are in =*calibredb-search*= buffer, =m/u= to mark/unmark items, and =s= to
-  set metadata in bulk. If you do not mark any items, actions will be performed
-  to the item under cursor.
-- If you are in =*calibredb-entry*= buffer, press =s= to set metadata.
+- In =*calibredb-search*= buffer, =m/u= to mark/unmark items, and =s= to set metadata
+  in bulk. If you do not mark any items, actions will be performed on the item
+  under cursor.
+- In =*calibredb-entry*= buffer, press =s= to set metadata.
 
 ** Can not remember so many keybindings?
-You can preform every actions starting from ~?~.
+Press ~?~, it will show you all actions.
 
 ** More examples?
 Please check
 #+html: <a href="#keybindings">keybindings</a>
-. You can play with every keybindings to perform
-different actions. All are self documented.
+. All are self documented.
 
 * Supported Features
 
@@ -296,6 +298,15 @@ M-x calibredb
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
+     
+** calibredb-search-live-filter
+In =*calibredb-search*=,
+perform live filtering:
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-search-live-filter
+#+END_SRC
+
+[[file:img/filter.gif]]
 
 ** calibredb-find-helm
 Use helm to list all ebooks
@@ -383,6 +394,9 @@ Remove an item.
 ** Export
 
 * Logs
+** =2020-05-31=
+Version *1.7.0*:
+- Add =calibredb-search-live-filter= to support live filtering.
 
 ** =2020-05-30=
 Version *1.6.0*:

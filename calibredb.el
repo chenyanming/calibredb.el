@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 1.6.0
+;; Version: 1.7.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -215,6 +215,43 @@ FROM
     ON sub2.id = comments.book) "
   "TODO calibre database query one entry prefix statement.")
 
+(defvar calibredb-column-names '("author_sort" "path" "name" "format" "pubdate" "title" "tag" "uncompressed_size" "text" "last_modified"))
+
+(defun calibredb-query-search-string (filter)
+  "Return the where part of SQL based on FILTER."
+  (format
+   "
+WHERE id LIKE '%%%s%%'
+OR last_modified LIKE '%%%s%%'
+OR text LIKE '%%%s%%'
+OR uncompressed_size LIKE '%%%s%%'
+OR tag LIKE '%%%s%%'
+OR title LIKE '%%%s%%'
+OR pubdate LIKE '%%%s%%'
+OR format LIKE '%%%s%%'
+OR name LIKE '%%%s%%'
+OR path LIKE '%%%s%%'
+OR author_sort LIKE '%%%s%%'
+" filter filter filter filter filter filter filter filter filter filter filter))
+
+(defcustom calibredb-search-filter ""
+  "Query string filtering shown entries."
+  :group 'calibredb
+  :type 'string)
+
+(defvar calibredb-search-entries nil
+  "List of the entries currently on display.")
+
+(defvar calibredb-search-filter-active nil
+  "When non-nil, calibredb is currently reading a filter from the minibuffer.
+When live editing the filter, it is bound to :live.")
+
+(defvar calibredb-search-last-update 0
+  "The last time the buffer was redrawn in epoch seconds.")
+
+(defvar calibredb-search-print-entry-function #'calibredb-search-print-entry--default
+  "Function to print entries into the *calibredb-search* buffer.")
+
 (defvar calibredb-helm-map
   (if (boundp 'helm-map)
       (let ((map (make-sparse-keymap)))
@@ -268,6 +305,7 @@ FROM
     (define-key map "U" #'calibredb-unmark-and-backward)
     (define-key map "j" #'next-line)
     (define-key map "k" #'previous-line)
+    (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
@@ -860,6 +898,22 @@ ARGUMENT ID is the id of the ebook in string."
                    (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
+(defun calibredb-candidate-filter (filter)
+  "Generate ebook candidate alist.
+ARGUMENT FILTER is the filter string."
+  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) %s" calibredb-query-string (calibredb-query-search-string filter))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+    (cond ((equal "" query-result) '(""))
+          (t (let (res-list)
+               (dolist (line line-list)
+                 ;; validate if it is right format
+                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                     ;; decode and push to res-list
+                     (push (calibredb-query-to-alist line) res-list)
+                   ;; concat the invalid format strings into last line
+                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+               (calibredb-getbooklist (nreverse res-list))) ))))
+
 (defun calibredb-helm-read ()
   "Helm read for calibredb."
   (if (fboundp 'helm)
@@ -1187,12 +1241,13 @@ Indicating the library you use."
         header-line-format '(:eval (funcall calibredb-search-header-function)))
   (buffer-disable-undo)
   (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
-  (hl-line-mode))
+  (hl-line-mode)
+  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
 
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (let ((cand (calibredb-candidates)))
+  (let ((cand (or calibredb-search-entries (calibredb-candidates))))
     (cond ((not cand)
            (message "INVALID LIBRARY"))
           (t
@@ -1238,6 +1293,7 @@ Argument EVENT mouse event."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
           (calibredb))
       (message "INVALID LIBRARY"))))
 
@@ -1252,6 +1308,7 @@ selecting the new item."
          (setq calibredb-root-dir result)
          (calibredb-root-dir-quote)
          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+         (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
          (calibredb))
       (message "INVALID LIBRARY"))))
 
@@ -1271,6 +1328,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
           (calibredb))
       (message "INVALID LIBRARY"))))
 
@@ -1287,6 +1345,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
           (calibredb))
       (message "INVALID LIBRARY"))))
 
@@ -1349,6 +1408,71 @@ selecting the new item."
          (inhibit-read-only t))
     (remove-overlays (line-beginning-position) (line-end-position))
     (remove-text-properties beg end '(calibredb-mark nil))))
+
+;; live filtering
+
+(defun calibredb-search--update-list ()
+  "Update `calibredb-search-entries' list."
+  ;; replace space with _ (SQL) The underscore represents a single character
+  (let* ((filter (replace-regexp-in-string " " "_" calibredb-search-filter))
+         (head (calibredb-candidate-filter filter)))
+    ;; Determine the final list order
+    (let ((entries head))
+      (setf calibredb-search-entries
+            entries))))
+
+(defun calibredb-search-print-entry--default (entry)
+  "Print ENTRY to the buffer."
+  (unless (equal entry "")
+    (let ((content (car entry)) beg end)
+      (setq beg (point))
+      (insert content)
+      (setq end (point))
+      (put-text-property beg end 'calibredb-entry entry))))
+
+(defun calibredb-search--minibuffer-setup ()
+  "Set up the minibuffer for live filtering."
+  (when calibredb-search-filter-active
+    (when (eq :live calibredb-search-filter-active)
+      (add-hook 'post-command-hook 'calibredb-search--live-update nil :local))))
+
+(defun calibredb-search--live-update ()
+  "Update the calibredb-search buffer based on the contents of the minibuffer."
+  (when (eq :live calibredb-search-filter-active)
+    ;; (message "HELLO")
+    (let ((buffer (calibredb-search-buffer))
+          (current-filter (minibuffer-contents-no-properties)))
+      (when buffer
+        (with-current-buffer buffer
+          (let ((calibredb-search-filter current-filter))
+            (calibredb-search-update :force)))))))
+
+(defun calibredb-search-live-filter ()
+  "Filter the calibredb-search buffer as the filter is written."
+  (interactive)
+  (unwind-protect
+      (let ((calibredb-search-filter-active :live))
+        (setq calibredb-search-filter
+              (read-from-minibuffer "Filter: " calibredb-search-filter))
+        (message calibredb-search-filter))
+    (calibredb-search-update :force)))
+
+(defun calibredb-search-update (&optional force)
+  "Update the calibredb-search buffer listing to match the database.
+When FORCE is non-nil, redraw even when the database hasn't changed."
+  (interactive)
+  (with-current-buffer (calibredb-search-buffer)
+    (when force
+      (let ((inhibit-read-only t)
+            (standard-output (current-buffer)))
+        (erase-buffer)
+        (calibredb-search--update-list)
+        ;; (setq calibredb-search-entries (calibredb-candidates))
+        (dolist (entry calibredb-search-entries)
+          (funcall calibredb-search-print-entry-function entry)
+          (insert "\n"))
+        ;; (insert "End of entries.\n")
+        (setf calibredb-search-last-update (float-time))))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
