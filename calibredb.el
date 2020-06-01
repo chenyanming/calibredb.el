@@ -1273,9 +1273,9 @@ Indicating the library you use."
                  (setq end (point))
                  (put-text-property beg end 'calibredb-entry item)
                  (insert "\n")))
-             (goto-char (point-min))
-             (unless (eq major-mode 'calibredb-search-mode)
-               (calibredb-search-mode)))))))
+             (goto-char (point-min)))
+           (unless (eq major-mode 'calibredb-search-mode)
+             (calibredb-search-mode))))))
 
 (defun calibredb-search-mouse (event)
   "Visit the calibredb-entry click on.
