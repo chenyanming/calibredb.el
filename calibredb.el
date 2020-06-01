@@ -457,7 +457,7 @@ Argument SQL-QUERY is the sqlite sql query string."
   (interactive)
   (if (file-exists-p calibredb-db-dir)
       (shell-command-to-string
-       (format "%s -separator \1 %s \"%s\""
+       (format "%s -separator \1 -newline \2 %s \"%s\""
                sql-sqlite-program
                (shell-quote-argument (expand-file-name calibredb-db-dir))
                sql-query)) nil))
@@ -877,7 +877,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
@@ -886,14 +886,15 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
-                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+                   ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
+                   ))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
   (let* ((query-result (calibredb-query (concat calibredb-query-one-entry-string "WHERE id = " id)))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
@@ -902,14 +903,15 @@ ARGUMENT ID is the id of the ebook in string."
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
-                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+                   ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
+                   ))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
 (defun calibredb-candidate-filter (filter)
   "Generate ebook candidate alist.
 ARGUMENT FILTER is the filter string."
   (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) %s" calibredb-query-string (calibredb-query-search-string filter))))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\n"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
@@ -918,7 +920,8 @@ ARGUMENT FILTER is the filter string."
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
-                   (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))))
+                   ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
+                   ))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
 (defun calibredb-helm-read ()
