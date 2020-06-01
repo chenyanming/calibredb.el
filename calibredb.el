@@ -272,7 +272,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh)
+    (define-key map "r" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
@@ -552,7 +552,7 @@ Optional argument CANDIDATE is the selected item."
                      :input (calibredb-complete-file-quote "Add a file to Calibre")
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
   (if (equal major-mode 'calibredb-search-mode)
-      (calibredb-search-refresh)))
+      (calibredb-search-refresh-or-resume)))
 
 (defun calibredb-add-dir (&optional option)
   "Add all files in a directory into calibre database.
@@ -565,7 +565,7 @@ Optional argument OPTION is additional options."
                      :option (or option "")
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
   (if (equal major-mode 'calibredb-search-mode)
-      (calibredb-search-refresh)))
+      (calibredb-search-refresh-or-resume)))
 
 (defun calibredb-clone ()
   "Create a clone of the current library.
@@ -601,7 +601,7 @@ Optional argument CANDIDATE is the selected item."
            (kill-buffer (calibredb-show--buffer-name candidate))
            (calibredb-search-refresh))
           (t (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-refresh)))))
+             (calibredb-search-refresh-or-resume)))))
 
 ;; set_metadata
 
@@ -1189,7 +1189,16 @@ The result depends on the value of `calibredb-search-unique-buffers'."
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "%s %s" "Library: " calibredb-root-dir))
+  (format "%s %s   %s   %s   %s" "Library: "
+          calibredb-root-dir
+          (propertize (concat "Total: "
+                              (if (equal calibredb-search-entries '(""))
+                                  "0"
+                                (number-to-string (length calibredb-search-entries)))) 'face font-lock-warning-face)
+          (propertize calibredb-search-filter 'face font-lock-keyword-face)
+          (let ((len (length (calibredb-find-marked-candidates))))
+            (if (> len 0)
+                (propertize (concat "Marked: " (number-to-string len)) 'face font-lock-negation-char-face) ""))))
 
 (define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.
@@ -1205,8 +1214,9 @@ Indicating the library you use."
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (setq calibredb-search-entries (calibredb-candidates))
-  (let ((cand calibredb-search-entries))
+  (let ((cand (if calibredb-search-entries
+                  calibredb-search-entries
+                  (setq calibredb-search-entries (calibredb-candidates)))))
     (cond ((not cand)
            (message "INVALID LIBRARY"))
           (t
@@ -1246,13 +1256,13 @@ Argument EVENT mouse event."
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
   (interactive)
-  (let ((result (read-file-name "Quick switch library: ")) )
+  (let ((result (read-file-name "Quick switch library: ")))
     (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
         (progn
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (calibredb-search-refresh))
+          (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-library-list ()
@@ -1266,7 +1276,7 @@ selecting the new item."
          (setq calibredb-root-dir result)
          (calibredb-root-dir-quote)
          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-         (calibredb-search-refresh))
+         (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
 (defvar calibredb-library-index 0)
@@ -1285,7 +1295,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (calibredb-search-refresh))
+          (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-library-next ()
@@ -1301,12 +1311,13 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (calibredb-search-refresh))
+          (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-search-refresh ()
   "Refresh calibredb."
   (interactive)
+  (setq calibredb-search-entries (calibredb-candidates))
   (calibredb))
 
 (defun calibredb-search-refresh-or-resume ()
