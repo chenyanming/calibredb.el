@@ -773,7 +773,7 @@ Argument PROPS are the additional parameters."
   "Find marked candidates and return the alist."
   (interactive)
   (save-excursion
-    (let (beg end cand-list)
+    (let (candidate beg end cand-list)
       (when (text-property-not-all (point-min) (point-max) 'calibredb-mark nil)
         (setq end (text-property-any (point-min) (point-max) 'calibredb-mark ?>))
         (while (setq beg (text-property-any end (point-max) 'calibredb-mark ?>) )

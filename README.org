@@ -1,7 +1,8 @@
 #+TITLE:   calibredb.el
-#+DATE:    May 30, 2020
+#+DATE:    June 1, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
+[[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
 
 * Table of Contents :TOC_3:noexport:
 - [[#description][Description]]
