@@ -600,8 +600,8 @@ Optional argument CANDIDATE is the selected item."
     (cond ((equal major-mode 'calibredb-show-mode)
            (kill-buffer (calibredb-show--buffer-name candidate))
            (calibredb-search-refresh))
-          (t (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-refresh-or-resume)))))
+          ((eq major-mode 'calibredb-search-mode)
+           (calibredb-search-refresh-or-resume)))))
 
 ;; set_metadata
 
