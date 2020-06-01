@@ -196,29 +196,6 @@ FROM
 GROUP BY id"
   "TODO calibre database query statement.")
 
-(defvar calibredb-query-one-entry-string "
-SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
-FROM
-  (SELECT sub2.id, sub2.author_sort, sub2.path, sub2.name, sub2.format, sub2.pubdate, sub2.title, sub2.tag, sub2.uncompressed_size, comments.text, sub2.last_modified
-  FROM
-    (SELECT child.id, child.author_sort, child.path, child.name, child.format, child.pubdate, child.title, child.last_modified, tags.name AS tag, child.uncompressed_size
-    FROM
-      (SELECT sub.id, sub.author_sort, sub.path, sub.name, sub.format, sub.pubdate, sub.title, sub.last_modified, sub.uncompressed_size, books_tags_link.tag
-      FROM
-        (SELECT b.id, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, b.last_modified, d.uncompressed_size
-        FROM data AS d
-        LEFT OUTER JOIN books AS b
-        ON d.book = b.id) AS sub
-        LEFT OUTER JOIN books_tags_link
-        ON sub.id = books_tags_link.book) AS child
-      LEFT OUTER JOIN tags
-      ON child.tag = tags.id) as sub2
-    LEFT OUTER JOIN comments
-    ON sub2.id = comments.book) "
-  "TODO calibre database query one entry prefix statement.")
-
-(defvar calibredb-column-names '("author_sort" "path" "name" "format" "pubdate" "title" "tag" "uncompressed_size" "text" "last_modified"))
-
 (defun calibredb-query-search-string (filter)
   "Return the where part of SQL based on FILTER."
   (format
@@ -295,7 +272,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-refresh)
+    (define-key map "r" #'calibredb-search-refresh)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
@@ -574,8 +551,8 @@ Optional argument CANDIDATE is the selected item."
   (calibredb-command :command "add"
                      :input (calibredb-complete-file-quote "Add a file to Calibre")
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
-  (if (eq major-mode 'calibredb-search-mode)
-      (calibredb)))
+  (if (equal major-mode 'calibredb-search-mode)
+      (calibredb-search-refresh)))
 
 (defun calibredb-add-dir (&optional option)
   "Add all files in a directory into calibre database.
@@ -584,11 +561,11 @@ types are added.
 Optional argument OPTION is additional options."
   (interactive)
   (calibredb-command :command "add"
-                     :input (format "--add %s" (concat (file-name-as-directory (calibredb-complete-file-quote "Add a directory to Calibre")) "*.*"))
+                     :input (format "--add %s" (concat (file-name-as-directory (calibredb-complete-file-quote "Add a directory to Calibre")) "*"))
                      :option (or option "")
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
-  (if (eq major-mode 'calibredb-search-mode)
-      (calibredb)))
+  (if (equal major-mode 'calibredb-search-mode)
+      (calibredb-search-refresh)))
 
 (defun calibredb-clone ()
   "Create a clone of the current library.
@@ -621,9 +598,10 @@ Optional argument CANDIDATE is the selected item."
                            :id id
                            :library (format "--library-path %s" (calibredb-root-dir-quote))))
     (cond ((equal major-mode 'calibredb-show-mode)
-           (kill-buffer (calibredb-show--buffer-name candidate)) (calibredb-refresh))
+           (kill-buffer (calibredb-show--buffer-name candidate))
+           (calibredb-search-refresh))
           (t (eq major-mode 'calibredb-search-mode)
-             (calibredb-refresh)))))
+             (calibredb-search-refresh)))))
 
 ;; set_metadata
 
@@ -636,16 +614,6 @@ Argument CAND is the candidate."
         ((equal name "author_sort") (calibredb-getattr cand :author-sort))
         ((equal name "authors") (calibredb-getattr cand :author-sort))
         ((equal name "title") (calibredb-getattr cand :book-title))))
-
-(defun calibredb-set-property (name input)
-  "OBSELETE: Set the text property.
-Argument NAME is the metadata field name string.
-Argument INPUT is the candidate."
-  (cond ((equal name "tags") (setf (car (cdr (assoc :tag (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
-        ((equal name "comments") (setf (car (cdr (assoc :comment (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
-        ((equal name "author_sort") (setf (car (cdr (assoc :author-sort (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
-        ((equal name "authors") (setf (car (cdr (assoc :author-sort (car (get-text-property (point-min) 'calibredb-entry nil))))) input))
-        ((equal name "title") (setf (car (cdr (assoc :book-title (car (get-text-property (point-min) 'calibredb-entry nil))))) input))))
 
 (defun calibredb-set-metadata (name &rest props)
   "Set metadata on filed NAME on amrked candidates.
@@ -666,7 +634,7 @@ Argument PROPS are the additional parameters."
                (num (length (calibredb-find-marked-candidates)))
                (input (or last-input (read-string (if (> num 0)
                                                       (concat "Set " field " for " (number-to-string num) " items: ")
-                                                    (concat prompt id " " title ": ") ) init))) beg pos)
+                                                    (concat prompt id " " title ": ") ) init))))
           (calibredb-command :command "set_metadata"
                              :option "--field"
                              :input (format "%s:\"%s\"" field input)
@@ -675,20 +643,9 @@ Argument PROPS are the additional parameters."
           ;; set the input as last input, so that all items use the same input
           (setq last-input input)
           (cond ((equal major-mode 'calibredb-show-mode)
-                 ;; set it back, calibredb-show-entry need a correct entry
-                 ;; (calibredb-set-property field input)
                  (calibredb-show-refresh))
                 ((eq major-mode 'calibredb-search-mode)
-                 (setq pos (window-start))
-                 (setq beg (point))
-                 (if calibredb-search-entries
-                     (progn
-                       (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-                       (calibredb)
-                       (calibredb-search-update :force))
-                   (calibredb))
-                 (set-window-start (selected-window) pos)
-                 (goto-char beg))
+                 (calibredb-search-refresh-or-resume))
                 (t nil)))))))
 
 (defun calibredb-set-metadata--tags (&optional candidate)
@@ -744,7 +701,7 @@ Argument PROPS are the additional parameters."
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
     (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id)) beg pos)
+      (let ((id (calibredb-getattr cand :id)))
         (calibredb-command :command "set_metadata"
                            :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
                            :id id
@@ -752,16 +709,7 @@ Argument PROPS are the additional parameters."
         (cond ((equal major-mode 'calibredb-show-mode)
                (calibredb-show-refresh))
               ((eq major-mode 'calibredb-search-mode)
-               (setq beg (point))
-               (setq pos (window-start))
-               (if calibredb-search-entries
-                   (progn
-                     (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-                     (calibredb)
-                     (calibredb-search-update :force))
-                 (calibredb))
-               (set-window-start (selected-window) pos)
-               (goto-char beg))
+               (calibredb-search-refresh-or-resume))
               (t nil))))))
 
 (defun calibredb-find-candidate-at-point ()
@@ -893,7 +841,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
-  (let* ((query-result (calibredb-query (concat calibredb-query-one-entry-string "WHERE id = " id)))
+  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
          (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
@@ -993,7 +941,7 @@ ARGUMENT FILTER is the filter string."
    [("l" "List Libraries"   calibredb-library-list)]
    [("S" "Switch library"   calibredb-switch-library)]
    [("c" "Clone library"   calibredb-clone)]
-   [("r" "Refresh Library"   calibredb-refresh)]
+   [("r" "Refresh Library"   calibredb-search-refresh)]
    [("n" "Next Library"   calibredb-library-next)]
    [("p" "Previous Library"   calibredb-library-previous)]])
 
@@ -1257,7 +1205,8 @@ Indicating the library you use."
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (let ((cand (or calibredb-search-entries (calibredb-candidates))))
+  (setq calibredb-search-entries (calibredb-candidates))
+  (let ((cand calibredb-search-entries))
     (cond ((not cand)
            (message "INVALID LIBRARY"))
           (t
@@ -1303,8 +1252,7 @@ Argument EVENT mouse event."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-          (calibredb))
+          (calibredb-search-refresh))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-library-list ()
@@ -1318,8 +1266,7 @@ selecting the new item."
          (setq calibredb-root-dir result)
          (calibredb-root-dir-quote)
          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-         (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-         (calibredb))
+         (calibredb-search-refresh))
       (message "INVALID LIBRARY"))))
 
 (defvar calibredb-library-index 0)
@@ -1338,8 +1285,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-          (calibredb))
+          (calibredb-search-refresh))
       (message "INVALID LIBRARY"))))
 
 (defun calibredb-library-next ()
@@ -1355,17 +1301,27 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-search-entries (calibredb-candidates)) ; refresh the result
-          (calibredb))
+          (calibredb-search-refresh))
       (message "INVALID LIBRARY"))))
 
-(defun calibredb-refresh ()
-  "Refresh the calibredb."
+(defun calibredb-search-refresh ()
+  "Refresh calibredb."
   (interactive)
-  (set-buffer (calibredb-search--buffer-name))
-  (if (eq major-mode 'calibredb-search-mode)
-      (calibredb))
-  (message "calibredb-search refreshed."))
+  (calibredb))
+
+(defun calibredb-search-refresh-or-resume ()
+  "Refresh calibredb or resume the result and windows position."
+  (interactive)
+  (let (beg pos)
+    (setq beg (point))
+    (setq pos (window-start))
+    (if (not (equal calibredb-search-filter ""))
+        (progn
+          (calibredb-search-refresh)
+          (calibredb-search-update :force))
+      (calibredb-search-refresh))
+    (set-window-start (selected-window) pos)
+    (goto-char beg)))
 
 (defun calibredb-search-quit ()
   "Quit the *calibredb-search*."
