@@ -13,10 +13,6 @@
     - [[#add-tags][Add tags]]
     - [[#add-comments][Add comments]]
 - [[#installation][Installation]]
-  - [[#install-calibredbel][Install calibredb.el]]
-    - [[#ues-package][ues-package]]
-    - [[#doom-emacs][Doom Emacs]]
-    - [[#spacemacs-or-other-emacs-distributions][Spacemacs or other emacs distributions]]
 - [[#configuration][Configuration]]
   - [[#enable-calibredbel][Enable calibredb.el]]
   - [[#keybindings][keybindings]]
@@ -92,37 +88,10 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 * Installation
 
-Then install this package:
-
-** Install calibredb.el
-Choose one of the following installation methods based on your needs:
-
-*** ues-package
+It's available on [[https://melpa.org/][Melpa]] :
 
 #+BEGIN_SRC emacs-lisp
-(use-package calibredb
-  :quelpa
-  (calibredb :repo "chenyanming/calibredb.el" :fetcher github))
-#+END_SRC
-
-*** Doom Emacs
-Add the following line to =package.el=
-#+BEGIN_SRC emacs-lisp
-(package! calibredb :recipe (:host github :repo "chenyanming/calibredb.el"))
-#+END_SRC
-
-Run =./.emacs.d/bin/doom sync=
-
-*** Spacemacs or other emacs distributions
-Put =calibredb.el= to your load-path. Here is example of ~spacemacs~
-
-#+BEGIN_SRC sh
-git clone git@github.com:chenyanming/calibredb.el.git ~/.emacs.d/private/calibredb.el
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/private/calibredb.el"))
-(require 'calibredb)
+M-x package-install calibredb
 #+END_SRC
 
 * Configuration
