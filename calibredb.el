@@ -83,6 +83,16 @@
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-sql-separator "\3"
+  "SQL separator, used in parsing SQL result into list."
+  :group 'calibredb
+  :type 'string)
+
+(defcustom calibredb-sql-newline "\2"
+  "SQL newline, used in parsing SQL result into list."
+  :group 'calibredb
+  :type 'string)
+
 (defcustom calibredb-id-width 4
   "Width for id.
 Set 0 to hide,
@@ -434,8 +444,10 @@ Argument SQL-QUERY is the sqlite sql query string."
   (interactive)
   (if (file-exists-p calibredb-db-dir)
       (shell-command-to-string
-       (format "%s -separator \1 -newline \2 %s \"%s\""
+       (format "%s -separator %s -newline %s %s \"%s\""
                sql-sqlite-program
+               calibredb-sql-separator
+               calibredb-sql-newline
                (shell-quote-argument (expand-file-name calibredb-db-dir))
                sql-query)) nil))
 
@@ -443,7 +455,7 @@ Argument SQL-QUERY is the sqlite sql query string."
   "Builds alist out of a full `calibredb-query' query record result.
 Argument QUERY-RESULT is the query result generate by sqlite."
   (if query-result
-      (let ((spl-query-result (split-string (calibredb-chomp query-result) "\1")))
+      (let ((spl-query-result (split-string (calibredb-chomp query-result) calibredb-sql-separator)))
         `((:id                     ,(nth 0 spl-query-result))
           (:author-sort            ,(nth 1 spl-query-result))
           (:book-dir               ,(nth 2 spl-query-result))
@@ -825,12 +837,12 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
                  ;; validate if it is right format
-                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                 (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
@@ -842,12 +854,12 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
   (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
                  ;; validate if it is right format
-                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                 (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
@@ -859,12 +871,12 @@ ARGUMENT ID is the id of the ebook in string."
   "Generate ebook candidate alist.
 ARGUMENT FILTER is the filter string."
   (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) %s" calibredb-query-string (calibredb-query-search-string filter))))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) "\2"))))
+         (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
                  ;; validate if it is right format
-                 (if (string-match-p "^[0-9]\\{1,10\\}\1" line)
+                 (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)
                    ;; concat the invalid format strings into last line
