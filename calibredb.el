@@ -1246,6 +1246,7 @@ Argument EVENT mouse event."
         (error "No ebook chosen"))
     (calibredb-show-entry (cdr (get-text-property pos 'calibredb-entry nil)))
     (select-window window)
+    (set-buffer (calibredb-search--buffer-name))
     (goto-char pos)))
 
 (defun calibredb-search-ret ()
