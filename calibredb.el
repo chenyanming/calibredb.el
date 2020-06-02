@@ -1201,16 +1201,19 @@ The result depends on the value of `calibredb-search-unique-buffers'."
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "%s %s   %s   %s   %s" "Library: "
-          calibredb-root-dir
-          (propertize (concat "Total: "
-                              (if (equal calibredb-search-entries '(""))
-                                  "0"
-                                (number-to-string (length calibredb-search-entries)))) 'face font-lock-warning-face)
-          (propertize calibredb-search-filter 'face font-lock-keyword-face)
-          (let ((len (length (calibredb-find-marked-candidates))))
-            (if (> len 0)
-                (propertize (concat "Marked: " (number-to-string len)) 'face font-lock-negation-char-face) ""))))
+  (format "Library: %s   %s"
+          (propertize calibredb-root-dir 'face font-lock-type-face)
+          (concat
+           (propertize (format "Total: %s"
+                               (if (equal calibredb-search-entries '(""))
+                                   "0   "
+                                 (concat (number-to-string (length calibredb-search-entries)) "   "))) 'face font-lock-warning-face)
+           (propertize (format "%s" (if (equal calibredb-search-filter "")
+                                        ""
+                                      (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
+           (propertize (let ((len (length (calibredb-find-marked-candidates))))
+                         (if (> len 0)
+                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))))
 
 (define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.
@@ -1258,6 +1261,7 @@ Argument EVENT mouse event."
         (error "No ebook chosen"))
     (calibredb-show-entry (cdr (get-text-property pos 'calibredb-entry nil)))
     (select-window window)
+    (set-buffer (calibredb-search--buffer-name))
     (goto-char pos)))
 
 (defun calibredb-search-ret ()
