@@ -944,18 +944,21 @@ ARGUMENT FILTER is the filter string."
   ["File operaion"
    [("a" "Add a file"   calibredb-add)
     ("A" "Add a directory"   calibredb-add-dir)
-    ("d" "Remove a file"   calibredb-remove)]
+    ("d" "Remove a file"   calibredb-remove)
+    ("e" "Export" calibredb-export-dispatch)]
    [("o" "Open file"         calibredb-find-file)
-    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
-   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
-   [("e" "Export" calibredb-export-dispatch)]]
+    ("O" "Open file other frame"            calibredb-find-file-other-frame)
+    ("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+   [("m" "Mark" calibredb-mark-and-forward)
+    ("u" "Unmark" calibredb-unmark-and-forward)
+    ("/" "Live Filter" calibredb-search-live-filter)]]
   ["Library operaion"
-   [("l" "List Libraries"   calibredb-library-list)]
-   [("S" "Switch library"   calibredb-switch-library)]
-   [("c" "Clone library"   calibredb-clone)]
-   [("r" "Refresh Library"   calibredb-search-refresh)]
-   [("n" "Next Library"   calibredb-library-next)]
-   [("p" "Previous Library"   calibredb-library-previous)]])
+   [("l" "List Libraries"   calibredb-library-list)
+   ("S" "Switch library"   calibredb-switch-library)
+   ("c" "Clone library"   calibredb-clone)
+   ("r" "Refresh Library"   calibredb-search-refresh)]
+   [("n" "Next Library"   calibredb-library-next)
+   ("p" "Previous Library"   calibredb-library-previous)]])
 
 (define-transient-command calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
