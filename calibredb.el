@@ -444,7 +444,7 @@ Argument SQL-QUERY is the sqlite sql query string."
   (interactive)
   (if (file-exists-p calibredb-db-dir)
       (shell-command-to-string
-       (format "%s -separator %s -newline %s %s \"%s\""
+       (format "%s -separator %s -newline %s -list -nullvalue \"\" -noheader %s \"%s\""
                sql-sqlite-program
                calibredb-sql-separator
                calibredb-sql-newline
