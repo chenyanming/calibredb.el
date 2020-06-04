@@ -56,6 +56,16 @@
   :type 'file
   :group 'calibredb)
 
+
+(defcustom calibredb-ref-default-bibliography nil
+  "List of bibtex files to search for.
+You should use full-paths for each file. Note that you must
+include a bibliography link in your document if you will be
+exporting it to pdf; org-ref-default-bibliography is not
+used by the LaTeX exporter."
+  :type 'file
+  :group 'calibredb)
+
 (defvar calibredb-root-dir-quote nil
   "Location of in your calibre library (expanded and quoted).")
 
@@ -65,6 +75,8 @@
   :set (lambda (var value)
          (set var value)
          (setq calibredb-db-dir (expand-file-name "metadata.db"
+                                                  calibredb-root-dir))
+         (setq calibredb-ref-default-bibliography (expand-file-name "catalog.bib"
                                                   calibredb-root-dir)))
   :group 'calibredb)
 
@@ -290,6 +302,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "R" #'calibredb-find-catalog-bib)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
@@ -785,12 +798,41 @@ Argument PROPS are the additional parameters."
                        :id id
                        :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
+;; catalog
+
+(defun calibredb-catalog ()
+  "Export the catalog."
+  (interactive)
+  (let ()
+    (calibredb-command :command "catalog"
+                       ;; :option (s-join " " (-remove 's-blank? (-flatten (calibredb-export-arguments))))
+                       :input (format "%s" (calibredb-complete-file-quote "Export to (select a path)"))
+                       ;; :id id
+                       :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+
+(defun calibredb-catalog--bib ()
+  "Export the catalog."
+  (interactive)
+  (let ()
+    (calibredb-command :command "catalog"
+                       :input (format "%s"
+                                      (shell-quote-argument
+                                       (expand-file-name
+                                        (or calibredb-ref-default-bibliography
+                                            (concat (file-name-as-directory calibredb-root-dir) "catalog.bib")))))
+                       :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+
+(defun calibredb-find-catalog-bib ()
+  (interactive)
+  (if (file-exists-p calibredb-ref-default-bibliography)
+      (find-file calibredb-ref-default-bibliography)))
+
 (defun calibredb-find-cover (candidate)
   "Open the cover page image of selected CANDIDATE."
   (if (get-buffer "cover.jpg")
       (kill-buffer "cover.jpg"))
   (let* ((path (calibredb-getattr candidate :file-path))
-        (cover (concat (file-name-directory path) "cover.jpg")))
+         (cover (concat (file-name-directory path) "cover.jpg")))
     (if (file-exists-p cover)
         (find-file cover)
       ;; (message "No cover")
@@ -1310,6 +1352,7 @@ Argument EVENT mouse event."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
@@ -1324,6 +1367,7 @@ selecting the new item."
          (setq calibredb-root-dir result)
          (calibredb-root-dir-quote)
          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+         (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
          (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
@@ -1343,6 +1387,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
@@ -1359,6 +1404,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
