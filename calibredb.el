@@ -180,6 +180,14 @@ Set negative to keep original length."
   "Face used for size."
   :group 'calibredb-faces)
 
+(defface calibredb-pubdate-face '((t :inherit default))
+  "Face for the publish date."
+  :group 'calibredb-faces)
+
+(defface calibredb-file-face '((t :inherit font-lock-function-name-face))
+  "Face for the file path."
+  :group 'calibredb-faces)
+
 (defface calibredb-mark-face '((t :inherit highlight))
   "Face for the mark candidate."
   :group 'calibredb-faces)
@@ -258,7 +266,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
@@ -291,7 +300,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "k" #'previous-line)
     (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
@@ -682,14 +692,14 @@ Argument PROPS are the additional parameters."
                           :candidate candidate))
 
 (defun calibredb-set-metadata--author_sort (&optional candidate)
-  "Change author on marked CANDIDATEs."
+  "Change author_sort on marked CANDIDATEs."
   (interactive)
   (calibredb-set-metadata "author_sort"
                           :prompt "Change author for "
                           :candidate candidate))
 
-(defun calibredb-set-metadata--author (&optional candidate)
-  "Change author on marked CANDIDATEs."
+(defun calibredb-set-metadata--authors (&optional candidate)
+  "Change authors on marked CANDIDATEs."
   (interactive)
   (calibredb-set-metadata "authors"
                           :prompt "Change author for "
@@ -995,7 +1005,7 @@ ARGUMENT FILTER is the filter string."
   [["Single Field"
     ("t" "tags"         calibredb-set-metadata--tags)
     ("T" "title"         calibredb-set-metadata--title)
-    ("a" "author"         calibredb-set-metadata--author)
+    ("a" "author_sort"         calibredb-set-metadata--author_sort)
     ("c" "comments"         calibredb-set-metadata--comments)]
    ["List fields"
     ("l" "list fileds"         calibredb-set-metadata--list-fields)]
@@ -1151,51 +1161,53 @@ The result depends on the value of `calibredb-search-unique-buffers'."
 
 (defun calibredb-show-entry (entry)
   "Display ENTRY in the current buffer."
-  (when (get-buffer (calibredb-show--buffer-name entry))
-    (kill-buffer (calibredb-show--buffer-name entry)))
+  (unless (eq major-mode 'calibredb-show-mode)
+      (when (get-buffer (calibredb-show--buffer-name entry))
+        (kill-buffer (calibredb-show--buffer-name entry))))
   (let* ((buff (get-buffer-create (calibredb-show--buffer-name entry)))
+         (id (calibredb-getattr entry :id)) ; only get the id
+         (tag (calibredb-getattr entry :tag))
+         (comment (calibredb-getattr entry :comment))
+         (author-sort (calibredb-getattr entry :author-sort))
+         (title (calibredb-getattr entry :book-title))
+         (pubdate (calibredb-getattr entry :book-pubdate))
+         ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new entry through SQL query
          (file (calibredb-getattr entry :file-path))
          (cover (concat (file-name-directory file) "cover.jpg"))
-         (format (calibredb-getattr entry :book-format)))
-    (with-current-buffer buff
-      ;; (setq start (point))
-      ;; (insert title)
-      (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
-      ;; (insert book)
-      (insert "\n")
-      (if (image-type-available-p (intern format))
-          (calibredb-insert-image file "")
-        (calibredb-insert-image cover ""))
-      ;; (setq end (point))
-      (calibredb-show-mode)
-      (setq calibredb-show-entry entry)
-      (goto-char (point-min)))
-    (funcall calibredb-show-entry-switch buff)))
+         (format (calibredb-getattr entry :book-format))
+         beg end)
+    (let ((inhibit-read-only t))
+      (with-current-buffer buff
+        (erase-buffer)
+        (setq beg (point))
+        ;; (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
+        (insert (format "ID          %s\n" (propertize id 'face 'calibredb-id-face)))
+        (setq end (point))
+        (put-text-property beg end 'calibredb-entry entry)
+        (insert (format "Title       %s\n" (propertize title 'face 'calibredb-title-face)))
+        (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
+        (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
+        (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))
+        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
+        (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
+        (insert "\n")
+        (if (image-type-available-p (intern format))
+            (calibredb-insert-image file "")
+          (calibredb-insert-image cover ""))
+        ;; (setq end (point))
+        (calibredb-show-mode)
+        (setq calibredb-show-entry entry)
+        (goto-char (point-min))))
+    (unless (eq major-mode 'calibredb-show-mode)
+      (funcall calibredb-show-entry-switch buff))))
 
 (defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
   (interactive)
   (let* ((entry (get-text-property (point-min) 'calibredb-entry nil)) ; old entry
-         (id (calibredb-getattr entry :id))                           ; only get the id
-         (query-result (cdr (car (calibredb-candidate id))))          ; get the new entry through SQL query
-         (buff (get-buffer-create (calibredb-show--buffer-name query-result)))
-         (file (calibredb-getattr query-result :file-path))
-         (cover (concat (file-name-directory file) "cover.jpg"))
-         (format (calibredb-getattr query-result :book-format)))
-    (with-current-buffer buff
-      (read-only-mode -1)
-      (erase-buffer)
-      ;; (setq start (point))
-      ;; (insert title)
-      (insert (propertize (calibredb-show-metadata query-result) 'calibredb-entry query-result))
-      ;; (insert book)
-      (insert "\n")
-      (if (image-type-available-p (intern format))
-          (calibredb-insert-image file "")
-        (calibredb-insert-image cover ""))
-      (calibredb-show-mode)
-      (setq calibredb-show-entry query-result)
-      (goto-char (point-min)))))
+         (id (calibredb-getattr entry :id)) ; only get the id
+         (query-result (cdr (car (calibredb-candidate id))))) ; get the new entry through SQL query
+    (calibredb-show-entry query-result)))
 
 (defun calibredb-search-buffer ()
   "Create buffer calibredb-search."
@@ -1472,7 +1484,8 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (setf calibredb-search-last-update (float-time))))))
 
 (defun calibredb-citekey (entry)
-  "return some kind of a unique citation key for BibTeX use"
+  "Return some kind of a unique citation key for BibTeX use.
+Argument ENTRY is the candidate."
   (let* ((stopword-list '("the" "on" "a"))
          (spl (split-string (s-trim (calibredb-getattr entry :author-sort)) "&"))
          (first-author-lastname (first (split-string (first spl) ",")))
