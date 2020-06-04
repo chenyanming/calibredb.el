@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    June 1, 2020
+#+DATE:    June 4, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
@@ -14,7 +14,7 @@
     - [[#add-comments][Add comments]]
 - [[#installation][Installation]]
 - [[#configuration][Configuration]]
-  - [[#enable-calibredbel][Enable calibredb.el]]
+  - [[#quick-start][Quick Start]]
   - [[#keybindings][keybindings]]
 - [[#workflows][Workflows]]
   - [[#start-with-calibredb][Start with =calibredb=]]
@@ -27,7 +27,7 @@
   - [[#how-to-remove-ebooks][How to remove ebooks?]]
   - [[#how-to-switch-to-different-library][How to switch to different library?]]
   - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
-  - [[#can-not-remember-so-many-keybindings][Can not remember so many keybindings?]]
+  - [[#can-not-remember-the-keybindings][Can not remember the keybindings?]]
   - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
   - [[#calibredb][calibredb]]
@@ -44,11 +44,9 @@
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
   - [[#set_metadata][set_metadata]]
-    - [[#--filed-tags][=--filed tags=]]
-    - [[#--filed-comments][=--filed comments=]]
-    - [[#--list-fields][=--list-fields=]]
   - [[#export][Export]]
 - [[#logs][Logs]]
+  - [[#2020-06-04][=2020-06-04=]]
   - [[#2020-05-31][=2020-05-31=]]
   - [[#2020-05-30][=2020-05-30=]]
   - [[#2020-05-16][=2020-05-16=]]
@@ -96,7 +94,7 @@ M-x package-install calibredb
 
 * Configuration
 
-** Enable calibredb.el
+** Quick Start
 
 #+BEGIN_SRC emacs-lisp
 (require 'calibredb)
@@ -124,7 +122,8 @@ M-x package-install calibredb
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
@@ -153,11 +152,12 @@ M-x package-install calibredb
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map "U" #'calibredb-unmark-and-backward)
-    (define-key map "j" #'next-line)
-    (define-key map "k" #'previous-line)
+    (define-key map "j" #'calibredb-show-next-entry)
+    (define-key map "k" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
-    (define-key map "\M-a" #'calibredb-set-metadata--author)
+    (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
+    (define-key map "\M-A" #'calibredb-set-metadata--authors)
     (define-key map "\M-T" #'calibredb-set-metadata--title)
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
@@ -174,7 +174,7 @@ You can perform the following actions:
  - Open the ebook
  - Set metadata on the ebook under cursor
  - Set metadata on marked ebooks
- - Add/remove ebooks into current library
+ - Add/remove ebooks on current library
  - Export the ebook under cursor
  - Clone/Switch/Jump to different libraries
  - Live filter the results
@@ -186,10 +186,10 @@ You can perform the following actions:
    - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
 
 PS:
-Workflows may be slightly changed in future versions.
+Workflows might be slightly changed in future versions.
 
 * Q&A
-The keybindings mentioned below are referred from
+The keybindings mentioned below are referenced from
 #+html: <a href="#keybindings">keybindings</a>.
 
 ** What is my current library?
@@ -202,7 +202,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - Press =o/O/v= to open it.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
-   - Select to the ebook you want to open in the list
+   - Select the ebook you want to open in the list
    - Press =Enter= to open it.
 
 3. =M-x calibredb=
@@ -248,13 +248,13 @@ switch temporarily.
   under cursor.
 - In =*calibredb-entry*= buffer, press =s= to set metadata.
 
-** Can not remember so many keybindings?
+Tips: You can filter the result via ~/~ before setting the metadata.
+
+** Can not remember the keybindings?
 Press ~?~, it will show you all actions.
 
 ** More examples?
-Please check
-#+html: <a href="#keybindings">keybindings</a>
-. All are self documented.
+Please check #+html: <a href="#keybindings">keybindings</a> . All are self documented.
 
 * Supported Features
 
@@ -372,13 +372,24 @@ Remove an item.
 ** show_metadata
 
 ** set_metadata
-*** =--filed tags=
-*** =--filed comments=
-*** =--list-fields=
+To set metadata,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-set-metadata-dispatch
+#+END_SRC
 
 ** Export
+To export the ebook,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-export-dispatch
+#+END_SRC
 
 * Logs
+** =2020-06-04=
+Version *1.8.0*:
+- Add =calibredb-show-next-entry= and =calibredb-show-previous-entry=.
+- Add *Total*, *Filter keyword*, *Marked* in =*calibredb-search*= header.
+- Improve the =*calibredb-show*= performance.
+
 ** =2020-05-31=
 Version *1.7.0*:
 - Add =calibredb-search-live-filter= to support live filtering.
