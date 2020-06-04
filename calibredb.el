@@ -296,8 +296,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map "U" #'calibredb-unmark-and-backward)
-    (define-key map "j" #'next-line)
-    (define-key map "k" #'previous-line)
+    (define-key map "j" #'calibredb-show-next-entry)
+    (define-key map "k" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
@@ -1159,8 +1159,9 @@ The result depends on the value of `calibredb-search-unique-buffers'."
       (format "*calibredb-search-<%s>*" calibredb-root-dir)
     "*calibredb-search*"))
 
-(defun calibredb-show-entry (entry)
-  "Display ENTRY in the current buffer."
+(defun calibredb-show-entry (entry &optional switch)
+  "Display ENTRY in the current buffer.
+Optional argument SWITCH to switch to *calibredb-search* buffer to other window."
   (unless (eq major-mode 'calibredb-show-mode)
       (when (get-buffer (calibredb-show--buffer-name entry))
         (kill-buffer (calibredb-show--buffer-name entry))))
@@ -1175,6 +1176,7 @@ The result depends on the value of `calibredb-search-unique-buffers'."
          (file (calibredb-getattr entry :file-path))
          (cover (concat (file-name-directory file) "cover.jpg"))
          (format (calibredb-getattr entry :book-format))
+         (original (point))
          beg end)
     (let ((inhibit-read-only t))
       (with-current-buffer buff
@@ -1199,7 +1201,22 @@ The result depends on the value of `calibredb-search-unique-buffers'."
         (setq calibredb-show-entry entry)
         (goto-char (point-min))))
     (unless (eq major-mode 'calibredb-show-mode)
-      (funcall calibredb-show-entry-switch buff))))
+      (funcall calibredb-show-entry-switch buff)
+      (when switch
+        (switch-to-buffer-other-window (set-buffer (calibredb-search--buffer-name)))
+        (goto-char original)))))
+
+(defun calibredb-show-next-entry ()
+  "Show next entry."
+  (interactive)
+  (forward-line 1)
+  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
+
+(defun calibredb-show-previous-entry ()
+  "Show previous entry."
+  (interactive)
+  (forward-line -1)
+  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
 
 (defun calibredb-show-refresh ()
   "Refresh ENTRY in the current buffer."
@@ -1282,7 +1299,7 @@ Argument EVENT mouse event."
 (defun calibredb-search-ret ()
   "Visit the calibredb-entry."
   (interactive)
-  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil))))
+  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
 
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
