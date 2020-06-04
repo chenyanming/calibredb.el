@@ -112,7 +112,9 @@ M-x package-install calibredb
                                 ("/Users/damonchan/Documents/HELLO")
                                 ("/Users/damonchan/Documents/Books")
                                 ("/Users/damonchan/Documents/World")))
+(require 'org-ref)
 (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+(add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
 (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
 #+END_SRC
 
@@ -262,7 +264,9 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 ** How to interact with org-ref?
 - Setup org-ref
   #+BEGIN_SRC emacs-lisp
+  (require 'org-ref)
   (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+  (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
   (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
   #+END_SRC
 - In =*calibredb-search*= buffer, =b= =b= to generate the ebook catalogs with a BibTex
@@ -459,7 +463,7 @@ Version *1.1.0*:
 - =calibredb-dispatch=
 
 ** =2020-05-09=
-Version *1.0*.0:
+Version *1.0.0*:
 - =calibredb-find-helm=
 - =calibredb-find-counsel=
 - =calibredb-list=
