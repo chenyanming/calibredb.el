@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 1.8.0
+;; Version: 1.9.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -26,11 +26,12 @@
 
 ;; Yet another [[https://calibre-ebook.com/][calibre]] Emacs client.
 ;; This package integrates calibre (using *calibredb*) into Emacs.
-;; 1. Ebook dashboard.
+;; 1. Powerful ebook dashboard.
 ;; 2. Manage ebooks, actually not only ebooks!
-;; 3. Manage libraries.
+;; 3. Manage Ebook libraries.
 ;; 4. Another bookmarks solution, by setting the tags and comments.
 ;; 5. Quick search, filter, make actions on items with ivy and helm.
+;; 6. Org-ref support.
 
 
 ;;; Code:
@@ -815,6 +816,7 @@ Argument PROPS are the additional parameters."
                                            (concat (file-name-as-directory calibredb-root-dir) "catalog.bib")))))
                      :input (s-join " " (-remove 's-blank? (-flatten (calibredb-catalog-bib-arguments))))
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (calibredb-ref-default-bibliography)
   (message "Updated BibTex file."))
 
 (defun calibredb-find-bib ()
@@ -823,6 +825,14 @@ Argument PROPS are the additional parameters."
   (if (file-exists-p calibredb-ref-default-bibliography)
       (find-file calibredb-ref-default-bibliography)
     (message "NO BibTex file.")))
+
+(defun calibredb-ref-default-bibliography ()
+  "Update the path of BibTex file."
+  (setq calibredb-ref-default-bibliography
+        (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+  (if (boundp 'org-ref-default-bibliography)
+      (if (file-exists-p calibredb-ref-default-bibliography)
+          (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography))))
 
 (defun calibredb-find-cover (candidate)
   "Open the cover page image of selected CANDIDATE."
@@ -1380,6 +1390,7 @@ Indicating the library you use."
                  (put-text-property beg end 'calibredb-entry item)
                  (insert "\n")))
              (goto-char (point-min)))
+           (calibredb-ref-default-bibliography)
            (unless (eq major-mode 'calibredb-search-mode)
              (calibredb-search-mode))))))
 
@@ -1410,7 +1421,7 @@ Argument EVENT mouse event."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+          (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
@@ -1422,11 +1433,11 @@ selecting the new item."
   (let ((result (completing-read "Quick switch library: " calibredb-library-alist)) )
     (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
         (progn
-         (setq calibredb-root-dir result)
-         (calibredb-root-dir-quote)
-         (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-         (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
-         (calibredb-search-refresh-or-resume))
+          (setq calibredb-root-dir result)
+          (calibredb-root-dir-quote)
+          (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
+          (calibredb-ref-default-bibliography)
+          (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
 (defvar calibredb-library-index 0)
@@ -1445,7 +1456,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+          (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
@@ -1462,7 +1473,7 @@ selecting the new item."
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
-          (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+          (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 

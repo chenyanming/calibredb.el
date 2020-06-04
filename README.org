@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    June 4, 2020
+#+DATE:    June 5, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
@@ -27,6 +27,7 @@
   - [[#how-to-remove-ebooks][How to remove ebooks?]]
   - [[#how-to-switch-to-different-library][How to switch to different library?]]
   - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
+  - [[#how-to-interact-with-org-ref][How to interact with org-ref?]]
   - [[#can-not-remember-the-keybindings][Can not remember the keybindings?]]
   - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
@@ -45,7 +46,10 @@
   - [[#show_metadata][show_metadata]]
   - [[#set_metadata][set_metadata]]
   - [[#export][Export]]
+  - [[#catalog][Catalog]]
+    - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-06-05][=2020-06-05=]]
   - [[#2020-06-04][=2020-06-04=]]
   - [[#2020-05-31][=2020-05-31=]]
   - [[#2020-05-30][=2020-05-30=]]
@@ -61,11 +65,12 @@ Yet another [[https://calibre-ebook.com/][calibre]] client for emacs.
 
 This package integrates calibre (using *calibredb*) into emacs.
 
-1. Ebook dashboard.
+1. Powerful ebook dashboard.
 2. Manage ebooks, actually not only ebooks!
-3. Manage libraries.
+3. Manage Ebook libraries.
 4. Another bookmarks solution, by setting the tags and comments.
 5. Quick search, filter, make actions on items with ivy and helm.
+6. Org-ref support.
 
 * Screenshots
 ** Dashboard
@@ -103,10 +108,12 @@ M-x package-install calibredb
 (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 (setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
-                                  ("/Users/damonchan/Documents/Books Library")
-                                  ("/Users/damonchan/Documents/HELLO")
-                                  ("/Users/damonchan/Documents/Books")
-                                  ("/Users/damonchan/Documents/World")))
+                                ("/Users/damonchan/Documents/Books Library")
+                                ("/Users/damonchan/Documents/HELLO")
+                                ("/Users/damonchan/Documents/Books")
+                                ("/Users/damonchan/Documents/World")))
+(setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+(setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
 #+END_SRC
 
 ** keybindings
@@ -146,6 +153,7 @@ M-x package-install calibredb
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
@@ -178,6 +186,7 @@ You can perform the following actions:
  - Export the ebook under cursor
  - Clone/Switch/Jump to different libraries
  - Live filter the results
+ - Generate Catalog, such as BibTex file
 
 ** Start with =calibredb-find-helm= or =calibredb-find-counsel=
    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
@@ -249,6 +258,19 @@ switch temporarily.
 - In =*calibredb-entry*= buffer, press =s= to set metadata.
 
 Tips: You can filter the result via ~/~ before setting the metadata.
+
+** How to interact with org-ref?
+- Setup org-ref
+  #+BEGIN_SRC emacs-lisp
+  (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+  (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
+  #+END_SRC
+- In =*calibredb-search*= buffer, =b= =b= to generate the ebook catalogs with a BibTex
+file.
+- The BibTex file is generated under current library path - =calibredb-root-dir=.
+- Every time you switch your library, the corresponding BibTex file
+path will added into =org-ref-default-bibliography= temporarily.
+- In an org file, =C-c ]= to insert cite.
 
 ** Can not remember the keybindings?
 Press ~?~, it will show you all actions.
@@ -383,7 +405,19 @@ To export the ebook,
 M-x calibredb-export-dispatch
 #+END_SRC
 
+** Catalog
+*** BibTex
+Export the ebook catalogs to a BibTex file.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-catalog-bib-dispatch
+#+END_SRC
+PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
+
 * Logs
+** =2020-06-05=
+Version *1.9.0*:
+- Add BibTex support: =calibredb-catalog-bib-dispatch=
+
 ** =2020-06-04=
 Version *1.8.0*:
 - Add =calibredb-show-next-entry= and =calibredb-show-previous-entry=.
