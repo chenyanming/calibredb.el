@@ -1483,23 +1483,23 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (goto-char (point-min))         ; back to point-min after filtering
         (setf calibredb-search-last-update (float-time))))))
 
-(defun calibredb-citekey (entry)
-  "Return some kind of a unique citation key for BibTeX use.
-Argument ENTRY is the candidate."
-  (let* ((stopword-list '("the" "on" "a"))
-         (spl (split-string (s-trim (calibredb-getattr entry :author-sort)) "&"))
-         (first-author-lastname (first (split-string (first spl) ",")))
-         (first-useful-word-in-title
-          ;; ref fitlering in http://www.emacswiki.org/emacs/ElispCookbook#toc39
-          (first (delq nil
-                       (mapcar
-                        (lambda (token) (if (member token stopword-list) nil token))
-                        (split-string (downcase (calibredb-getattr entry :book-title)) " "))))))
-    (concat
-     (downcase (replace-regexp-in-string  "\\W" "" first-author-lastname))
-     (if (< 1 (length spl)) "etal" "")
-     (substring (calibredb-getattr entry :book-pubdate) 0 4)
-     (downcase (replace-regexp-in-string  "\\W.*" "" first-useful-word-in-title)))))
+;; (defun calibredb-citekey (entry)
+;;   "Return some kind of a unique citation key for BibTeX use.
+;; Argument ENTRY is the candidate."
+;;   (let* ((stopword-list '("the" "on" "a"))
+;;          (spl (split-string (s-trim (calibredb-getattr entry :author-sort)) "&"))
+;;          (first-author-lastname (first (split-string (first spl) ",")))
+;;          (first-useful-word-in-title
+;;           ;; ref fitlering in http://www.emacswiki.org/emacs/ElispCookbook#toc39
+;;           (first (delq nil
+;;                        (mapcar
+;;                         (lambda (token) (if (member token stopword-list) nil token))
+;;                         (split-string (downcase (calibredb-getattr entry :book-title)) " "))))))
+;;     (concat
+;;      (downcase (replace-regexp-in-string  "\\W" "" first-author-lastname))
+;;      (if (< 1 (length spl)) "etal" "")
+;;      (substring (calibredb-getattr entry :book-pubdate) 0 4)
+;;      (downcase (replace-regexp-in-string  "\\W.*" "" first-useful-word-in-title)))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
