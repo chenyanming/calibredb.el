@@ -58,11 +58,7 @@
 
 
 (defcustom calibredb-ref-default-bibliography nil
-  "List of bibtex files to search for.
-You should use full-paths for each file. Note that you must
-include a bibliography link in your document if you will be
-exporting it to pdf; org-ref-default-bibliography is not
-used by the LaTeX exporter."
+  "BibTex file for current library."
   :type 'file
   :group 'calibredb)
 
@@ -75,8 +71,6 @@ used by the LaTeX exporter."
   :set (lambda (var value)
          (set var value)
          (setq calibredb-db-dir (expand-file-name "metadata.db"
-                                                  calibredb-root-dir))
-         (setq calibredb-ref-default-bibliography (expand-file-name "catalog.bib"
                                                   calibredb-root-dir)))
   :group 'calibredb)
 
@@ -302,7 +296,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-open-file-with-default-tool)
-    (define-key map "R" #'calibredb-find-catalog-bib)
+    (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
@@ -810,22 +804,25 @@ Argument PROPS are the additional parameters."
                        ;; :id id
                        :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
-(defun calibredb-catalog--bib ()
-  "Export the catalog."
+(defun calibredb-catalog-bib--transient ()
+  "Export the catalog with BibTex file."
   (interactive)
-  (let ()
-    (calibredb-command :command "catalog"
-                       :input (format "%s"
-                                      (shell-quote-argument
-                                       (expand-file-name
-                                        (or calibredb-ref-default-bibliography
-                                            (concat (file-name-as-directory calibredb-root-dir) "catalog.bib")))))
-                       :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+  (calibredb-command :command "catalog"
+                     :option (format "%s"
+                                     (shell-quote-argument
+                                      (expand-file-name
+                                       (or calibredb-ref-default-bibliography
+                                           (concat (file-name-as-directory calibredb-root-dir) "catalog.bib")))))
+                     :input (s-join " " (-remove 's-blank? (-flatten (calibredb-catalog-bib-arguments))))
+                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (message "Updated BibTex file."))
 
-(defun calibredb-find-catalog-bib ()
+(defun calibredb-find-bib ()
+  "Open the catalog BibTex file."
   (interactive)
   (if (file-exists-p calibredb-ref-default-bibliography)
-      (find-file calibredb-ref-default-bibliography)))
+      (find-file calibredb-ref-default-bibliography)
+    (message "NO BibTex file.")))
 
 (defun calibredb-find-cover (candidate)
   "Open the cover page image of selected CANDIDATE."
@@ -993,6 +990,8 @@ ARGUMENT FILTER is the filter string."
    [("s" "set_metadata"   calibredb-set-metadata-dispatch)
     ;; ("S" "show_metadata"         calibredb-show-metadata)
     ]]
+  ["Catalog"
+   [("b" "BibTex"   calibredb-catalog-bib-dispatch)]]
   ["File operaion"
    [("a" "Add a file"   calibredb-add)
     ("A" "Add a directory"   calibredb-add-dir)
@@ -1026,7 +1025,7 @@ ARGUMENT FILTER is the filter string."
    [("e" "Export" calibredb-export-dispatch)]])
 
 (define-transient-command calibredb-set-metadata-dispatch ()
-  "Create a new commit or replace an existing commit."
+  "Dispatch for set-metadata."
   ["Arguments"
    ("-a" "author_sort"  "author_sort:" calibredb-transient-read-metadata-author-sort)
    ("-A" "authors"  "authors:" calibredb-transient-read-metadata-authors)
@@ -1055,7 +1054,7 @@ ARGUMENT FILTER is the filter string."
     ("s" "Set metadata"         calibredb-set-metadata--transient)]])
 
 (define-transient-command calibredb-export-dispatch ()
-  "TODO: Create a new commit or replace an existing commit."
+  "Dispatch for export."
   ["Arguments"
    ("-a" "Do not convert non English characters for the file names"  "--dont-asciiize")
    ("-c" "Do not save cover"  "--dont-save-cover")
@@ -1072,6 +1071,61 @@ ARGUMENT FILTER is the filter string."
    ("-A" "Export all books in database, ignoring the list of ids" "--all")]
   [["Export"
     ("e" "Export"         calibredb-export)]])
+
+(define-transient-command calibredb-catalog-bib-dispatch ()
+  "Dispatch for catalog BibTex."
+  ["Arguments"
+   ("-f" "The fields to output when cataloging books in the database.  Should be a comma-separated list of fields." "--fields " calibredb-transient-read-bib-fields)
+   ("-s" "Output field to sort on." "--sort-by " calibredb-transient-read-bib-sort-by)
+   ("-c" "Create a citation for BibTeX entries."  " --create-citation " calibredb-transient-read-bib-create-citation)
+   ("-p" "Create a file entry if formats is selected for BibTeX entries."  "--add-files-path " calibredb-transient-read-bib-add-files-path)
+   ("-T" "The template for citation creation from database fields." "--citation-template " calibredb-transient-read-bib-citation-template)
+   ("-e" "BibTeX file encoding output."  "--choose-encoding " calibredb-transient-read-choose-encoding)
+   ("-E" "BibTeX file encoding flag."  "--choose-encoding-configuration " calibredb-transient-read-choose-encoding-configuration)
+   ("-t" "Entry type for BibTeX catalog."  "--entry-type " calibredb-transient-read-entry-type)]
+  [["Bibtex"
+    ("o" "Find BibTex file"         calibredb-find-bib)
+    ("b" "Update BibTex file"         calibredb-catalog-bib--transient)]])
+
+(defun calibredb-transient-read-bib-fields (prompt _initial-input _history)
+  "TODO: Read a BibTex --fields value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("title,authors,tags")))
+
+(defun calibredb-transient-read-bib-sort-by (prompt _initial-input _history)
+  "Read a BibTex --sort-by value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("author_sort" "id" "rating" "size" "timestamp" "title")))
+
+(defun calibredb-transient-read-bib-create-citation (prompt _initial-input _history)
+  "Read a BibTex --create-citation value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("True" "False")))
+
+(defun calibredb-transient-read-bib-add-files-path (prompt _initial-input _history)
+  "Read a BibTex --add-files-path value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("True" "False")))
+
+(defun calibredb-transient-read-bib-citation-template (prompt _initial-input _history)
+  "TODO: Read a BibTex --citation-template value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("{authors}{id}")))
+
+(defun calibredb-transient-read-choose-encoding (prompt _initial-input _history)
+  "Read a BibTex --choose-encoding value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("utf8" "cp1252" "ascii")))
+
+(defun calibredb-transient-read-choose-encoding-configuration (prompt _initial-input _history)
+  "Read a BibTex --choose-encoding-configuration value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("strict" "replace" "ignore" "backslashreplace")))
+
+(defun calibredb-transient-read-entry-type (prompt _initial-input _history)
+  "Read a BibTex --entry-type value.
+Argument PROMPT prompt to show."
+  (completing-read prompt '("book" "misc" "mixed")))
 
 ;; Readers
 
@@ -1179,6 +1233,10 @@ Argument PROMPT prompt to show."
 (defun calibredb-export-arguments ()
   "Return the latest used arguments in the `calibredb-export-dispatch' transient."
   (car (alist-get 'calibredb-export-dispatch transient-history)))
+
+(defun calibredb-catalog-bib-arguments ()
+  "Return the latest used arguments in the `calibredb-catalog-bib-dispatch' transient."
+  (car (alist-get 'calibredb-catalog-bib-dispatch transient-history)))
 
 (define-derived-mode calibredb-show-mode fundamental-mode "calibredb-show"
   "Mode for displaying book entry details.
@@ -1545,24 +1603,6 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         ;; (insert "End of entries.\n")
         (goto-char (point-min))         ; back to point-min after filtering
         (setf calibredb-search-last-update (float-time))))))
-
-;; (defun calibredb-citekey (entry)
-;;   "Return some kind of a unique citation key for BibTeX use.
-;; Argument ENTRY is the candidate."
-;;   (let* ((stopword-list '("the" "on" "a"))
-;;          (spl (split-string (s-trim (calibredb-getattr entry :author-sort)) "&"))
-;;          (first-author-lastname (first (split-string (first spl) ",")))
-;;          (first-useful-word-in-title
-;;           ;; ref fitlering in http://www.emacswiki.org/emacs/ElispCookbook#toc39
-;;           (first (delq nil
-;;                        (mapcar
-;;                         (lambda (token) (if (member token stopword-list) nil token))
-;;                         (split-string (downcase (calibredb-getattr entry :book-title)) " "))))))
-;;     (concat
-;;      (downcase (replace-regexp-in-string  "\\W" "" first-author-lastname))
-;;      (if (< 1 (length spl)) "etal" "")
-;;      (substring (calibredb-getattr entry :book-pubdate) 0 4)
-;;      (downcase (replace-regexp-in-string  "\\W.*" "" first-useful-word-in-title)))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
