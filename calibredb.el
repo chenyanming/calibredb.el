@@ -303,7 +303,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
-    (define-key map "U" #'calibredb-unmark-and-backward)
+    (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
     (define-key map "j" #'calibredb-show-next-entry)
     (define-key map "k" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
@@ -574,6 +574,46 @@ Optional argument CANDIDATE is the selected item."
   (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
 ;; add
+
+(defun calibredb-counsel-find-file-action (x)
+  "Find file X."
+  (with-ivy-window
+    (message x)))
+
+(defun calibredb-find-dired (&optional candidate)
+  "Open file of the selected item.
+Optional argument CANDIDATE is the selected item."
+  (interactive)
+  (unless candidate
+    (setq candidate (car (calibredb-find-candidate-at-point))))
+  (find-file (calibredb-getattr candidate :file-path)))
+
+(defun calibredb-counsel-add ()
+  "Add a file into calibre database."
+  (interactive)
+  (cond (and ivy-mode))
+  (counsel--find-file-1
+   "Find file: " initial-input
+   #'calibredb-counsel-find-file-action
+   'calibredb-counsel-find-file)
+  ;; (calibredb-command :command "add"
+  ;;                    :input (calibredb-complete-file-quote "Add a file to Calibre")
+  ;;                    :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (calibredb-complete-file-quote "Add a file to Calibre")
+  (if (equal major-mode 'calibredb-search-mode)
+      (calibredb-search-refresh-or-resume))
+  (message ivy-marked-candidates)
+  (dolist (cand (cond ((memq this-command '(ivy-done)) (if (fboundp 'ivy-marked-candidates)
+                                                           (ivy-marked-candidates) nil))
+                      ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
+                                                                             (helm-marked-candidates) nil))))
+    (message cand)
+    ;; (calibredb-command :command "add"
+    ;;                    :input (calibredb-complete-file-quote "Add a file to Calibre")
+    ;;                    :library (format "--library-path %s" (calibredb-root-dir-quote)))
+    )
+  (if (equal major-mode 'calibredb-search-mode)
+      (calibredb-search-refresh-or-resume)))
 
 (defun calibredb-add ()
   "Add a file into calibre database."
