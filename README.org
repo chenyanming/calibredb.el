@@ -15,6 +15,7 @@
 - [[#installation][Installation]]
 - [[#configuration][Configuration]]
   - [[#quick-start][Quick Start]]
+  - [[#configure-to-support-org-ref][Configure to support org-ref]]
   - [[#keybindings][keybindings]]
 - [[#workflows][Workflows]]
   - [[#start-with-calibredb][Start with =calibredb=]]
@@ -117,6 +118,10 @@ M-x package-install calibredb
                                 ("/Users/damonchan/Documents/HELLO")
                                 ("/Users/damonchan/Documents/Books")
                                 ("/Users/damonchan/Documents/World")))
+#+END_SRC
+
+** Configure to support org-ref
+#+BEGIN_SRC emacs-lisp
 (require 'org-ref)
 (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
 (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)

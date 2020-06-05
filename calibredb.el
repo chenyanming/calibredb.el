@@ -361,6 +361,9 @@ time."
   :group 'calibredb
   :type '(alist :key-type string :value-type function))
 
+(define-obsolete-function-alias 'calibredb-search-ret
+  'calibredb-view "calibredb 2.0.0")
+
 (if (fboundp 'ivy-set-actions)
     (ivy-set-actions
      'calibredb-ivy-read
