@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 1.9.0
+;; Version: 2.0.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -579,7 +579,7 @@ Optional argument CANDIDATE is the selected item."
 ;; add
 
 (defun calibredb-counsel-add-file-action (file)
-  "Add marked files."
+  "Add marked FILEs."
   (calibredb-command :command "add"
                      :input (shell-quote-argument (expand-file-name file))
                      :library (format "--library-path %s" (calibredb-root-dir-quote))))
@@ -603,7 +603,7 @@ directory, open this directory."
 With ivy-mode: Add marked items.
 Others: Add only one item."
   (interactive)
-  (cond ((if (boundp ivy-mode)
+  (cond ((if (boundp 'ivy-mode)
              (if ivy-mode
                  (if (fboundp 'counsel--find-file-1)
                      (counsel--find-file-1
