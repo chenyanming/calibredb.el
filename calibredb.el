@@ -522,7 +522,7 @@ Argument QUERY-RESULT is the query result generate by sqlite."
               (insert "#+attr_org: :width 200px\n")
               (insert (concat "[[file:" cover "]]")))
             (insert "\n")
-            (org-insert-link nil book title)
+            (insert (format "[[file:%s][%s]]" book title))
             (insert "\n")))))
     (when (buffer-live-p occur-buf)
       (switch-to-buffer-other-window occur-buf)
