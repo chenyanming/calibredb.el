@@ -21,7 +21,7 @@
   - [[#start-with-calibredb-find-helm-or-calibredb-find-counsel][Start with =calibredb-find-helm= or =calibredb-find-counsel=]]
   - [[#start-with-calibredb-list][Start with =calibredb-list=]]
 - [[#qa][Q&A]]
-  - [[#what-is-my-current-library][What is my current library?]]
+  - [[#what-is-my-working-library][What is my working library?]]
   - [[#how-to-open-an-ebook][How to open an ebook?]]
   - [[#how-to-add-ebooks][How to add ebooks?]]
   - [[#how-to-remove-ebooks][How to remove ebooks?]]
@@ -40,7 +40,11 @@
   - [[#calibredb-library-list][calibredb-library-list]]
   - [[#calibredb-switch-library][calibredb-switch-library]]
   - [[#show-details][Show details]]
-  - [[#calibredb-dispatch][calibredb-dispatch]]
+  - [[#dispatch][Dispatch]]
+    - [[#calibredb-dispatch][calibredb-dispatch]]
+    - [[#calibredb-set-metadata-dispatch][calibredb-set-metadata-dispatch]]
+    - [[#calibredb-catalog-bib-dispatch][calibredb-catalog-bib-dispatch]]
+    - [[#calibredb-export-dispatch][calibredb-export-dispatch]]
   - [[#add][add]]
   - [[#remove][remove]]
   - [[#show_metadata][show_metadata]]
@@ -50,6 +54,7 @@
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
   - [[#2020-06-05][=2020-06-05=]]
+  - [[#2020-06-05-1][=2020-06-05=]]
   - [[#2020-06-04][=2020-06-04=]]
   - [[#2020-05-31][=2020-05-31=]]
   - [[#2020-05-30][=2020-05-30=]]
@@ -126,10 +131,11 @@ M-x package-install calibredb
     (define-key map "?" #'calibredb-entry-dispatch)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
+    (define-key map "." #'calibredb-open-dired)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
     (define-key map "\M-A" #'calibredb-set-metadata--authors)
@@ -141,7 +147,7 @@ M-x package-install calibredb
 (defvar calibredb-search-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
-    (define-key map (kbd "<RET>") #'calibredb-search-ret)
+    (define-key map (kbd "<RET>") #'calibredb-find-file)
     (define-key map "?" #'calibredb-dispatch)
     (define-key map "a" #'calibredb-add)
     (define-key map "A" #'calibredb-add-dir)
@@ -154,16 +160,18 @@ M-x package-install calibredb
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "v" #'calibredb-view)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
-    (define-key map "U" #'calibredb-unmark-and-backward)
-    (define-key map "j" #'calibredb-show-next-entry)
-    (define-key map "k" #'calibredb-show-previous-entry)
+    (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
+    (define-key map "\M-n" #'calibredb-show-next-entry)
+    (define-key map "\M-p" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
@@ -175,6 +183,7 @@ M-x package-install calibredb
 
 #+END_SRC
 
+PS: Keybindings might be changed after the update.
 
 * Workflows
 There are three ways to manage your ebooks:
@@ -203,30 +212,36 @@ Workflows might be slightly changed in future versions.
 The keybindings mentioned below are referenced from
 #+html: <a href="#keybindings">keybindings</a>.
 
-** What is my current library?
+** What is my working library?
 =M-x calibredb=, your current library path shows in the header in buffer =*calibredb-search*=
 Besides, variable =calibredb-root-dir= also saves the current library location.
 
 ** How to open an ebook?
 1. =M-x calibredb=
    - In =*calibredb-search*= buffer, move the cursor to the ebook you want to open.
-   - Press =o/O/v= to open it.
+   - Press =RET/o/O/V= to open it.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
    - Select the ebook you want to open in the list
-   - Press =Enter= to open it.
+   - Press =RET= to open it.
 
 3. =M-x calibredb=
-   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =Enter=, or just =Right Click= on the ebook.
-   - In =*calibredb-entry*= buffer, press =o/O/v= to open it.
+   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =v= to
+     show details, or just =Right Click= on the ebook.
+   - Then in =*calibredb-entry*= buffer, press =o/O/V= to open it.
     
 ** How to add ebooks?
-=M-x calibredb-add= and select one ebook file to add.
-=M-x calibredb-add-dir= and select one directory to add, all supported formats will be added into current library.
+1. =M-x calibredb-add=, select and mark ebooks (only ivy supported currently - with
+=ivy-hydra=, in ivy-window, press =m= to mark, other engines can only select one
+item) to add to currently library.
+
+2. =M-x calibredb-add-dir= and select one
+directory to add, all supported formats will be added into current library.
 
 ** How to remove ebooks?
 1. =M-x calibredb=
-   - move the cursor to the ebook you want to delete, press =d=, calibredb will ask you to delete or not.
+   - move the cursor to the ebook you want to delete, press =d=, calibredb will
+     ask you to delete or not.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
    - Select to the ebook you want to delete in the list
@@ -280,7 +295,9 @@ path will added into =org-ref-default-bibliography= temporarily.
 Press ~?~, it will show you all actions.
 
 ** More examples?
-Please check #+html: <a href="#keybindings">keybindings</a> . All are self documented.
+Please check
+#+html: <a href="#keybindings">keybindings</a> .
+All are self documented.
 
 * Supported Features
 
@@ -292,7 +309,7 @@ Enter calibre emacs client, a new buffer called =*calibredb-search*= with =calib
 #+BEGIN_SRC emacs-lisp
 M-x calibredb
 #+END_SRC
-=RET= or =mouse-3= to open the entry
+=RET= open the entry
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
@@ -368,7 +385,8 @@ M-x calibredb-switch-library
 ** Show details
 This action will get you to the book details buffer called =*calibredb-entry*=
 
-** calibredb-dispatch
+** Dispatch
+*** calibredb-dispatch
 Under =*calilbredb-search*= or =*calilbredb-entry*= buffer, you can make actions on
 selected item with =calibredb-dispatch=, just like =magit-dispatch=.
 
@@ -380,6 +398,24 @@ Or fire with keybinding ~?~
 Demo:
 #+attr_org: :width 600px
 [[file:img/details.gif]]
+*** calibredb-set-metadata-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-set-metadata-dispatch
+#+END_SRC
+Or fire with keybinding ~s~
+
+*** calibredb-catalog-bib-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-catalog-bib-dispatch
+#+END_SRC
+Or fire with keybinding ~b~
+
+*** calibredb-export-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-export-dispatch
+#+END_SRC
+Or fire with keybinding ~e~
+
 
 ** add
 To add a file into calibre, call
@@ -394,6 +430,8 @@ M-x calibredb-add-dir
 
 ** remove
 Remove an item.
+
+PS: In case of wrong deletion, you can only delete one file each time.
 
 ** show_metadata
 
@@ -418,6 +456,13 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-06-05=
+Version *2.0.0*:
+- Adjust or add keybindings: =RET= =v= =V= ~.~ =M-n= =M-p= to provide better user experience.
+- Add =calibredb-open-dired=
+- Upgrade =calibredb-add= to support add marked items in ivy.
+- Improve user experience
+
 ** =2020-06-05=
 Version *1.9.0*:
 - Add BibTex support: =calibredb-catalog-bib-dispatch=

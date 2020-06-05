@@ -268,10 +268,11 @@ When live editing the filter, it is bound to :live.")
     (define-key map "?" #'calibredb-entry-dispatch)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
+    (define-key map "." #'calibredb-open-dired)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
     (define-key map "\M-A" #'calibredb-set-metadata--authors)
@@ -283,7 +284,7 @@ When live editing the filter, it is bound to :live.")
 (defvar calibredb-search-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
-    (define-key map (kbd "<RET>") #'calibredb-search-ret)
+    (define-key map (kbd "<RET>") #'calibredb-find-file)
     (define-key map "?" #'calibredb-dispatch)
     (define-key map "a" #'calibredb-add)
     (define-key map "A" #'calibredb-add-dir)
@@ -296,7 +297,9 @@ When live editing the filter, it is bound to :live.")
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
     (define-key map "O" #'calibredb-find-file-other-frame)
-    (define-key map "v" #'calibredb-open-file-with-default-tool)
+    (define-key map "v" #'calibredb-view)
+    (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-or-resume)
@@ -304,8 +307,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
-    (define-key map "j" #'calibredb-show-next-entry)
-    (define-key map "k" #'calibredb-show-previous-entry)
+    (define-key map "\M-n" #'calibredb-show-next-entry)
+    (define-key map "\M-p" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
@@ -344,7 +347,7 @@ time."
   (if (fboundp 'helm-make-actions)
       (helm-make-actions
        "Open file"                   'calibredb-find-file
-       "Show details"                'calibredb-show-entry
+       "View details"                'calibredb-show-entry
        "Open file other frame"       'calibredb-find-file-other-frame
        "Open file with default tool" 'calibredb-open-file-with-default-tool
        "Open Cover Page"             'calibredb-find-cover
@@ -366,9 +369,9 @@ time."
        ("O" (lambda (candidate)
               (calibredb-find-file-other-frame (cdr candidate))) "Find file other frame")
        ("v" (lambda (candidate)
+              (calibredb-show-entry (cdr candidate))) "View details")
+       ("V" (lambda (candidate)
               (calibredb-open-file-with-default-tool (cdr candidate))) "Open with default tool")
-       ("s" (lambda (candidate)
-              (calibredb-show-entry (cdr candidate))) "Show details")
        ("d" (lambda (candidate)
               (calibredb-remove (cdr candidate))) "Delete ebook")
        ("t" (lambda (candidate)
@@ -575,52 +578,42 @@ Optional argument CANDIDATE is the selected item."
 
 ;; add
 
-(defun calibredb-counsel-find-file-action (x)
-  "Find file X."
-  (with-ivy-window
-    (message x)))
+(defun calibredb-counsel-add-file-action (file)
+  "Add marked files."
+  (calibredb-command :command "add"
+                     :input (shell-quote-argument (expand-file-name file))
+                     :library (format "--library-path %s" (calibredb-root-dir-quote))))
 
-(defun calibredb-find-dired (&optional candidate)
-  "Open file of the selected item.
-Optional argument CANDIDATE is the selected item."
+(defun calibredb-open-dired (&optional candidate)
+  "Open dired of the selected item.
+Optional argument CANDIDATE is the selected item.
+Opens a dired buffer in FILE's directory.  If FILE is a
+directory, open this directory."
   (interactive)
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file (calibredb-getattr candidate :file-path)))
-
-(defun calibredb-counsel-add ()
-  "Add a file into calibre database."
-  (interactive)
-  (cond (and ivy-mode))
-  (counsel--find-file-1
-   "Find file: " initial-input
-   #'calibredb-counsel-find-file-action
-   'calibredb-counsel-find-file)
-  ;; (calibredb-command :command "add"
-  ;;                    :input (calibredb-complete-file-quote "Add a file to Calibre")
-  ;;                    :library (format "--library-path %s" (calibredb-root-dir-quote)))
-  (calibredb-complete-file-quote "Add a file to Calibre")
-  (if (equal major-mode 'calibredb-search-mode)
-      (calibredb-search-refresh-or-resume))
-  (message ivy-marked-candidates)
-  (dolist (cand (cond ((memq this-command '(ivy-done)) (if (fboundp 'ivy-marked-candidates)
-                                                           (ivy-marked-candidates) nil))
-                      ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
-                                                                             (helm-marked-candidates) nil))))
-    (message cand)
-    ;; (calibredb-command :command "add"
-    ;;                    :input (calibredb-complete-file-quote "Add a file to Calibre")
-    ;;                    :library (format "--library-path %s" (calibredb-root-dir-quote)))
-    )
-  (if (equal major-mode 'calibredb-search-mode)
-      (calibredb-search-refresh-or-resume)))
+  (let ((file (calibredb-getattr candidate :file-path)))
+    (if (file-directory-p file)
+        (dired file)
+      (dired (file-name-directory file))
+      (dired-goto-file file))))
 
 (defun calibredb-add ()
-  "Add a file into calibre database."
+  "Add file(s) into calibredb.
+With ivy-mode: Add marked items.
+Others: Add only one item."
   (interactive)
-  (calibredb-command :command "add"
-                     :input (calibredb-complete-file-quote "Add a file to Calibre")
-                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (cond ((if (boundp ivy-mode)
+             (if ivy-mode
+                 (if (fboundp 'counsel--find-file-1)
+                     (counsel--find-file-1
+                      "Add file(s) to calibredb: " nil
+                      #'calibredb-counsel-add-file-action
+                      'calibredb-add)))))
+        (t
+         (calibredb-command :command "add"
+                            :input (calibredb-complete-file-quote "Add a file to Calibre")
+                            :library (format "--library-path %s" (calibredb-root-dir-quote)))))
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
 
@@ -1049,9 +1042,12 @@ ARGUMENT FILTER is the filter string."
     ("e" "Export" calibredb-export-dispatch)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
-    ("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+    ("v" "View details"  calibredb-view)
+    ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
+    ("." "Open dired"  calibredb-open-dired)]
    [("m" "Mark" calibredb-mark-and-forward)
-    ("u" "Unmark" calibredb-unmark-and-forward)
+    ("u" "Unmark and forward" calibredb-unmark-and-forward)
+    ("DEL" "Unmark and backward" calibredb-unmark-and-backward)
     ("/" "Live Filter" calibredb-search-live-filter)]]
   ["Library operaion"
    [("l" "List Libraries"   calibredb-library-list)
@@ -1070,8 +1066,9 @@ ARGUMENT FILTER is the filter string."
     ]]
   ["File operaion"
    [("o" "Open file"         calibredb-find-file)
-    ("O" "Open file other frame"            calibredb-find-file-other-frame)]
-   [("v" "Open file with default tool"  calibredb-open-file-with-default-tool)]
+    ("O" "Open file other frame"            calibredb-find-file-other-frame)
+    ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
+    ("." "Open dired"  calibredb-open-dired)]
    [("e" "Export" calibredb-export-dispatch)]])
 
 (define-transient-command calibredb-set-metadata-dispatch ()
@@ -1125,14 +1122,14 @@ ARGUMENT FILTER is the filter string."
 (define-transient-command calibredb-catalog-bib-dispatch ()
   "Dispatch for catalog BibTex."
   ["Arguments"
-   ("-f" "The fields to output when cataloging books in the database.  Should be a comma-separated list of fields." "--fields " calibredb-transient-read-bib-fields)
-   ("-s" "Output field to sort on." "--sort-by " calibredb-transient-read-bib-sort-by)
-   ("-c" "Create a citation for BibTeX entries."  " --create-citation " calibredb-transient-read-bib-create-citation)
-   ("-p" "Create a file entry if formats is selected for BibTeX entries."  "--add-files-path " calibredb-transient-read-bib-add-files-path)
-   ("-T" "The template for citation creation from database fields." "--citation-template " calibredb-transient-read-bib-citation-template)
-   ("-e" "BibTeX file encoding output."  "--choose-encoding " calibredb-transient-read-choose-encoding)
-   ("-E" "BibTeX file encoding flag."  "--choose-encoding-configuration " calibredb-transient-read-choose-encoding-configuration)
-   ("-t" "Entry type for BibTeX catalog."  "--entry-type " calibredb-transient-read-entry-type)]
+   ("-f" "The fields (comma-separated) to output. Default: all" "--fields " calibredb-transient-read-bib-fields)
+   ("-t" "Entry type for BibTeX catalog. Default: book"  "--entry-type " calibredb-transient-read-entry-type)
+   ("-s" "Output field to sort on. Default: id" "--sort-by " calibredb-transient-read-bib-sort-by)
+   ("-c" "Create a citation for BibTeX entries. Default: True"  " --create-citation " calibredb-transient-read-bib-create-citation)
+   ("-p" "Create a file entry if formats is selected for BibTeX entries. Default: True"  "--add-files-path " calibredb-transient-read-bib-add-files-path)
+   ("-T" "The template for citation creation from database fields. Default: {authors}{id}" "--citation-template " calibredb-transient-read-bib-citation-template)
+   ("-e" "BibTeX file encoding output. Default: utf8"  "--choose-encoding " calibredb-transient-read-choose-encoding)
+   ("-E" "BibTeX file encoding flag. Default: strict"  "--choose-encoding-configuration " calibredb-transient-read-choose-encoding-configuration)]
   [["Bibtex"
     ("o" "Find BibTex file"         calibredb-find-bib)
     ("b" "Update BibTex file"         calibredb-catalog-bib--transient)]])
@@ -1140,7 +1137,7 @@ ARGUMENT FILTER is the filter string."
 (defun calibredb-transient-read-bib-fields (prompt _initial-input _history)
   "TODO: Read a BibTex --fields value.
 Argument PROMPT prompt to show."
-  (completing-read prompt '("title,authors,tags")))
+  (read-string prompt "title,title_sort,author_sort,authors,comments,cover,formats,id,isbn,library_name,ondevice,pubdate,publisher,rating,series_index,series,size,tags,timestamp,uuid,languages,identifiers"))
 
 (defun calibredb-transient-read-bib-sort-by (prompt _initial-input _history)
   "Read a BibTex --sort-by value.
@@ -1160,7 +1157,7 @@ Argument PROMPT prompt to show."
 (defun calibredb-transient-read-bib-citation-template (prompt _initial-input _history)
   "TODO: Read a BibTex --citation-template value.
 Argument PROMPT prompt to show."
-  (completing-read prompt '("{authors}{id}")))
+  (read-string prompt "{author_sort}{authors}{id}{isbn}{pubdate}{title_sort}{publisher}{series_index}{series}{tags}{timestamp}{title}{uuid}"))
 
 (defun calibredb-transient-read-choose-encoding (prompt _initial-input _history)
   "Read a BibTex --choose-encoding value.
@@ -1447,7 +1444,7 @@ Argument EVENT mouse event."
     (set-buffer (calibredb-search--buffer-name))
     (goto-char pos)))
 
-(defun calibredb-search-ret ()
+(defun calibredb-view ()
   "Visit the calibredb-entry."
   (interactive)
   (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
@@ -1538,11 +1535,13 @@ selecting the new item."
     (goto-char beg)))
 
 (defun calibredb-search-quit ()
-  "Quit the *calibredb-search*."
+  "Quit *calibredb-entry* then *calibredb-search*."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
-    (if (get-buffer "*calibredb-search*")
-        (kill-buffer "*calibredb-search*"))))
+    (if (get-buffer "*calibredb-entry*")
+        (kill-buffer "*calibredb-entry*")
+      (if (get-buffer "*calibredb-search*")
+          (kill-buffer "*calibredb-search*")))))
 
 (defun calibredb-entry-quit ()
   "Quit the *calibredb-entry*."
