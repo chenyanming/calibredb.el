@@ -16,6 +16,9 @@
 - [[#configuration][Configuration]]
   - [[#quick-start][Quick Start]]
   - [[#configure-to-support-org-ref][Configure to support org-ref]]
+  - [[#column-width][Column width]]
+  - [[#size-indicator][Size indicator]]
+  - [[#file-format-icons][File format icons]]
   - [[#keybindings][keybindings]]
 - [[#workflows][Workflows]]
   - [[#start-with-calibredb][Start with =calibredb=]]
@@ -121,11 +124,44 @@ M-x package-install calibredb
 #+END_SRC
 
 ** Configure to support org-ref
+You can output a BibTex file which can be used in org-ref.
 #+BEGIN_SRC emacs-lisp
 (require 'org-ref)
 (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
 (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
 (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
+#+END_SRC
+
+** Column width
+You can configure the column width via
+
+For example:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-id-width 4)
+#+END_SRC
+
+- Set positive to limit the width.
+- Set 0 to hide,
+- Set negative to keep original length.
+
+The following columns are supported:
+- =calibredb-id-width=
+- =calibredb-format-width=
+- =calibredb-tag-width=
+- =calibredb-title-width=
+- =calibredb-author-width=
+- =calibredb-comment-width=
+
+** Size indicator
+Disable size indicator:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-size-show nil)
+#+END_SRC
+
+** File format icons
+To enable all-the-icons:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-format-icons t)
 #+END_SRC
 
 ** keybindings
@@ -236,9 +272,9 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - Then in =*calibredb-entry*= buffer, press =o/O/V= to open it.
     
 ** How to add ebooks?
-1. =M-x calibredb-add=, select and mark ebooks (only ivy supported currently - with
-=ivy-hydra=, in ivy-window, press =m= to mark, other engines can only select one
-item) to add to currently library.
+1. =M-x calibredb-add=, select and mark ebooks (only ivy supported currently -
+   with =ivy-hydra=, in ivy-window, press =m= to mark, other engines can only select
+   one item) to add to currently library.
 
 2. =M-x calibredb-add-dir= and select one
 directory to add, all supported formats will be added into current library.
@@ -290,10 +326,10 @@ Tips: You can filter the result via ~/~ before setting the metadata.
   (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
   #+END_SRC
 - In =*calibredb-search*= buffer, =b= =b= to generate the ebook catalogs with a BibTex
-file.
+  file.
 - The BibTex file is generated under current library path - =calibredb-root-dir=.
-- Every time you switch your library, the corresponding BibTex file
-path will added into =org-ref-default-bibliography= temporarily.
+- Every time you switch your library, the corresponding BibTex file path will
+  added into =org-ref-default-bibliography= temporarily.
 - In an org file, =C-c ]= to insert cite.
 
 ** Can not remember the keybindings?
