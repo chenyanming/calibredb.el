@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    June 6, 2020
+#+DATE:    June 7, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
@@ -32,6 +32,7 @@
   - [[#how-to-switch-to-different-library][How to switch to different library?]]
   - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
   - [[#how-to-mark-favoritehighlightarchive-on-ebooks][How to mark favorite/highlight/archive on ebooks?]]
+  - [[#how-to-do-live-filtering][How to do live filtering?]]
   - [[#how-to-do-quick-filtering][How to do quick filtering?]]
   - [[#how-to-interact-with-org-ref][How to interact with org-ref?]]
   - [[#why-the-loading-time-is-so-long][Why the loading time is so long?]]
@@ -345,13 +346,20 @@ Tips: You can filter the result via ~/~ before setting the metadata.
   favorite/highlight/archive status on marked items.
 
   Demo:
+#+attr_org: :width 600px
   [[file:img/favorite_highlight_archive.png]]
+** How to do live filtering?
+- Press ~/~ to start live filtering.
+
+Here is the demo:
+[[file:img/filter.gif]]
 
 ** How to do quick filtering?
 - Click the =calibredb-favorite-icon=, authors, file format, and tags.
 - Press =r= to reset the filtering.
 
   Demo:
+ 
   [[file:img/quick_filter.gif]]
  
 ** How to interact with org-ref?
@@ -444,8 +452,6 @@ Tip: =*calibredb-search*=, =calibredb-find-counsel=, and =calibredb-find-helm= a
 the same results. Therefore, after the filtering in =*calibredb-search*=, you can do
 second-level filter with =calibredb-find-counsel=, and =calibredb-find-helm=.
 
-Here is the demo:
-[[file:img/filter.gif]]
 
 ** calibredb-find-helm
 Use helm to list all ebooks
