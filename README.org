@@ -344,9 +344,15 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 - In =*calibredb-search*= buffer, =m= to mark the items, =f/h/x= to toggle
   favorite/highlight/archive status on marked items.
 
+  Demo:
+  [[file:img/favorite_highlight_archive.png]]
+
 ** How to do quick filtering?
 - Click the =calibredb-favorite-icon=, authors, file format, and tags.
 - Press =r= to reset the filtering.
+
+  Demo:
+  [[file:img/quick_filter.gif]]
  
 ** How to interact with org-ref?
 - Setup org-ref
@@ -362,6 +368,10 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 - Every time you switch your library, the corresponding BibTex file path will
   added into =org-ref-default-bibliography= temporarily.
 - In an org file, =C-c ]= to insert cite.
+
+  Demo:
+  [[file:img/bib.gif]]
+
 
 ** Why the loading time is so long?
 For some big libraries, such as the libraries that has 10000+ books, the package
