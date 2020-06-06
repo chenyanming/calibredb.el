@@ -223,7 +223,7 @@ GROUP BY id"
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)
-  "Return the where part of SQL based on FILTER."
+  "DEPRECATED Return the where part of SQL based on FILTER."
   (format
    "
 WHERE id LIKE '%%%s%%'
