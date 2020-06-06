@@ -323,7 +323,7 @@ If the library is not defined in =calibredb-library-alist=, you can call
 switch temporarily.
 
 ** How to set metadata on ebooks?
-- In =*calibredb-search*= buffer, =m/u= to mark/unmark items, and =s= to set metadata
+- In =*calibredb-search*= buffer, =m/DEL/u= to mark/unmark backward/unmark forward items, and =s= to set metadata
   in bulk. If you do not mark any items, actions will be performed on the item
   under cursor.
 - In =*calibredb-entry*= buffer, press =s= to set metadata.
@@ -348,14 +348,14 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 ** Why the loading time is so long?
 For some big libraries, such as the libraries that has 10000+ books, the package
 will need a few seconds to query and decode all the metadata. This will be
-improve in future versions.
+improved in future versions.
 
 You should know the following test results and behaviors so that it will not
 frustrate you when dealing with big libraries:)
 
 1. Tested with a library that has 8668 books, using 4.2 GHz Intel Core i7 in
-   macOS 10.13.6, around =2= seconds to query the database.
-2. DO NOT setq =calibredb-format-icon= t on big library. Tested with a library
+   macOS 10.13.6, around =2= to =3= seconds to query the database.
+2. *DO NOT* setq =calibredb-format-icon= t on big library. Tested with a library
    that has 8668 books, using 4.2 GHz Intel Core i7 in macOS 10.13.6, around =37=
    seconds to query the database.
 3. The first time to enter =calibredb=, is to query and decode the whole database.
