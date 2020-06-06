@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.0.0
+;; Version: 2.1.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -237,6 +237,9 @@ OR author_sort LIKE '%%%s%%'
   "Query string filtering shown entries."
   :group 'calibredb
   :type 'string)
+
+(defvar calibredb-full-entries nil
+  "List of the all entries currently on library.")
 
 (defvar calibredb-search-entries nil
   "List of the entries currently on display.")
@@ -507,7 +510,9 @@ Argument QUERY-RESULT is the query result generate by sqlite."
     (setq occur-buf (get-buffer-create buf-name))
     (let ((res-list (if calibredb-search-entries
                         calibredb-search-entries
-                      (setq calibredb-search-entries (calibredb-candidates)))))
+                      (progn
+                        (setq calibredb-search-entries (calibredb-candidates))
+                        (setq calibredb-full-entries calibredb-search-entries)))))
       (with-current-buffer occur-buf
         (erase-buffer)
         (insert "#+STARTUP: inlineimages nofold"))
@@ -917,7 +922,9 @@ Argument BOOK-ALIST ."
   (if (fboundp 'ivy-read)
       (let ((cand (if calibredb-search-entries
                       calibredb-search-entries
-                    (setq calibredb-search-entries (calibredb-candidates)))))
+                    (progn
+                      (setq calibredb-search-entries (calibredb-candidates))
+                      (setq calibredb-full-entries calibredb-search-entries)))))
         (if cand
             (ivy-read "Pick a book: "
                       cand
@@ -966,8 +973,8 @@ ARGUMENT ID is the id of the ebook in string."
                    ))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
-(defun calibredb-candidate-filter (filter)
-  "Generate ebook candidate alist.
+(defun calibredb-candidate-query-filter (filter)
+  "DEPRECATED Generate ebook candidate alist.
 ARGUMENT FILTER is the filter string."
   (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) %s" calibredb-query-string (calibredb-query-search-string filter))))
          (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
@@ -983,26 +990,43 @@ ARGUMENT FILTER is the filter string."
                    ))
                (calibredb-getbooklist (nreverse res-list))) ))))
 
+(defun calibredb-candidate-filter (filter)
+  "Generate ebook candidate alist.
+ARGUMENT FILTER is the filter string."
+  (let (res-list)
+    (dolist (line calibredb-full-entries)
+      (if (or
+           (unless (equal calibredb-id-width 0) (string-match-p filter (calibredb-getattr (cdr line) :id)))
+           (unless (equal calibredb-title-width 0) (string-match-p filter (calibredb-getattr (cdr line) :book-title)))
+           (unless (equal calibredb-format-width 0) (string-match-p filter (calibredb-getattr (cdr line) :book-format)))
+           (unless (equal calibredb-tag-width 0) (string-match-p filter (calibredb-getattr (cdr line) :tag)))
+           (unless (equal calibredb-author-width 0) (string-match-p filter (calibredb-getattr (cdr line) :author-sort)))
+           (unless (equal calibredb-comment-width 0) (string-match-p filter (calibredb-getattr (cdr line) :comment))))
+          (push line res-list)))
+    (nreverse res-list)))
+
 (defun calibredb-helm-read ()
   "Helm read for calibredb."
   (if (fboundp 'helm)
       (helm :sources (if (fboundp 'helm-build-sync-source)
-                          (helm-build-sync-source "calibredb"
-                            :header-name (lambda (name)
-                                           (concat name " in [" calibredb-root-dir "]"))
-                            :candidates (lambda ()
-                                           (if calibredb-search-entries
-                                               calibredb-search-entries
-                                             (setq calibredb-search-entries (calibredb-candidates))))
-                            ;; :filtered-candidate-transformer 'helm-findutils-transformer
-                            ;; :action-transformer 'helm-transform-file-load-el
-                            :persistent-action 'calibredb-find-cover
-                            :action 'calibredb-helm-actions
-                            ;; :help-message 'helm-generic-file-help-message
-                            :keymap calibredb-helm-map
-                            :candidate-number-limit 9999
-                            ;; :requires-pattern 3
-                            ))
+                         (helm-build-sync-source "calibredb"
+                           :header-name (lambda (name)
+                                          (concat name " in [" calibredb-root-dir "]"))
+                           :candidates (lambda ()
+                                         (if calibredb-search-entries
+                                             calibredb-search-entries
+                                           (progn
+                                             (setq calibredb-search-entries (calibredb-candidates))
+                                             (setq calibredb-full-entries calibredb-search-entries))))
+                           ;; :filtered-candidate-transformer 'helm-findutils-transformer
+                           ;; :action-transformer 'helm-transform-file-load-el
+                           :persistent-action 'calibredb-find-cover
+                           :action 'calibredb-helm-actions
+                           ;; :help-message 'helm-generic-file-help-message
+                           :keymap calibredb-helm-map
+                           :candidate-number-limit 9999
+                           ;; :requires-pattern 3
+                           ))
             :buffer "*helm calibredb*")))
 
 (defun calibredb-find-helm ()
@@ -1420,7 +1444,9 @@ Indicating the library you use."
   (interactive)
   (let ((cand (if calibredb-search-entries
                   calibredb-search-entries
-                  (setq calibredb-search-entries (calibredb-candidates)))))
+                (progn
+                  (setq calibredb-search-entries (calibredb-candidates))
+                  (setq calibredb-full-entries calibredb-search-entries)))))
     (cond ((not cand)
            (message "INVALID LIBRARY"))
           (t
@@ -1528,6 +1554,7 @@ selecting the new item."
   "Refresh calibredb."
   (interactive)
   (setq calibredb-search-entries (calibredb-candidates))
+  (setq calibredb-full-entries calibredb-search-entries)
   (calibredb))
 
 (defun calibredb-search-refresh-or-resume ()
