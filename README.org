@@ -31,6 +31,8 @@
   - [[#how-to-remove-ebooks][How to remove ebooks?]]
   - [[#how-to-switch-to-different-library][How to switch to different library?]]
   - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
+  - [[#how-to-mark-favoritehighlightarchive-on-ebooks][How to mark favorite/highlight/archive on ebooks?]]
+  - [[#how-to-do-quick-filtering][How to do quick filtering?]]
   - [[#how-to-interact-with-org-ref][How to interact with org-ref?]]
   - [[#why-the-loading-time-is-so-long][Why the loading time is so long?]]
   - [[#can-not-remember-the-keybindings][Can not remember the keybindings?]]
@@ -58,6 +60,7 @@
   - [[#catalog][Catalog]]
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-06-07][=2020-06-07=]]
   - [[#2020-06-06][=2020-06-06=]]
   - [[#2020-06-05][=2020-06-05=]]
   - [[#2020-06-05-1][=2020-06-05=]]
@@ -221,9 +224,13 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh-or-resume)
+    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
+    (define-key map "R" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
+    (define-key map "t" #'calibredb-toggle-favorite-at-point)
+    (define-key map "x" #'calibredb-toggle-archive-at-point)
+    (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
     (define-key map "\M-n" #'calibredb-show-next-entry)
@@ -255,6 +262,7 @@ You can perform the following actions:
  - Clone/Switch/Jump to different libraries
  - Live filter the results
  - Generate Catalog, such as a BibTex file
+ - Favorite, highlight and archive the items
 
 ** Start with =calibredb-find-helm= or =calibredb-find-counsel=
    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
@@ -332,6 +340,14 @@ switch temporarily.
 
 Tips: You can filter the result via ~/~ before setting the metadata.
 
+** How to mark favorite/highlight/archive on ebooks?
+- In =*calibredb-search*= buffer, =m= to mark the items, =t/h/x= to toggle
+  favorite/highlight/archive status on marked items.
+
+** How to do quick filtering?
+- Click the =calibredb-favorite-icon=, authors, file format, and tags.
+- Press =r= to reset the filtering.
+ 
 ** How to interact with org-ref?
 - Setup org-ref
   #+BEGIN_SRC emacs-lisp
@@ -541,6 +557,11 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-06-07=
+Version 2.2.0:
+- New features: favorite, highlight, and archive the items.
+- Clickable items: tags, authors, and format.
+
 ** =2020-06-06=
 Version 2.1.0:
 - Improve the performance of live filter when dealing with big libraries.

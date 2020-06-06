@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.1.0
+;; Version: 2.2.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -45,6 +45,7 @@
 (require 'transient)
 (require 'sendmail)
 (require 'dired)
+(require 'thingatpt)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
@@ -201,6 +202,22 @@ Set negative to keep original length."
   "Face for the mark candidate."
   :group 'calibredb-faces)
 
+(defface calibredb-favorite-face '((t :inherit default :foreground "yellow"))
+  "Face used for title."
+  :group 'calibredb-faces)
+
+(defface calibredb-highlight-face '((t :inherit default :foreground "cyan"))
+  "Face used for hightlight."
+  :group 'calibredb-faces)
+
+(defface calibredb-archive-face '((t :inherit default :foreground "dim grey"))
+  "Face used for archive."
+  :group 'calibredb-faces)
+
+(defface calibredb-mouse-face '((t :inherit mode-line-highlight))
+  "Face used for *calibredb-search* mouse face"
+  :group 'calibredb-faces)
+
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
@@ -309,9 +326,13 @@ When live editing the filter, it is bound to :live.")
     (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh-or-resume)
+    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
+    (define-key map "R" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
+    (define-key map "t" #'calibredb-toggle-favorite-at-point)
+    (define-key map "x" #'calibredb-toggle-archive-at-point)
+    (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
     (define-key map "\M-n" #'calibredb-show-next-entry)
@@ -324,6 +345,12 @@ When live editing the filter, it is bound to :live.")
     (define-key map "\M-c" #'calibredb-set-metadata--comments)
     map)
   "Keymap for `calibredb-search-mode'.")
+
+
+(defvar calibredb-favorite-keyword "favorite")
+(defvar calibredb-archive-keyword "archive")
+(defvar calibredb-highlight-keyword "highlight")
+(defvar calibredb-favorite-icon "★")
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
@@ -912,23 +939,113 @@ ALIGN should be a keyword :left or :right."
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.
 Argument BOOK-ALIST ."
-  (format
-   "%s%s%s %s %s (%s) %s %s%s"
-   (if calibredb-format-icons
-       (concat (if (fboundp 'all-the-icons-icon-for-file)
-                   (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") "")
-   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :id) 'face 'calibredb-id-face) calibredb-id-width :left)
-   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :book-title) 'face 'calibredb-title-face) calibredb-title-width :left)
-   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :book-format) 'face 'calibredb-format-face) calibredb-format-width :left)
-   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :author-sort) 'face 'calibredb-author-face) calibredb-author-width :left)
-   (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :tag) 'face 'calibredb-tag-face) calibredb-tag-width :left)
-   (if (stringp (calibredb-getattr (list book-alist) :comment))
-       (calibredb-format-column (propertize (calibredb-getattr (list book-alist) :comment) 'face 'calibredb-comment-face) calibredb-comment-width :left)
-     "")
-   (if calibredb-size-show
-       (propertize (calibredb-getattr (list book-alist) :size) 'face 'calibredb-size-face) "")
-   (if calibredb-size-show
-       (propertize "Mb" 'face 'calibredb-size-face) "")))
+  (let ((id (calibredb-getattr (list book-alist) :id))
+        (title (calibredb-getattr (list book-alist) :book-title))
+        (format (calibredb-getattr (list book-alist) :book-format))
+        (author (calibredb-getattr (list book-alist) :author-sort))
+        (tag (calibredb-getattr (list book-alist) :tag))
+        (comment (calibredb-getattr (list book-alist) :comment))
+        (size (calibredb-getattr (list book-alist) :size))
+        (favorite-map (make-sparse-keymap))
+        (tag-map (make-sparse-keymap))
+        (format-map (make-sparse-keymap))
+        (author-map (make-sparse-keymap)))
+    (define-key favorite-map [mouse-1] 'calibredb-favorite-mouse-1)
+    (define-key tag-map [mouse-1] 'calibredb-tag-mouse-1)
+    (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
+    (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
+    (format
+     "%s %s %s %s (%s) %s %s"
+     (calibredb-format-column (format "%s%s"
+                                      (if calibredb-format-icons
+                                          (concat (if (fboundp 'all-the-icons-icon-for-file)
+                                                      (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") "")
+                                      (propertize id 'face 'calibredb-id-face) ) calibredb-id-width :left)
+     (calibredb-format-column (format "%s%s"
+                                      (if (s-contains? calibredb-favorite-keyword tag)
+                                          (format "%s " (propertize calibredb-favorite-icon
+                                                                    'face 'calibredb-favorite-face
+                                                                    'mouse-face 'calibredb-mouse-face
+                                                                    'help-echo "Filter the favorite items"
+                                                                    'keymap favorite-map)) "")
+                                      (cond
+                                       ((s-contains? calibredb-archive-keyword tag)
+                                        (propertize title 'face 'calibredb-archive-face))
+                                       ((s-contains? calibredb-highlight-keyword tag)
+                                        (propertize title 'face 'calibredb-highlight-face))
+                                       (t
+                                         (propertize title 'face 'calibredb-title-face)))) calibredb-title-width :left)
+     (calibredb-format-column (propertize format
+                                          'face 'calibredb-format-face
+                                          'mouse-face 'calibredb-mouse-face
+                                          'help-echo "Filter with this format"
+                                          'keymap format-map) calibredb-format-width :left)
+     (calibredb-format-column (propertize author
+                                          'face 'calibredb-author-face
+                                          'mouse-face 'calibredb-mouse-face
+                                          'help-echo "Filter with this author"
+                                          'keymap author-map) calibredb-author-width :left)
+     (calibredb-format-column (propertize tag
+                                          'face 'calibredb-tag-face
+                                          'mouse-face 'calibredb-mouse-face
+                                          'help-echo "Filter with this tag"
+                                          'keymap tag-map) calibredb-tag-width :left)
+     (if (stringp comment)
+         (calibredb-format-column (propertize comment 'face 'calibredb-comment-face) calibredb-comment-width :left)
+       "")
+     (format "%s%s"
+             (if calibredb-size-show
+                 (propertize size 'face 'calibredb-size-face) "")
+             (if calibredb-size-show
+                 (propertize "Mb" 'face 'calibredb-size-face) ""))) ))
+
+(defun calibredb-favorite-mouse-1 (event)
+  "Visit the location click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No favorite chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (calibredb-search-keyword-filter calibredb-favorite-keyword))))
+
+(defun calibredb-tag-mouse-1 (event)
+  "Visit the location click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No favorite chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+
+(defun calibredb-author-mouse-1 (event)
+  "Visit the location click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No favorite chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+
+(defun calibredb-format-mouse-1 (event)
+  "Visit the location click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No favorite chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
 
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
@@ -1611,6 +1728,13 @@ selecting the new item."
     (set-window-start (selected-window) pos)
     (goto-char beg)))
 
+(defun calibredb-search-refresh-and-clear-filter ()
+  "Refresh calibredb and clear the fitler result."
+  (interactive)
+  (setq calibredb-search-filter "")
+  (calibredb-search-refresh)
+  (calibredb-search-update :force))
+
 (defun calibredb-search-quit ()
   "Quit *calibredb-entry* then *calibredb-search*."
   (interactive)
@@ -1665,12 +1789,104 @@ selecting the new item."
     (remove-overlays (line-beginning-position) (line-end-position))
     (remove-text-properties beg end '(calibredb-mark nil))))
 
+;; favorite
+
+(defun calibredb-read-metadatas (field &optional candidate)
+  "Read metadata.
+Argument FIELD is the field to read.
+Optional argument CANDIDATE is candidate to read."
+  (let ((cand))
+    (if (eq major-mode 'calibredb-search-mode)
+        (if candidate
+            (setq cand candidate)
+          (setq cand (cdr (get-text-property (point) 'calibredb-entry nil))))
+      (if candidate
+          (setq cand candidate)
+          (setq cand (get-text-property (point-min) 'calibredb-entry nil)) ))
+    (calibredb-get-init field cand)))
+
+(defun calibredb-toggle-favorite-at-point (&optional keyword)
+  "Toggle favorite the current item.
+Argument KEYWORD is the tag keyword."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (dolist (cand candidates)
+      (let ((id (calibredb-getattr cand :id))
+            (tags (calibredb-read-metadatas "tags" cand)))
+        (if (s-contains? calibredb-favorite-keyword tags)
+            (calibredb-command :command "set_metadata"
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-favorite-keyword "" tags) (or keyword calibredb-favorite-keyword))
+                               :id id
+                               :library (format "--library-path \"%s\"" calibredb-root-dir))
+          (calibredb-command :command "set_metadata"
+                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-favorite-keyword))
+                             :id id
+                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb-search-refresh-or-resume))
+              (t nil))))))
+
+;; highlight
+(defun calibredb-toggle-highlight-at-point (&optional keyword)
+  "Toggle highlight the current item.
+Argument KEYWORD is the tag keyword."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (dolist (cand candidates)
+      (let ((id (calibredb-getattr cand :id))
+            (tags (calibredb-read-metadatas "tags" cand)))
+        (if (s-contains? calibredb-highlight-keyword tags)
+            (calibredb-command :command "set_metadata"
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-highlight-keyword "" tags) (or keyword calibredb-highlight-keyword))
+                               :id id
+                               :library (format "--library-path \"%s\"" calibredb-root-dir))
+          (calibredb-command :command "set_metadata"
+                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-highlight-keyword))
+                             :id id
+                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb-search-refresh-or-resume))
+              (t nil))))))
+;; archive
+(defun calibredb-toggle-archive-at-point (&optional keyword)
+  "Toggle archive the current item.
+Argument KEYWORD is the tag keyword."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (dolist (cand candidates)
+      (let ((id (calibredb-getattr cand :id))
+            (tags (calibredb-read-metadatas "tags" cand)))
+        (if (s-contains? calibredb-archive-keyword tags)
+            (calibredb-command :command "set_metadata"
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-archive-keyword "" tags) (or keyword calibredb-archive-keyword))
+                               :id id
+                               :library (format "--library-path \"%s\"" calibredb-root-dir))
+          (calibredb-command :command "set_metadata"
+                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-archive-keyword))
+                             :id id
+                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb-search-refresh-or-resume))
+              (t nil))))))
+
 ;; live filtering
 
 (defun calibredb-search--update-list ()
   "Update `calibredb-search-entries' list."
   ;; replace space with _ (SQL) The underscore represents a single character
-  (let* ((filter (replace-regexp-in-string " " "_" calibredb-search-filter))
+  (let* ((filter calibredb-search-filter) ;; (replace-regexp-in-string " " "_" calibredb-search-filter)
          (head (calibredb-candidate-filter filter)))
     ;; Determine the final list order
     (let ((entries head))
@@ -1712,6 +1928,11 @@ selecting the new item."
               (read-from-minibuffer "Filter: " calibredb-search-filter))
         (message calibredb-search-filter))
     (calibredb-search-update :force)))
+
+(defun calibredb-search-keyword-filter (keyword)
+  "Filter the calibredb-search buffer with KEYWORD."
+  (setq calibredb-search-filter keyword)
+  (calibredb-search-update :force))
 
 (defun calibredb-search-update (&optional force)
   "Update the calibredb-search buffer listing to match the database.
