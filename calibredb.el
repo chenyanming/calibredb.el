@@ -44,6 +44,7 @@
 (require 'hl-line)
 (require 'transient)
 (require 'sendmail)
+(require 'dired)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
