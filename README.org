@@ -171,6 +171,11 @@ To enable all-the-icons:
 
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
+Notice: Do not enable icons on big libraries, it will consume a lot of time than
+you image.
+
+TODO: Auto disable format icons when dealing with big libraries.
+
 ** keybindings
 
 #+BEGIN_SRC emacs-lisp
@@ -340,19 +345,24 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 - In an org file, =C-c ]= to insert cite.
 
 ** Why the loading time is so long?
-For some big libraries, such as the libraries that has thousands of books, the
-package will need multiple seconds or may be more than a minute to query and
-decode all the metadata. This will be improve in future versions.
+For some big libraries, such as the libraries that has 10000+ books, the package
+will need a few seconds to query and decode all the metadata. This will be
+improve in future versions.
 
-The following behaviors you should know so that you will not frustrate when you
-deal with big libraries:)
+You should know the following test results and behaviors so that it will not
+frustrate you when dealing with big libraries:)
 
-1. The first time to enter =calibredb=, via ivy/helm/dashboard/list, is to query and
-   decode the whole database. After that, all data will be saved in
+1. Tested with a library that has 8668 books, using 4.2 GHz Intel Core i7 in
+   macOS 10.13.6, around =2= seconds to query the database.
+2. DO NOT setq =calibredb-format-icon= t on big library. Tested with a library
+   that has 8668 books, using 4.2 GHz Intel Core i7 in macOS 10.13.6, around =37=
+   seconds to query the database.
+3. The first time to enter =calibredb=, via ivy/helm/dashboard/list, is to query
+   and decode the whole database. After that, all data will be saved in
    =calibredb-search-entries=. Therefore, the next time to load the library is
    just reading =calibredb-search-entries= and show again. And you can feel much
    happier starting from the second time.
-2. Update metadata, live filter, refresh dashboard and switch library will
+4. Update metadata, live filter, refresh dashboard and switch library will
    re-query and decode the whole database.
 
 ** Can not remember the keybindings?
