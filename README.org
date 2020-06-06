@@ -177,7 +177,7 @@ To enable all-the-icons:
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
 Notice: Do not enable icons on big libraries, it will consume a lot of time than
-you image.
+you imagine.
 
 TODO: Auto disable format icons when dealing with big libraries.
 
