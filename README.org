@@ -207,6 +207,8 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "A" #'calibredb-add-dir)
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
+    (define-key map "j" #'calibredb-next-entry)
+    (define-key map "k" #'calibredb-previous-entry)
     (define-key map "l" #'calibredb-library-list)
     (define-key map "n" #'calibredb-library-next)
     (define-key map "p" #'calibredb-library-previous)

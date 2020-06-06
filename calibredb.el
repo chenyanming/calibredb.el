@@ -293,6 +293,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "A" #'calibredb-add-dir)
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
+    (define-key map "j" #'calibredb-next-entry)
+    (define-key map "k" #'calibredb-previous-entry)
     (define-key map "l" #'calibredb-library-list)
     (define-key map "n" #'calibredb-library-next)
     (define-key map "p" #'calibredb-library-previous)
@@ -1386,6 +1388,26 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
       (when switch
         (switch-to-buffer-other-window (set-buffer (calibredb-search--buffer-name)))
         (goto-char original)))))
+
+(defun calibredb-next-entry ()
+  "Move to next entry."
+  (interactive)
+  (let ((ori "") (new ""))
+    (while (and (equal new ori) new ori)
+      (setq ori (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))
+      (forward-line 1)
+      (setq new (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id)))))
+
+(defun calibredb-previous-entry ()
+  "Move to previous entry."
+  (interactive)
+  (let ((ori "") (new ""))
+    (while (and (equal new ori) new ori (> (line-number-at-pos) 1))
+      (forward-line -1)
+      (save-excursion
+        (setq ori (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))
+        (forward-line -1)
+        (setq new (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))))))
 
 (defun calibredb-show-next-entry ()
   "Show next entry."
