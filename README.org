@@ -133,7 +133,7 @@ You can output a BibTex file which can be used in org-ref.
 #+END_SRC
 
 ** Column width
-You can configure the column width via
+You can configure the column width:
 
 For example:
 #+BEGIN_SRC emacs-lisp
@@ -141,8 +141,8 @@ For example:
 #+END_SRC
 
 - Set positive to limit the width.
-- Set 0 to hide,
-- Set negative to keep original length.
+- Set 0 to hide.
+- Set -1 to keep original length.
 
 The following columns are supported:
 - =calibredb-id-width=
@@ -153,9 +153,9 @@ The following columns are supported:
 - =calibredb-comment-width=
 
 ** Size indicator
-Disable size indicator:
+Enable size indicator:
 #+BEGIN_SRC emacs-lisp
-(setq calibredb-size-show nil)
+(setq calibredb-size-show t)
 #+END_SRC
 
 ** File format icons
@@ -224,21 +224,22 @@ To enable all-the-icons:
 
 #+END_SRC
 
-PS: Keybindings might be changed after the update.
+PS: Keybindings might be changed in future versions.
 
 * Workflows
 There are three ways to manage your ebooks:
 ** Start with =calibredb=
-First  =M-x calibredb= to enter ebook dashboard.
+First,  =M-x calibredb= to enter ebook dashboard.
 You can perform the following actions:
- - Open the ebook
+ - Open/View the ebook
+ - Open Dired the ebook located
  - Set metadata on the ebook under cursor
  - Set metadata on marked ebooks
- - Add/remove ebooks on current library
+ - Add/Remove ebooks on current library
  - Export the ebook under cursor
  - Clone/Switch/Jump to different libraries
  - Live filter the results
- - Generate Catalog, such as BibTex file
+ - Generate Catalog, such as a BibTex file
 
 ** Start with =calibredb-find-helm= or =calibredb-find-counsel=
    - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
@@ -272,12 +273,11 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - Then in =*calibredb-entry*= buffer, press =o/O/V= to open it.
     
 ** How to add ebooks?
-1. =M-x calibredb-add=, select and mark ebooks (only ivy supported currently -
-   with =ivy-hydra=, in ivy-window, press =m= to mark, other engines can only select
-   one item) to add to currently library.
+1. =M-x calibredb-add=, select, mark ebooks (only ivy supports mark/unmark currently -
+   with =ivy-hydra=, in ivy-window, press =m= to mark, =DEL= or =u= to unmark. 
+   Other engines can only select one item) and add to current library.
 
-2. =M-x calibredb-add-dir= and select one
-directory to add, all supported formats will be added into current library.
+2. =M-x calibredb-add-dir= and select one directory, all supported formats will be added into current library.
 
 ** How to remove ebooks?
 1. =M-x calibredb=
@@ -285,7 +285,7 @@ directory to add, all supported formats will be added into current library.
      ask you to delete or not.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
-   - Select to the ebook you want to delete in the list
+   - Select the ebook you want to delete in the list
    - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
    - Perform remove action as shown in the menu.
 
