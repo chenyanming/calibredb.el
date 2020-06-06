@@ -359,12 +359,14 @@ time."
        "Open file other frame"       'calibredb-find-file-other-frame
        "Open file with default tool" 'calibredb-open-file-with-default-tool
        "Open Cover Page"             'calibredb-find-cover
-       "set_metadata, tags"          'calibredb-set-metadata--tags
-       "set_metadata, comments"      'calibredb-set-metadata--comments
-       "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
-       "show_metadata"               'calibredb-show-metadata
+       "Set tags"          'calibredb-set-metadata--tags
+       "Set comments"      'calibredb-set-metadata--comments
+       "List fileds" 'calibredb-set-metadata--list-fields
+       "Show metadata"               'calibredb-show-metadata
        "Export"                      'calibredb-export
-       "remove"                      'calibredb-remove
+       "Remove"                      'calibredb-remove
+       "Insert an org link"          (lambda (candidate)
+                                       (org-insert-link nil (calibredb-getattr candidate :file-path) (calibredb-getattr candidate :book-title)))
        "Mail Add attachment"         (lambda (candidate)
                                        (mail-add-attachment (calibredb-getattr candidate :file-path)))))
   "Default actions for calibredb helm."
@@ -394,7 +396,9 @@ time."
        ("e" (lambda (candidate)
               (calibredb-export (cdr candidate))) "Export")
        ("m" (lambda (candidate)
-              (mail-add-attachment (calibredb-getattr (cdr candidate) :file-path))) "Mail add attachment"))))
+              (mail-add-attachment (calibredb-getattr (cdr candidate) :file-path))) "Mail add attachment")
+       ("i" (lambda (candidate)
+              (org-insert-link nil (calibredb-getattr (cdr candidate) :file-path) (calibredb-getattr (cdr candidate) :book-title))) "Insert an org link"))))
 
 ;; Utility
 
