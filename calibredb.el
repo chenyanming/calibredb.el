@@ -505,7 +505,9 @@ Argument QUERY-RESULT is the query result generate by sqlite."
     (when (get-buffer buf-name)
       (kill-buffer buf-name))
     (setq occur-buf (get-buffer-create buf-name))
-    (let ((res-list (calibredb-candidates)))
+    (let ((res-list (if calibredb-search-entries
+                        calibredb-search-entries
+                      (setq calibredb-search-entries (calibredb-candidates)))))
       (with-current-buffer occur-buf
         (erase-buffer)
         (insert "#+STARTUP: inlineimages nofold"))
@@ -913,7 +915,9 @@ Argument BOOK-ALIST ."
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
   (if (fboundp 'ivy-read)
-      (let ((cand (calibredb-candidates)))
+      (let ((cand (if calibredb-search-entries
+                      calibredb-search-entries
+                    (setq calibredb-search-entries (calibredb-candidates)))))
         (if cand
             (ivy-read "Pick a book: "
                       cand
@@ -986,7 +990,10 @@ ARGUMENT FILTER is the filter string."
                           (helm-build-sync-source "calibredb"
                             :header-name (lambda (name)
                                            (concat name " in [" calibredb-root-dir "]"))
-                            :candidates 'calibredb-candidates
+                            :candidates (lambda ()
+                                           (if calibredb-search-entries
+                                               calibredb-search-entries
+                                             (setq calibredb-search-entries (calibredb-candidates))))
                             ;; :filtered-candidate-transformer 'helm-findutils-transformer
                             ;; :action-transformer 'helm-transform-file-load-el
                             :persistent-action 'calibredb-find-cover

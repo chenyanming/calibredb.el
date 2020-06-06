@@ -32,6 +32,7 @@
   - [[#how-to-switch-to-different-library][How to switch to different library?]]
   - [[#how-to-set-metadata-on-ebooks][How to set metadata on ebooks?]]
   - [[#how-to-interact-with-org-ref][How to interact with org-ref?]]
+  - [[#why-the-loading-time-is-so-long][Why the loading time is so long?]]
   - [[#can-not-remember-the-keybindings][Can not remember the keybindings?]]
   - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
@@ -152,17 +153,23 @@ The following columns are supported:
 - =calibredb-author-width=
 - =calibredb-comment-width=
 
+Then in =*calibredb-search*= buffer, press =r= to refresh the library.
+
 ** Size indicator
 Enable size indicator:
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-size-show t)
 #+END_SRC
 
+Then in =*calibredb-search*= buffer, press =r= to refresh the library.
+
 ** File format icons
 To enable all-the-icons:
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-format-icons t)
 #+END_SRC
+
+Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
 ** keybindings
 
@@ -331,6 +338,22 @@ Tips: You can filter the result via ~/~ before setting the metadata.
 - Every time you switch your library, the corresponding BibTex file path will
   added into =org-ref-default-bibliography= temporarily.
 - In an org file, =C-c ]= to insert cite.
+
+** Why the loading time is so long?
+For some big libraries, such as the libraries that has thousands of books, the
+package will need multiple seconds or may be more than a minute to query and
+decode all the metadata. This will be improve in future versions.
+
+The following behaviors you should know so that you will not frustrate when you
+deal with big libraries:)
+
+1. The first time to enter =calibredb=, via ivy/helm/dashboard, is to query and
+   decode the whole database. After that, all data will be saved in
+   =calibredb-search-entries=. Therefore, the next time to load the library is
+   just reading =calibredb-search-entries= and show again. And you can feel much
+   happier starting from the second time.
+2. Update metadata, live filter, refresh dashboard and switch library will
+   re-query and decode the whole database.
 
 ** Can not remember the keybindings?
 Press ~?~, it will show you all actions.
