@@ -43,6 +43,7 @@
 (require 'sql)
 (require 'hl-line)
 (require 'transient)
+(require 'sendmail)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
@@ -326,6 +327,8 @@ When live editing the filter, it is bound to :live.")
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
 
+(defvar calibredb-library-index 0)
+
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
@@ -361,7 +364,9 @@ time."
        "set_metadata, --list-fileds" 'calibredb-set-metadata--list-fields
        "show_metadata"               'calibredb-show-metadata
        "Export"                      'calibredb-export
-       "remove"                      'calibredb-remove))
+       "remove"                      'calibredb-remove
+       "Mail Add attachment"         (lambda (candidate)
+                                       (mail-add-attachment (calibredb-getattr candidate :file-path)))))
   "Default actions for calibredb helm."
   :group 'calibredb
   :type '(alist :key-type string :value-type function))
@@ -387,8 +392,9 @@ time."
        ("c" (lambda (candidate)
               (calibredb-set-metadata--comments (cdr candidate)))"Comment ebook")
        ("e" (lambda (candidate)
-              (calibredb-export (cdr candidate))) "Export"))))
-
+              (calibredb-export (cdr candidate))) "Export")
+       ("m" (lambda (candidate)
+              (mail-add-attachment (calibredb-getattr (cdr candidate) :file-path))) "Mail add attachment"))))
 
 ;; Utility
 
@@ -1009,27 +1015,30 @@ ARGUMENT FILTER is the filter string."
 
 (defun calibredb-helm-read ()
   "Helm read for calibredb."
-  (if (fboundp 'helm)
-      (helm :sources (if (fboundp 'helm-build-sync-source)
-                         (helm-build-sync-source "calibredb"
-                           :header-name (lambda (name)
-                                          (concat name " in [" calibredb-root-dir "]"))
-                           :candidates (lambda ()
-                                         (if calibredb-search-entries
-                                             calibredb-search-entries
-                                           (progn
-                                             (setq calibredb-search-entries (calibredb-candidates))
-                                             (setq calibredb-full-entries calibredb-search-entries))))
-                           ;; :filtered-candidate-transformer 'helm-findutils-transformer
-                           ;; :action-transformer 'helm-transform-file-load-el
-                           :persistent-action 'calibredb-find-cover
-                           :action 'calibredb-helm-actions
-                           ;; :help-message 'helm-generic-file-help-message
-                           :keymap calibredb-helm-map
-                           :candidate-number-limit 9999
-                           ;; :requires-pattern 3
-                           ))
-            :buffer "*helm calibredb*")))
+  (when (fboundp 'helm)
+    (when (get-buffer "*helm action*")
+      (kill-buffer "*helm action*"))
+    (unwind-protect
+        (helm :sources (if (fboundp 'helm-build-sync-source)
+                           (helm-build-sync-source "calibredb"
+                             :header-name (lambda (name)
+                                            (concat name " in [" calibredb-root-dir "]"))
+                             :candidates (lambda ()
+                                           (if calibredb-search-entries
+                                               calibredb-search-entries
+                                             (progn
+                                               (setq calibredb-search-entries (calibredb-candidates))
+                                               (setq calibredb-full-entries calibredb-search-entries))))
+                             ;; :filtered-candidate-transformer 'helm-findutils-transformer
+                             ;; :action-transformer 'helm-transform-file-load-el
+                             :persistent-action 'calibredb-view--helm
+                             :action 'calibredb-helm-actions
+                             ;; :help-message 'helm-generic-file-help-message
+                             :keymap calibredb-helm-map
+                             :candidate-number-limit 9999
+                             ;; :requires-pattern 3
+                             ))
+              :buffer "*helm calibredb*") )))
 
 (defun calibredb-find-helm ()
   "Use helm to list all ebooks details."
@@ -1507,6 +1516,12 @@ Argument EVENT mouse event."
   (interactive)
   (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
 
+(defun calibredb-view--helm (candidate)
+  "Visit the calibredb-entry with helm.
+Argument CANDIDATE is the selected candidate."
+  (interactive)
+  (calibredb-show-entry candidate))
+
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
   (interactive)
@@ -1534,8 +1549,6 @@ selecting the new item."
           (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
-
-(defvar calibredb-library-index 0)
 
 (defun calibredb-library-previous ()
   "Next library from variable `calibredb-library-alist'.
