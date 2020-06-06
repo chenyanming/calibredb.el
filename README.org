@@ -397,6 +397,10 @@ The following columns will be searched:
 If the keyword occurs in any of the columns above, the matched ebook record will
 be shown.
 
+Tip: =*calibredb-search*=, =calibredb-find-counsel=, and =calibredb-find-helm= are sharing
+the same results. Therefore, after the filtering in =*calibredb-search*=, you can do
+second-level filter with =calibredb-find-counsel=, and =calibredb-find-helm=.
+
 Here is the demo:
 [[file:img/filter.gif]]
 
