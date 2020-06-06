@@ -330,7 +330,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "R" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
-    (define-key map "t" #'calibredb-toggle-favorite-at-point)
+    (define-key map "f" #'calibredb-toggle-favorite-at-point)
     (define-key map "x" #'calibredb-toggle-archive-at-point)
     (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
@@ -1817,7 +1817,7 @@ Argument KEYWORD is the tag keyword."
             (tags (calibredb-read-metadatas "tags" cand)))
         (if (s-contains? calibredb-favorite-keyword tags)
             (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-favorite-keyword "" tags) (or keyword calibredb-favorite-keyword))
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-favorite-keyword "" tags))
                                :id id
                                :library (format "--library-path \"%s\"" calibredb-root-dir))
           (calibredb-command :command "set_metadata"
@@ -1843,7 +1843,7 @@ Argument KEYWORD is the tag keyword."
             (tags (calibredb-read-metadatas "tags" cand)))
         (if (s-contains? calibredb-highlight-keyword tags)
             (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-highlight-keyword "" tags) (or keyword calibredb-highlight-keyword))
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-highlight-keyword "" tags))
                                :id id
                                :library (format "--library-path \"%s\"" calibredb-root-dir))
           (calibredb-command :command "set_metadata"
@@ -1868,7 +1868,7 @@ Argument KEYWORD is the tag keyword."
             (tags (calibredb-read-metadatas "tags" cand)))
         (if (s-contains? calibredb-archive-keyword tags)
             (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-archive-keyword "" tags) (or keyword calibredb-archive-keyword))
+                               :option (format "--field tags:\"%s\"" (s-replace calibredb-archive-keyword "" tags))
                                :id id
                                :library (format "--library-path \"%s\"" calibredb-root-dir))
           (calibredb-command :command "set_metadata"

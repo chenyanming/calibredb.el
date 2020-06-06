@@ -228,7 +228,7 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "R" #'calibredb-search-refresh-or-resume)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
-    (define-key map "t" #'calibredb-toggle-favorite-at-point)
+    (define-key map "f" #'calibredb-toggle-favorite-at-point)
     (define-key map "x" #'calibredb-toggle-archive-at-point)
     (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
@@ -341,7 +341,7 @@ switch temporarily.
 Tips: You can filter the result via ~/~ before setting the metadata.
 
 ** How to mark favorite/highlight/archive on ebooks?
-- In =*calibredb-search*= buffer, =m= to mark the items, =t/h/x= to toggle
+- In =*calibredb-search*= buffer, =m= to mark the items, =f/h/x= to toggle
   favorite/highlight/archive status on marked items.
 
 ** How to do quick filtering?
