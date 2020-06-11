@@ -407,6 +407,10 @@ frustrate you when dealing with big libraries:)
 ** Can not remember the keybindings?
 Press ~?~, it will show you all actions.
 
+Demo:
+#+attr_org: :width 600px
+[[file:img/details.gif]]
+
 ** How to edit annotation with org-mode?
 In =*calibredb-search*= buffer,
 #+BEGIN_SRC emacs-lisp
@@ -528,9 +532,6 @@ M-x calibredb-dispatch
 #+END_SRC
 Or fire with keybinding ~?~
 
-Demo:
-#+attr_org: :width 600px
-[[file:img/details.gif]]
 *** calibredb-set-metadata-dispatch
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-set-metadata-dispatch
