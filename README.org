@@ -235,6 +235,7 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "x" #'calibredb-toggle-archive-at-point)
     (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
+    (define-key map "i" #'calibredb-edit-annotation)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
     (define-key map "\M-n" #'calibredb-show-next-entry)
     (define-key map "\M-p" #'calibredb-show-previous-entry)
