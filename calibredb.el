@@ -1244,7 +1244,8 @@ ARGUMENT FILTER is the filter string."
    [("m" "Mark" calibredb-mark-and-forward)
     ("u" "Unmark and forward" calibredb-unmark-and-forward)
     ("DEL" "Unmark and backward" calibredb-unmark-and-backward)
-    ("/" "Live Filter" calibredb-search-live-filter)]]
+    ("/" "Live Filter" calibredb-search-live-filter)
+    ("i" "Edit Annotation" calibredb-edit-annotation)]]
   ["Library operaion"
    [("l" "List Libraries"   calibredb-library-list)
    ("S" "Switch library"   calibredb-switch-library)
