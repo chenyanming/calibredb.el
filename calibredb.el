@@ -155,6 +155,11 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
+(defcustom calibredb-annotation-field "comments"
+  "The field to be saved the annotation."
+  :group 'calibredb
+  :type 'string)
+
 ;; faces
 
 (defface calibredb-search-header-highlight-face
@@ -334,6 +339,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "x" #'calibredb-toggle-archive-at-point)
     (define-key map "h" #'calibredb-toggle-highlight-at-point)
     (define-key map "u" #'calibredb-unmark-and-forward)
+    (define-key map "i" #'calibredb-edit-annotation)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
     (define-key map "\M-n" #'calibredb-show-next-entry)
     (define-key map "\M-p" #'calibredb-show-previous-entry)
@@ -346,6 +352,12 @@ When live editing the filter, it is bound to :live.")
     map)
   "Keymap for `calibredb-search-mode'.")
 
+(defvar calibredb-edit-annotation-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\C-c\C-c" 'calibredb-send-edited-annotation)
+    (define-key map "\C-c\C-k" 'calibredb-annotation-quit)
+    map)
+  "Keymap for `calibredb-edit-annotation-mode'.")
 
 (defvar calibredb-favorite-keyword "favorite")
 (defvar calibredb-archive-keyword "archive")
@@ -357,9 +369,15 @@ When live editing the filter, it is bound to :live.")
 
 (defvar calibredb-library-index 0)
 
-(defvar calibredb-edit-annotation-text-func 'calibredb-default-annotation-text
+(defvar calibredb-edit-annotation-text-func nil
   "Function to return default text to use for an ebook annotation.
-It takes one argument, the title of the ebook, as a string.")
+It takes one argument, the title of the ebook, as a string.
+It could be function `calibredb-default-annotation-text'")
+
+(defvar calibredb-annotation-candidate nil
+  "Local variable used in *calibredb-annotation*.")
+(defvar calibredb-annotation-parameter nil
+  "Local variable used in *calibredb-annotation*.")
 
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
@@ -475,7 +493,7 @@ time."
     ;;       nil
     ;;     (message "No process running.")))
     (setq-local inhibit-message t)
-    (message line)
+    (message "%s" line)
     (message "%s" (shell-command-to-string line))))
 
 (defun calibredb-chomp (s)
@@ -1461,13 +1479,6 @@ Argument PROMPT prompt to show."
   (setq buffer-read-only t)
   (buffer-disable-undo))
 
-(define-derived-mode calibredb-edit-annotation-mode org-mode
-  "Edit Ebook Annotation"
-  "Mode for editing the annotation of a ebook.
-When you have finished composing, use `C-c C-c'.
-\\{calibredb-edit-annotation-mode-map}")
-(define-key calibredb-edit-annotation-mode-map "\C-c\C-c" 'calibredb-send-edited-annotation)
-
 (defun calibredb-show--buffer-name (entry)
   "Return the appropriate buffer name for ENTRY.
 The result depends on the value of `calibredb-show-unique-buffers'."
@@ -1724,12 +1735,12 @@ selecting the new item."
   (setq calibredb-full-entries calibredb-search-entries)
   (calibredb))
 
-(defun calibredb-search-refresh-or-resume ()
-  "Refresh calibredb or resume the result and windows position."
+(defun calibredb-search-refresh-or-resume (&optional begin position)
+  "Refresh calibredb or resume the BEGIN point and windows POSITION."
   (interactive)
   (let (beg pos)
-    (setq beg (point))
-    (setq pos (window-start))
+    (setq beg (or begin (point)))
+    (setq pos (or position (window-start)))
     (if (not (equal calibredb-search-filter ""))
         (progn
           (calibredb-search-refresh)
@@ -1964,16 +1975,25 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 
 ;; annotation
 
+(define-derived-mode calibredb-edit-annotation-mode org-mode "calibredb-edit-annatation"
+  "Mode for editing the annotation of a ebook.
+When you have finished composing, use `C-c C-c'.
+\\{calibredb-edit-annotation-mode-map}")
+
 (defun calibredb-edit-annotation (&optional candidate)
   "Pop up a buffer for editing ebook CANDIDATE's annotation."
   (interactive)
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
-  (pop-to-buffer (generate-new-buffer-name "*Calibredb Annotation Compose*"))
-  (calibredb-insert-annotation candidate)
-  (calibredb-edit-annotation-mode)
-  (set (make-local-variable 'calibredb-annotation-candidate) candidate))
-
+  (let (beg pos)
+    ;; save the original position temporary.
+    (setq beg (point))
+    (setq pos (window-start))
+    (unless candidate
+      (setq candidate (car (calibredb-find-candidate-at-point))))
+    (pop-to-buffer (generate-new-buffer-name "*calibredb-edit-annatation*"))
+    (calibredb-insert-annotation candidate)
+    (calibredb-edit-annotation-mode)
+    (set (make-local-variable 'calibredb-annotation-candidate) candidate)
+    (set (make-local-variable 'calibredb-annotation-parameter) `(,beg . ,pos))))
 
 (defun calibredb-default-annotation-text (title)
   "Return default annotation text for TITLE.
@@ -1988,20 +2008,11 @@ annotations."
 
 (defun calibredb-insert-annotation (candidate)
   "Insert annotation for CANDIDATE."
-  (insert (funcall calibredb-edit-annotation-text-func
-                   (calibredb-read-metadatas "title" candidate)))
+  (when calibredb-edit-annotation-text-func
+    (insert (funcall calibredb-edit-annotation-text-func
+                     (calibredb-read-metadatas "title" candidate))))
   (let ((annotation  (calibredb-read-metadatas "comments" candidate)))
     (when (and annotation  (not (string-equal annotation ""))) (insert annotation))))
-
-(defcustom calibredb-annotation-modes-inherit-from (if (fboundp 'org-mode) 'org-mode 'text-mode)
-  "Symbol for mode that calibredb annotation modes are to inherit from.
-Or nil if no parent mode.  The annotation modes are
-`calibredb-edit-annotation-mode' and `calibredb-show-annotation-mode'.
-
-You must restart Emacs after changing the value of this option, for
-the change to take effect."
-  :type  'symbol :group 'calibredb)
-
 
 (defun calibredb-kill-line (&optional newline-too)
   "Kill from point to end of line.
@@ -2012,26 +2023,37 @@ Does not affect the kill ring."
     (when (and newline-too (= (following-char) ?\n))
       (delete-char 1))))
 
-(defun calibredb-send-edited-annotation () ; Bound to `C-c C-c' in `calibredb-edit-annotation-mode'.
+(defun calibredb-send-edited-annotation ()
   "Use buffer contents as annotation for an ebook.
-Lines beginning with `#' are ignored."
+Lines beginning with `#' are ignored.
+Bound to \\<C-cC-c> in `calibredb-edit-annotation-mode'."
   (interactive)
   (unless (derived-mode-p 'calibredb-edit-annotation-mode)
     (error "Not in mode derived from `calibredb-edit-annotation-mode'"))
   (goto-char (point-min))
-  (while (< (point) (point-max)) (if (= (following-char) ?#) (calibredb-kill-line t) (forward-line 1)))
+  ;; (while (< (point) (point-max)) (if (= (following-char) ?#) (calibredb-kill-line t) (forward-line 1)))
   (let ((annotation      (buffer-substring-no-properties (point-min) (point-max)))
         (candidate        calibredb-annotation-candidate)
+        (beg        (car calibredb-annotation-parameter))
+        (pos        (cdr calibredb-annotation-parameter))
         (annotation-buf  (current-buffer)))
-    (when (string= annotation "") (setq annotation  nil))
+    (when (string= annotation "") (setq annotation nil))
     (calibredb-command :command "set_metadata"
-                       :option (format "--field comments:\"%s\"" annotation)
+                       :option (format "--field %s:%s " calibredb-annotation-field (prin1-to-string annotation))
                        :id (calibredb-getattr candidate :id)
                        :library (format "--library-path \"%s\"" calibredb-root-dir))
     (if (fboundp 'kill-buffer-and-its-windows)
         (kill-buffer-and-its-windows annotation-buf) ; Defined in `misc-cmds.el'.
       (kill-buffer annotation-buf))
-    (calibredb-search-refresh-or-resume)))
+    (calibredb-search-refresh-or-resume beg pos)))
+
+(defun calibredb-annotation-quit ()
+  "Quit *calibredb-edit-annatation*.
+Bound to \\<C-cC-k> in `calibredb-edit-annotation-mode'."
+  (interactive)
+  (when (eq major-mode 'calibredb-edit-annotation-mode)
+    (if (get-buffer "*calibredb-edit-annatation*")
+        (kill-buffer "*calibredb-edit-annatation*"))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
