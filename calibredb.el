@@ -223,6 +223,10 @@ Set negative to keep original length."
   "Face used for *calibredb-search* mouse face"
   :group 'calibredb-faces)
 
+(defface calibredb-edit-annotation-header-title-face '((t :inherit font-lock-string-face))
+  "Face used for *calibredb-edit-annotation* header tilte face"
+  :group 'calibredb-faces)
+
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
@@ -368,6 +372,9 @@ When live editing the filter, it is bound to :live.")
   "Function that returns the string to be used for the Calibredb search header.")
 
 (defvar calibredb-library-index 0)
+
+(defvar calibredb-edit-annotation-header-function #'calibredb-edit-annotation-header
+  "Function that returns the string to be used for the Calibredb edit annotation header.")
 
 (defvar calibredb-edit-annotation-text-func nil
   "Function to return default text to use for an ebook annotation.
@@ -562,6 +569,7 @@ Argument QUERY-RESULT is the query result generate by sqlite."
                                                 ""
                                               (nth 9 spl-query-result))))))))
 
+;;;###autoload
 (defun calibredb-list ()
   "Generate an org buffer which contain all ebooks' cover image, title and the file link."
   (interactive)
@@ -1613,6 +1621,7 @@ Indicating the library you use."
   (hl-line-mode)
   (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
 
+;;;###autoload
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
@@ -1665,6 +1674,7 @@ Argument CANDIDATE is the selected candidate."
   (interactive)
   (calibredb-show-entry candidate))
 
+;;;###autoload
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
   (interactive)
@@ -1678,6 +1688,7 @@ Argument CANDIDATE is the selected candidate."
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
 
+;;;###autoload
 (defun calibredb-library-list ()
   "Switch library from variable `calibredb-library-alist'.
 If under *calibredb-search* buffer, it will auto refresh after
@@ -1978,7 +1989,15 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 (define-derived-mode calibredb-edit-annotation-mode org-mode "calibredb-edit-annatation"
   "Mode for editing the annotation of a ebook.
 When you have finished composing, use `C-c C-c'.
-\\{calibredb-edit-annotation-mode-map}")
+\\{calibredb-edit-annotation-mode-map}"
+  (setq header-line-format '(:eval (funcall calibredb-edit-annotation-header-function))))
+
+(defun calibredb-edit-annotation-header ()
+  "TODO: Return the string to be used as the Calibredb edit annotation header."
+  (format "%s -> Edit Annotation. %s%s"
+          (propertize (calibredb-get-init "title" calibredb-annotation-candidate) 'face 'calibredb-edit-annotation-header-title-face)
+           "Finish 'C-c C-c',"
+           "abort 'C-c C-k'."))
 
 (defun calibredb-edit-annotation (&optional candidate)
   "Pop up a buffer for editing ebook CANDIDATE's annotation."
