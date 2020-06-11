@@ -37,6 +37,7 @@
   - [[#how-to-interact-with-org-ref][How to interact with org-ref?]]
   - [[#why-the-loading-time-is-so-long][Why the loading time is so long?]]
   - [[#can-not-remember-the-keybindings][Can not remember the keybindings?]]
+  - [[#how-to-edit-annotation-with-org-mode][How to edit annotation with org-mode?]]
   - [[#more-examples][More examples?]]
 - [[#supported-features][Supported Features]]
   - [[#calibredb][calibredb]]
@@ -61,6 +62,7 @@
   - [[#catalog][Catalog]]
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-06-11][=2020-06-11=]]
   - [[#2020-06-07][=2020-06-07=]]
   - [[#2020-06-06][=2020-06-06=]]
   - [[#2020-06-05][=2020-06-05=]]
@@ -404,6 +406,19 @@ frustrate you when dealing with big libraries:)
 ** Can not remember the keybindings?
 Press ~?~, it will show you all actions.
 
+** How to edit annotation with org-mode?
+In =*calibredb-search*= buffer,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-edit-annotation
+#+END_SRC
+Or press ~i~.
+
+By default, the annotation would be saved to =comments= field. If you want to
+change to other filed, please set with the following statement:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-annotation-field "comments")
+#+END_SRC
+
 ** More examples?
 Please check
 #+html: <a href="#keybindings">keybindings</a> .
@@ -573,8 +588,12 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-06-11=
+Version *2.3.0*:
+- New features: =calibredb-edit-annotation=
+
 ** =2020-06-07=
-Version 2.2.0:
+Version *2.2.0*:
 - New features: favorite, highlight, and archive the items.
 - Clickable items: tags, authors, and format.
 
