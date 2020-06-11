@@ -277,6 +277,11 @@ You can perform the following actions:
 PS:
 Workflows might be slightly changed in future versions.
 
+Notice: This package use *calibredb* update the *metadata.db* file rather than use
+sqlite to update the database. Sqlite is only used for reading rather than
+updating and deleting. But it is still very important to do backup by yourself.
+For example, with cloud services.
+
 * Q&A
 The keybindings mentioned below are referenced from
 #+html: <a href="#keybindings">keybindings</a>.
