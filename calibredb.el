@@ -1995,7 +1995,7 @@ When you have finished composing, use `C-c C-c'.
 
 (defun calibredb-edit-annotation-header ()
   "TODO: Return the string to be used as the Calibredb edit annotation header."
-  (format "%s -> Edit Annotation. %s%s"
+  (format "%s -> Edit Annotation. %s %s"
           (propertize (calibredb-get-init "title" calibredb-annotation-candidate) 'face 'calibredb-edit-annotation-header-title-face)
            "Finish 'C-c C-c',"
            "abort 'C-c C-k'."))
