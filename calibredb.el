@@ -1115,12 +1115,12 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                  (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
                         (setq res-list (remove item res-list))
                         (setq a-list (cons item a-list)))
-                       ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
-                        (setq res-list (remove item res-list))
-                        (setq h-list (cons item h-list)))
                        ((string-match-p "favorite" (calibredb-getattr (list item) :tag))
                         (setq res-list (remove item res-list))
-                        (setq f-list (cons item f-list)))))
+                        (setq f-list (cons item f-list)))
+                       ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
+                        (setq res-list (remove item res-list))
+                        (setq h-list (cons item h-list)))))
                ;; merge archive/highlight/favorite/rest items
                (setq res-list (nconc f-list h-list res-list a-list))
                (calibredb-getbooklist (nreverse res-list)))))))
@@ -1245,7 +1245,9 @@ ARGUMENT FILTER is the filter string."
    [("a" "Add a file"   calibredb-add)
     ("A" "Add a directory"   calibredb-add-dir)
     ("d" "Remove a file"   calibredb-remove)
-    ("e" "Export" calibredb-export-dispatch)]
+    ("e" "Export" calibredb-export-dispatch)
+    ("/" "Live Filter" calibredb-search-live-filter)
+    ("i" "Edit Annotation" calibredb-edit-annotation)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("v" "View details"  calibredb-view)
@@ -1254,8 +1256,9 @@ ARGUMENT FILTER is the filter string."
    [("m" "Mark" calibredb-mark-and-forward)
     ("u" "Unmark and forward" calibredb-unmark-and-forward)
     ("DEL" "Unmark and backward" calibredb-unmark-and-backward)
-    ("/" "Live Filter" calibredb-search-live-filter)
-    ("i" "Edit Annotation" calibredb-edit-annotation)]]
+    ("f" "Favorite" calibredb-toggle-favorite-at-point)
+    ("h" "Highlight" calibredb-toggle-highlight-at-point)
+    ("x" "Archive" calibredb-toggle-archive-at-point)]]
   ["Library operaion"
    [("l" "List Libraries"   calibredb-library-list)
    ("S" "Switch library"   calibredb-switch-library)
