@@ -160,6 +160,11 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'string)
 
+(defcustom calibredb-condense-comments t
+  "Condense comments into one line."
+  :group 'calibredb
+  :type 'boolean)
+
 ;; faces
 
 (defface calibredb-search-header-highlight-face
@@ -1020,13 +1025,21 @@ Argument BOOK-ALIST ."
                                           'help-echo "Filter with this tag"
                                           'keymap tag-map) calibredb-tag-width :left)
      (if (stringp comment)
-         (calibredb-format-column (propertize comment 'face 'calibredb-comment-face) calibredb-comment-width :left)
+         (calibredb-format-column (propertize (if calibredb-condense-comments
+                                                  (calibredb-condense-comments comment)
+                                                comment)
+                                              'face 'calibredb-comment-face)
+                                  calibredb-comment-width :left)
        "")
      (format "%s%s"
              (if calibredb-size-show
                  (propertize size 'face 'calibredb-size-face) "")
              (if calibredb-size-show
                  (propertize "Mb" 'face 'calibredb-size-face) ""))) ))
+
+(defun calibredb-condense-comments (str)
+  "Condense whitespace in STR into a single space."
+  (replace-regexp-in-string "[[:space:]\n\r]+" " " str))
 
 (defun calibredb-favorite-mouse-1 (event)
   "Visit the location click on.

@@ -599,6 +599,7 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 ** =2020-06-21=
 Version *2.3.1*:
 - Sort favorite, highlight, and archive items: favorite -> highlight -> rest -> archive
+- Add: =calibredb-condense-comments=
 
 ** =2020-06-11=
 Version *2.3.0*:
