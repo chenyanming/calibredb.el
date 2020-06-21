@@ -322,6 +322,8 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
    - Perform remove action as shown in the menu.
 
+PS: In case of wrong deletion, you can only delete one file each time.
+
 ** How to switch to different library?
 First, set =calibredb-library-alist= to include the calibre libraries.
 #+BEGIN_SRC emacs-lisp
@@ -429,6 +431,8 @@ change to other filed, please set with the following statement:
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-annotation-field "comments")
 #+END_SRC
+
+Please notice: Due to the limitation of *calibredb*, the blank new lines will be deleted.
 
 ** More examples?
 Please check
