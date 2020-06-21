@@ -155,6 +155,26 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
+(defcustom calibredb-favorite-keyword "favorite"
+  "The favorite tag."
+  :group 'calibredb
+  :type 'string)
+
+(defcustom calibredb-favorite-icon "★"
+  "The favorite icon."
+  :group 'calibredb
+  :type 'string)
+
+(defcustom calibredb-archive-keyword "archive"
+  "The archive tag."
+  :group 'calibredb
+  :type 'string)
+
+(defcustom calibredb-highlight-keyword "highlight"
+  "The highlight tag."
+  :group 'calibredb
+  :type 'string)
+
 (defcustom calibredb-annotation-field "comments"
   "The field to be saved the annotation."
   :group 'calibredb
@@ -367,11 +387,6 @@ When live editing the filter, it is bound to :live.")
     (define-key map "\C-c\C-k" 'calibredb-annotation-quit)
     map)
   "Keymap for `calibredb-edit-annotation-mode'.")
-
-(defvar calibredb-favorite-keyword "favorite")
-(defvar calibredb-archive-keyword "archive")
-(defvar calibredb-highlight-keyword "highlight")
-(defvar calibredb-favorite-icon "★")
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
