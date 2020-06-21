@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.3.0
+;; Version: 2.3.1
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -1104,16 +1104,26 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
   (let* ((query-result (calibredb-query calibredb-query-string))
          (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
-          (t (let (res-list)
+          (t (let (res-list h-list f-list a-list)
                (dolist (line line-list)
                  ;; validate if it is right format
                  (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                      ;; decode and push to res-list
-                     (push (calibredb-query-to-alist line) res-list)
-                   ;; concat the invalid format strings into last line
-                   ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
-                   ))
-               (calibredb-getbooklist (nreverse res-list))) ))))
+                     (push (calibredb-query-to-alist line) res-list)))
+               ;; filter archive/highlight/favorite items
+               (dolist (item res-list)
+                 (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
+                        (setq res-list (remove item res-list))
+                        (setq a-list (cons item a-list)))
+                       ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
+                        (setq res-list (remove item res-list))
+                        (setq h-list (cons item h-list)))
+                       ((string-match-p "favorite" (calibredb-getattr (list item) :tag))
+                        (setq res-list (remove item res-list))
+                        (setq f-list (cons item f-list)))))
+               ;; merge archive/highlight/favorite/rest items
+               (setq res-list (nconc f-list h-list res-list a-list))
+               (calibredb-getbooklist (nreverse res-list)))))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.

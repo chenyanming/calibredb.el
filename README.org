@@ -62,6 +62,7 @@
   - [[#catalog][Catalog]]
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-06-21][=2020-06-21=]]
   - [[#2020-06-11][=2020-06-11=]]
   - [[#2020-06-07][=2020-06-07=]]
   - [[#2020-06-06][=2020-06-06=]]
@@ -595,6 +596,10 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-06-21=
+Version *2.3.1*:
+- Sort favorite, highlight, and archive items: favorite -> highlight -> rest -> archive
+
 ** =2020-06-11=
 Version *2.3.0*:
 - New features: =calibredb-edit-annotation=
