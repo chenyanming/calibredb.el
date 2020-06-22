@@ -62,6 +62,7 @@
   - [[#catalog][Catalog]]
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-06-22][=2020-06-22=]]
   - [[#2020-06-21][=2020-06-21=]]
   - [[#2020-06-11][=2020-06-11=]]
   - [[#2020-06-07][=2020-06-07=]]
@@ -172,9 +173,17 @@ Enable size indicator:
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
 ** File format icons
+You can choose [[https://github.com/domtronn/all-the-icons.el][all-the-icons]] or [[https://github.com/seagle0128/icons-in-terminal.el][icons-in-terminal]] to render the icons. You have
+to install the icons packages by yourself, otherwise it would not work.
+
 To enable all-the-icons:
 #+BEGIN_SRC emacs-lisp
-(setq calibredb-format-icons t)
+(setq calibredb-format-all-the-icons t)
+#+END_SRC
+
+To enable icons-in-terminal:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-format-icons-in-terminal t)
 #+END_SRC
 
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
@@ -600,6 +609,12 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-06-22=
+Version *2.3.2*:
+- Add: =icons-in-terminal= support
+- Rename =calibredb-format-icons= to =calibredb-format-all-the-icons=
+- Add =calibredb-format-icons-in-terminal=
+
 ** =2020-06-21=
 Version *2.3.1*:
 - Sort favorite, highlight, and archive items: favorite -> highlight -> rest -> archive

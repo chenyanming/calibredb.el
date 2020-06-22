@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.3.1
+;; Version: 2.3.2
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,8 @@
 (ignore-errors
   (require 'helm)
   (require 'ivy)
-  (require 'all-the-icons))
+  (require 'all-the-icons)
+  (require 'icons-in-terminal))
 
 (defgroup calibredb nil
   "calibredb group"
@@ -150,8 +151,16 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-format-icons nil
-  "Set Non-nil to show file format icons."
+(define-obsolete-variable-alias 'calibredb-format-icons
+  'calibredb-format-all-the-icons "calibredb 2.3.2")
+
+(defcustom calibredb-format-all-the-icons nil
+  "Set Non-nil to show file format icons with all-the-icons."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-format-icons-in-terminal nil
+  "Set Non-nil to show file format icons with icons-in-terminal."
   :group 'calibredb
   :type 'boolean)
 
@@ -1006,9 +1015,13 @@ Argument BOOK-ALIST ."
     (format
      "%s %s %s %s (%s) %s %s"
      (calibredb-format-column (format "%s%s"
-                                      (if calibredb-format-icons
-                                          (concat (if (fboundp 'all-the-icons-icon-for-file)
-                                                      (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") "")
+                                      (cond (calibredb-format-all-the-icons
+                                              (concat (if (fboundp 'all-the-icons-icon-for-file)
+                                                          (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") )
+                                            (calibredb-format-icons-in-terminal
+                                              (concat (if (fboundp 'icons-in-terminal-icon-for-file)
+                                                          (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") )
+                                            (t ""))
                                       (propertize id 'face 'calibredb-id-face) ) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
                                       (if (s-contains? calibredb-favorite-keyword tag)
