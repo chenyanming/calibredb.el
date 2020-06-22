@@ -1013,16 +1013,17 @@ Argument BOOK-ALIST ."
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
     (format
-     "%s %s %s %s (%s) %s %s"
-     (calibredb-format-column (format "%s%s"
-                                      (cond (calibredb-format-all-the-icons
-                                              (concat (if (fboundp 'all-the-icons-icon-for-file)
-                                                          (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") )
-                                            (calibredb-format-icons-in-terminal
-                                              (concat (if (fboundp 'icons-in-terminal-icon-for-file)
-                                                          (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "") " ") )
-                                            (t ""))
-                                      (propertize id 'face 'calibredb-id-face) ) calibredb-id-width :left)
+     "%s%s%s %s %s (%s) %s %s"
+     (cond (calibredb-format-all-the-icons
+            (concat (if (fboundp 'all-the-icons-icon-for-file)
+                        (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
+                    " "))
+           (calibredb-format-icons-in-terminal
+            (concat (if (fboundp 'icons-in-terminal-icon-for-file)
+                        (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
+                    " "))
+           (t ""))
+     (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
                                       (if (s-contains? calibredb-favorite-keyword tag)
                                           (format "%s " (propertize calibredb-favorite-icon
