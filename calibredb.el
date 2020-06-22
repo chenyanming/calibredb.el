@@ -415,6 +415,9 @@ It could be function `calibredb-default-annotation-text'")
 (defvar calibredb-annotation-parameter nil
   "Local variable used in *calibredb-annotation*.")
 
+(defvar calibredb-images-path (concat (file-name-directory load-file-name) "img")
+  "Relative path to images.")
+
 (defcustom calibredb-show-unique-buffers nil
   "When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
@@ -650,10 +653,15 @@ Argument KEY is the key."
    ;; TODO: add native resizing support once it's official
    ((fboundp 'imagemagick-types)
     (insert-image
-     (create-image path 'imagemagick nil
-                   :ascent 100
-                   :max-width 500
-                   :max-height 500)))
+     (if (file-exists-p path)
+         (create-image path 'imagemagick nil
+                       :ascent 100
+                       :max-width 500
+                       :max-height 500)
+       (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
+                     :ascent 100
+                     :max-width 500
+                     :max-height 500))))
    (t
     ;; `create-image' errors out for unsupported image types
     (let ((image (ignore-errors (create-image path nil nil :ascent 100))))
