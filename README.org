@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    June 7, 2020
+#+DATE:    June 23, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
@@ -459,6 +459,7 @@ Enter calibre emacs client, a new buffer called =*calibredb-search*= with =calib
 M-x calibredb
 #+END_SRC
 =RET= open the entry
+
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
@@ -483,8 +484,8 @@ If the keyword occurs in any of the columns above, the matched ebook record will
 be shown.
 
 Start from version =2.1.0=,
-1. Live filter is faster than before since it search the
-results in =calibredb-full-entries= rather than query the database.
+1. Live filter is faster than before since it search the results in
+   =calibredb-full-entries= rather than query the database.
 2. The keyword supports REGEX.
 
 Tip: =*calibredb-search*=, =calibredb-find-counsel=, and =calibredb-find-helm= are sharing

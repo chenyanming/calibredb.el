@@ -419,14 +419,14 @@ It could be function `calibredb-default-annotation-text'")
   "Relative path to images.")
 
 (defcustom calibredb-show-unique-buffers nil
-  "When non-nil, every entry buffer gets a unique name.
+  "TODO: When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple show buffers at the same
 time."
   :group 'calibredb
   :type 'boolean)
 
 (defcustom calibredb-search-unique-buffers nil
-  "When non-nil, every entry buffer gets a unique name.
+  "TODO: When non-nil, every entry buffer gets a unique name.
 This allows for displaying multiple serch buffers at the same
 time."
   :group 'calibredb
