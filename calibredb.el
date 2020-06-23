@@ -2138,5 +2138,23 @@ Bound to \\<C-cC-k> in `calibredb-edit-annotation-mode'."
     (if (get-buffer "*calibredb-edit-annatation*")
         (kill-buffer "*calibredb-edit-annatation*"))))
 
+;; org-capture
+
+(defun calibredb-capture-at-point ()
+  "TODO: org capture the current item."
+  (interactive)
+  (let (capture-path capture-title)
+    (with-current-buffer (calibredb-search--buffer-name)
+      (let ((candidates (calibredb-find-marked-candidates)))
+        (unless candidates
+          (setq candidates (calibredb-find-candidate-at-point)))
+        (dolist (cand candidates)
+          (let ((path (calibredb-getattr cand :file-path))
+                (title (calibredb-getattr cand :book-title)))
+            (setq capture-path path)
+            (setq capture-title title)))))
+    (with-temp-buffer (insert "* TODO ")
+                      (insert (format "[[file:%s][%s]]" capture-path capture-title))
+                      (buffer-string))))
 (provide 'calibredb)
 ;;; calibredb.el ends here
