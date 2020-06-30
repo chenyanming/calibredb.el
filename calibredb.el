@@ -1944,19 +1944,19 @@ selecting the new item."
   "Mark the current line and forward."
   (interactive)
   (calibredb-mark-at-point)
-  (forward-line 1))
+  (calibredb-next-entry))
 
 (defun calibredb-unmark-and-forward ()
   "Unmark the current line and forward."
   (interactive)
   (calibredb-unmark-at-point)
-  (forward-line 1))
+  (calibredb-next-entry))
 
 (defun calibredb-unmark-and-backward ()
   "Unmark the current line and backward."
   (interactive)
   (calibredb-unmark-at-point)
-  (forward-line -1))
+  (calibredb-previous-entry))
 
 (defun calibredb-unmark-at-point ()
   "Unmark the current line."
