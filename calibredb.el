@@ -1044,6 +1044,30 @@ ALIGN should be a keyword :left or :right."
       -1
     calibredb-title-width))
 
+(defun calibredb-format-width ()
+  "Return the format width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-format-width))
+
+(defun calibredb-tag-width ()
+  "Return the tag width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-tag-width))
+
+(defun calibredb-author-width ()
+  "Return the author width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-author-width))
+
+(defun calibredb-comment-width ()
+  "Return the comment width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-comment-width))
+
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.
 Argument BOOK-ALIST ."
@@ -1063,7 +1087,7 @@ Argument BOOK-ALIST ."
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
     (if calibredb-detial-view
-          (setq title (concat title "\n")))
+        (setq title (concat title "\n")))
     (format
      (if calibredb-detial-view
          (let ((num (cond (calibredb-format-all-the-icons 3)
@@ -1106,23 +1130,23 @@ Argument BOOK-ALIST ."
                                           'face 'calibredb-format-face
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this format"
-                                          'keymap format-map) calibredb-format-width :left)
+                                          'keymap format-map) (calibredb-format-width) :left)
      (calibredb-format-column (propertize author
                                           'face 'calibredb-author-face
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this author"
-                                          'keymap author-map) calibredb-author-width :left)
+                                          'keymap author-map) (calibredb-author-width) :left)
      (calibredb-format-column (propertize tag
                                           'face 'calibredb-tag-face
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this tag"
-                                          'keymap tag-map) calibredb-tag-width :left)
+                                          'keymap tag-map) (calibredb-tag-width) :left)
      (if (stringp comment)
          (calibredb-format-column (propertize (if calibredb-condense-comments
                                                   (calibredb-condense-comments comment)
                                                 comment)
                                               'face 'calibredb-comment-face)
-                                  calibredb-comment-width :left)
+                                  (calibredb-comment-width) :left)
        "")
      (format "%s%s"
              (if calibredb-size-show
@@ -1273,10 +1297,10 @@ ARGUMENT FILTER is the filter string."
       (if (or
            (unless (equal calibredb-id-width 0) (string-match-p filter (calibredb-getattr (cdr line) :id)))
            (unless (equal (calibredb-title-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :book-title)))
-           (unless (equal calibredb-format-width 0) (string-match-p filter (calibredb-getattr (cdr line) :book-format)))
-           (unless (equal calibredb-tag-width 0) (string-match-p filter (calibredb-getattr (cdr line) :tag)))
-           (unless (equal calibredb-author-width 0) (string-match-p filter (calibredb-getattr (cdr line) :author-sort)))
-           (unless (equal calibredb-comment-width 0) (string-match-p filter (calibredb-getattr (cdr line) :comment))))
+           (unless (equal (calibredb-format-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :book-format)))
+           (unless (equal (calibredb-tag-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :tag)))
+           (unless (equal (calibredb-author-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :author-sort)))
+           (unless (equal (calibredb-comment-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :comment))))
           (push line res-list)))
     (nreverse res-list)))
 
