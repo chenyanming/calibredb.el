@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.3.2
+;; Version: 2.4.0
 ;; Package-Requires: ((emacs "25.1") (org "9.0") (transient "0.1.0") (s "1.12.0") (dash "2.17.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -206,7 +206,16 @@ Set negative to keep original length."
   :group 'calibredb-faces)
 
 (defface calibredb-title-face '((t :inherit default))
-  "Face used for title."
+  "Face used for title on list view."
+  :group 'calibredb-faces)
+
+(defface calibredb-title-detail-view-face
+  '((((class color) (background light))
+     :background "gray85")
+    (((class color) (background dark))
+     :background "gray25")
+    (t :inherit calibredb-title-face))
+  "Face used for title on detail view."
   :group 'calibredb-faces)
 
 (defface calibredb-author-face '((t :inherit font-lock-variable-name-face))
@@ -379,6 +388,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map "i" #'calibredb-edit-annotation)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
+    (define-key map "t" #'calibredb-toggle-view)
     (define-key map "\M-n" #'calibredb-show-next-entry)
     (define-key map "\M-p" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
@@ -1002,6 +1012,38 @@ ALIGN should be a keyword :left or :right."
         (t (format (format "%%%s%d.%ds" (if (eq align :left) "-" "") width width)
                    string))))
 
+(defcustom calibredb-detial-view nil
+  "Set t to change detail view, nil to list view."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-detial-view-image-show t
+  "Set Non-nil to show size indicator."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-detail-view-image-max-width 150
+  "Width for id."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-detail-view-image-max-height 150
+  "Width for id. "
+  :group 'calibredb
+  :type 'integer)
+
+(defun calibredb-title-face ()
+  "Return the title face base on the view."
+  (if calibredb-detial-view
+      'calibredb-title-detail-view-face
+      'calibredb-title-face))
+
+(defun calibredb-title-width ()
+  "Return the title width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-title-width))
+
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.
 Argument BOOK-ALIST ."
@@ -1020,8 +1062,22 @@ Argument BOOK-ALIST ."
     (define-key tag-map [mouse-1] 'calibredb-tag-mouse-1)
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
+    (if calibredb-detial-view
+          (setq title (concat title "\n")))
     (format
-     "%s%s%s %s %s (%s) %s %s"
+     (if calibredb-detial-view
+         (let ((num (cond (calibredb-format-all-the-icons 3)
+                          (calibredb-format-icons-in-terminal 3)
+                          ((>= calibredb-id-width 0) calibredb-id-width)
+                          (t 0 ))))
+           (concat
+            "%s%s%s"
+            (calibredb-format-column (format "%sFormat:" (make-string num ? )) (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sAuthor:" (make-string num ? ))  (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sTag:" (make-string num ? )) (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sComment:" (make-string num ? )) (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sSize:" (make-string num ? )) (+ 8 num) :left) "%s"))
+       "%s%s%s %s %s (%s) %s %s")
      (cond (calibredb-format-all-the-icons
             (concat (if (fboundp 'all-the-icons-icon-for-file)
                         (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
@@ -1045,7 +1101,7 @@ Argument BOOK-ALIST ."
                                        ((s-contains? calibredb-highlight-keyword tag)
                                         (propertize title 'face 'calibredb-highlight-face))
                                        (t
-                                         (propertize title 'face 'calibredb-title-face)))) calibredb-title-width :left)
+                                        (propertize title 'face (calibredb-title-face))))) (calibredb-title-width) :left)
      (calibredb-format-column (propertize format
                                           'face 'calibredb-format-face
                                           'mouse-face 'calibredb-mouse-face
@@ -1216,7 +1272,7 @@ ARGUMENT FILTER is the filter string."
     (dolist (line calibredb-full-entries)
       (if (or
            (unless (equal calibredb-id-width 0) (string-match-p filter (calibredb-getattr (cdr line) :id)))
-           (unless (equal calibredb-title-width 0) (string-match-p filter (calibredb-getattr (cdr line) :book-title)))
+           (unless (equal (calibredb-title-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :book-title)))
            (unless (equal calibredb-format-width 0) (string-match-p filter (calibredb-getattr (cdr line) :book-format)))
            (unless (equal calibredb-tag-width 0) (string-match-p filter (calibredb-getattr (cdr line) :tag)))
            (unless (equal calibredb-author-width 0) (string-match-p filter (calibredb-getattr (cdr line) :author-sort)))
@@ -1315,7 +1371,8 @@ ARGUMENT FILTER is the filter string."
    ("c" "Clone library"   calibredb-clone)
    ("r" "Refresh Library"   calibredb-search-refresh)]
    [("n" "Next Library"   calibredb-library-next)
-   ("p" "Previous Library"   calibredb-library-previous)]])
+    ("p" "Previous Library"   calibredb-library-previous)
+    ("t" "Toggle view (Detail/List)"   calibredb-toggle-view)]])
 
 (define-transient-command calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
@@ -1706,6 +1763,7 @@ Indicating the library you use."
                (let (beg end)
                  (setq beg (point))
                  (insert (car item))
+                 (calibredb-detail-view-insert-image item)
                  (setq end (point))
                  (put-text-property beg end 'calibredb-entry item)
                  (insert "\n")))
@@ -1995,8 +2053,32 @@ Argument KEYWORD is the tag keyword."
     (let ((content (car entry)) beg end)
       (setq beg (point))
       (insert content)
+      (calibredb-detail-view-insert-image entry)
       (setq end (point))
       (put-text-property beg end 'calibredb-entry entry))))
+
+(defun calibredb-toggle-view ()
+  "Toggle between detail view or list view in *calibredb-search* buffer."
+  (interactive)
+  (setq calibredb-detial-view (if (eq calibredb-detial-view nil) t nil))
+  (calibredb-search-refresh-or-resume))
+
+(defun calibredb-detail-view-insert-image (entry)
+  "Insert image in *calibredb-search* under detail view based on ENTRY."
+  (if (and calibredb-detial-view calibredb-detial-view-image-show)
+      (let* ((num (cond (calibredb-format-all-the-icons 3)
+                        (calibredb-format-icons-in-terminal 3)
+                        ((>= calibredb-id-width 0) calibredb-id-width)
+                        (t 0 )))
+             (file (calibredb-getattr (cdr entry) :file-path))
+             (cover (concat (file-name-directory file) "cover.jpg")))
+        (when (file-exists-p cover)
+          (insert "\n")
+          (insert (make-string num ? ))
+          (insert-image (create-image cover 'imagemagick nil
+                                      :ascent 100
+                                      :max-width calibredb-detail-view-image-max-width
+                                      :max-height calibredb-detail-view-image-max-height))))))
 
 (defun calibredb-search--minibuffer-setup ()
   "Set up the minibuffer for live filtering."
