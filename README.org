@@ -62,6 +62,7 @@
   - [[#catalog][Catalog]]
     - [[#bibtex][BibTex]]
 - [[#logs][Logs]]
+  - [[#2020-07-01][=2020-07-01=]]
   - [[#2020-06-22][=2020-06-22=]]
   - [[#2020-06-21][=2020-06-21=]]
   - [[#2020-06-11][=2020-06-11=]]
@@ -247,6 +248,7 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "u" #'calibredb-unmark-and-forward)
     (define-key map "i" #'calibredb-edit-annotation)
     (define-key map (kbd "<DEL>") #'calibredb-unmark-and-backward)
+    (define-key map "t" #'calibredb-toggle-view)
     (define-key map "\M-n" #'calibredb-show-next-entry)
     (define-key map "\M-p" #'calibredb-show-previous-entry)
     (define-key map "/" #'calibredb-search-live-filter)
@@ -460,6 +462,11 @@ M-x calibredb
 #+END_SRC
 =RET= open the entry
 
+To toggle between detail view or list view.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-toggle-view
+#+END_SRC
+
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
@@ -610,6 +617,10 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+** =2020-07-01=
+Version *2.4.0*:
+- Add: =calibredb-toggle-view=
+
 ** =2020-06-22=
 Version *2.3.2*:
 - Add: =icons-in-terminal= support
