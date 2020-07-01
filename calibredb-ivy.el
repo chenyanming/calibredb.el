@@ -22,7 +22,6 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-utils)
 
 (if (fboundp 'ivy-set-actions)
     (ivy-set-actions

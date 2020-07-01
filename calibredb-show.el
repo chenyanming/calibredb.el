@@ -22,7 +22,6 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-utils)
 (require 'calibredb-transient)
 
 (defvar calibredb-show-entry nil
