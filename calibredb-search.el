@@ -267,7 +267,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "Library: %s   %s"
+  (format "Library: %s   %s   %s"
           (propertize calibredb-root-dir 'face font-lock-type-face)
           (concat
            (propertize (format "Total: %s"
@@ -279,7 +279,8 @@ Indicating the library you use."
                                       (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
            (propertize (let ((len (length (calibredb-find-marked-candidates))))
                          (if (> len 0)
-                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))))
+                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))
+          (if calibredb-detial-view "< >" "> <")))
 
 (define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.
@@ -634,62 +635,109 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
   (interactive)
   (let ((inhibit-read-only t)
         (status calibredb-detial-view))
-    (cond
-     ;; save to calibredb-entry
-     ((get-text-property (point) 'calibredb-entry nil)
-      (setq calibredb-detial-view t)
-      (let* ((original (get-text-property (point) 'calibredb-entry nil))
-             (entry (cadr original))
-             (format (list (calibredb-format-item entry)))
-             ;; (position (seq-position calibredb-search-entries original))
-             )
-        (delete-region (line-beginning-position) (line-end-position))
-        (save-excursion
-          (unless (equal format "")
-            (let ((content (car format))
-                  (list (cons (car format) (list entry)))
-                  beg end)
-              (setq beg (point))
-              (insert content)
-              (calibredb-detail-view-insert-image original)
-              (setq end (point))
-              (put-text-property beg end 'calibredb-detail list)
-              ;; (setf (nth position calibredb-search-entries) (cons (car format) (list entry)))
-              ))))
-      (setq calibredb-detial-view status))
+    (if calibredb-detial-view
+        ;; detail view
+        (cond
+         ;; save to calibredb-entry
+         ((get-text-property (point) 'calibredb-entry nil)
+          (setq calibredb-detial-view nil)
+          (let* ((original (get-text-property (point) 'calibredb-entry nil))
+                 (entry (cadr original))
+                 (format (list (calibredb-format-item entry)))
+                 ;; (position (seq-position calibredb-search-entries original))
+                 (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-entry nil)))) ; the "id" of current point
+                 d-beg d-end)
+            (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-entry nil))))
+                (setq d-beg (point-min))
+              (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-entry nil))))
+                                (forward-line -1))
+                              (forward-line 1)
+                              (setq d-beg (point))))
+            (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-entry nil))))
+                              (forward-line 1))
+                            (goto-char (1- (point)))
+                            (setq d-end (point)))
+            (delete-region d-beg d-end)
+            (save-excursion
+              (unless (equal format "")
+                (let ((content (car format))
+                      (list (cons (car format) (list entry)))
+                      beg end)
+                  (setq beg (point))
+                  (insert content)
+                  (setq end (point))
+                  (put-text-property beg end 'calibredb-compact list)))))
+          (setq calibredb-detial-view status))
 
-     ;; save to calibredb-detail
-     ((get-text-property (point) 'calibredb-detail nil)
-      (setq calibredb-detial-view nil)
-      (let* ((original (get-text-property (point) 'calibredb-detail nil))
-             (entry (cadr original))
-             (format (list (calibredb-format-item entry)))
-             ;; (position (seq-position calibredb-search-entries original))
-             (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil)))) ; the "id" of current point
-             d-beg d-end)
-        (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-detail nil))))
-            (setq d-beg (point-min))
+         ;; save to calibredb-compact
+         ((get-text-property (point) 'calibredb-compact nil)
+          (setq calibredb-detial-view t)
+          (let* ((original (get-text-property (point) 'calibredb-compact nil))
+                 (entry (cadr original))
+                 (format (list (calibredb-format-item entry))))
+            (delete-region (line-beginning-position) (line-end-position))
+            (save-excursion
+              (unless (equal format "")
+                (let ((content (car format))
+                      (list (cons (car format) (list entry)))
+                      beg end)
+                  (setq beg (point))
+                  (insert content)
+                  (calibredb-detail-view-insert-image original)
+                  (setq end (point))
+                  (put-text-property beg end 'calibredb-entry list)))))
+          (setq calibredb-detial-view status)))
+
+      ;; compact view
+      (cond
+       ;; save to calibredb-entry
+       ((get-text-property (point) 'calibredb-entry nil)
+        (setq calibredb-detial-view t)
+        (let* ((original (get-text-property (point) 'calibredb-entry nil))
+               (entry (cadr original))
+               (format (list (calibredb-format-item entry))))
+          (delete-region (line-beginning-position) (line-end-position))
+          (save-excursion
+            (unless (equal format "")
+              (let ((content (car format))
+                    (list (cons (car format) (list entry)))
+                    beg end)
+                (setq beg (point))
+                (insert content)
+                (calibredb-detail-view-insert-image original)
+                (setq end (point))
+                (put-text-property beg end 'calibredb-detail list)))))
+        (setq calibredb-detial-view status))
+
+       ;; save to calibredb-detail
+       ((get-text-property (point) 'calibredb-detail nil)
+        (setq calibredb-detial-view nil)
+        (let* ((original (get-text-property (point) 'calibredb-detail nil))
+               (entry (cadr original))
+               (format (list (calibredb-format-item entry)))
+               (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil)))) ; the "id" of current point
+               d-beg d-end)
+          (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-detail nil))))
+              (setq d-beg (point-min))
+            (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil))))
+                              (forward-line -1))
+                            (forward-line 1)
+                            (setq d-beg (point))))
           (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil))))
-                            (forward-line -1))
-                          (forward-line 1)
-                          (setq d-beg (point))))
-        (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil))))
-                          (forward-line 1))
-                        (goto-char (1- (point)))
-                        (setq d-end (point)))
-        (delete-region d-beg d-end)
-        (save-excursion
-          (unless (equal format "")
-            (let ((content (car format))
-                  (list (cons (car format) (list entry)))
-                  beg end)
-              (setq beg (point))
-              (insert content)
-              (setq end (point))
-              (put-text-property beg end 'calibredb-entry list)
-              ;; (setf (nth position calibredb-search-entries) list)
-              ))))
-      (setq calibredb-detial-view status)))))
+                            (forward-line 1))
+                          (goto-char (1- (point)))
+                          (setq d-end (point)))
+          (delete-region d-beg d-end)
+          (save-excursion
+            (unless (equal format "")
+              (let ((content (car format))
+                    (list (cons (car format) (list entry)))
+                    beg end)
+                (setq beg (point))
+                (insert content)
+                (setq end (point))
+                (put-text-property beg end 'calibredb-entry list)))))
+        (setq calibredb-detial-view status))))))
 
 
 (provide 'calibredb-search)
