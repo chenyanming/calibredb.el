@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-utils)
 
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")
