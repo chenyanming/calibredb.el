@@ -37,6 +37,10 @@
   (require 'all-the-icons)
   (require 'icons-in-terminal))
 
+(eval-when-compile (defvar calibredb-detial-view))
+(eval-when-compile (defvar calibredb-full-entries))
+(declare-function calibredb-condense-comments "calibredb-search.el")
+
 (defgroup calibredb nil
   "calibredb group"
   :group 'calibredb)
