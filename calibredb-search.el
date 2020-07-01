@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-utils)
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."

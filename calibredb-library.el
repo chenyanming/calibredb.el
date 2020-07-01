@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-utils)
 
 ;;;###autoload
 (defun calibredb-switch-library ()

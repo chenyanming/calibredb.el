@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-utils)
 
 (defvar calibredb-helm-map
   (if (boundp 'helm-map)
