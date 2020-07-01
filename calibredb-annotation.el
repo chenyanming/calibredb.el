@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-search)
 
 ;; annotation
 
