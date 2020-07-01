@@ -22,6 +22,8 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-ivy)
+(require 'calibredb-show)
 
 ;;;###autoload
 (defun calibredb ()

@@ -23,6 +23,10 @@
 
 (require 'calibredb-core)
 (require 'calibredb-utils)
+(require 'calibredb-library)
+(require 'calibredb-transient)
+(require 'calibredb-annotation)
+(require 'calibredb-show)
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."

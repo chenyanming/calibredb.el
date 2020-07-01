@@ -23,6 +23,7 @@
 
 (require 'calibredb-core)
 (require 'calibredb-utils)
+(require 'calibredb-library)
 
 ;; Transient dispatch
 
