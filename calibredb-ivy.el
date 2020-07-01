@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-ivy.el -*- lexical-binding: t; -*-
+;;; calibredb-ivy.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,6 +22,9 @@
 ;;; Code:
 
 (require 'calibredb-core)
+
+(eval-when-compile (defvar calibredb-search-entries))
+(eval-when-compile (defvar calibredb-full-entries))
 
 (if (fboundp 'ivy-set-actions)
     (ivy-set-actions

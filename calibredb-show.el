@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-show.el -*- lexical-binding: t; -*-
+;;; calibredb-show.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,7 +22,20 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-transient)
+
+(declare-function calibredb-entry-dispatch "calibredb-transient.el")
+(declare-function calibredb-find-file "calibredb-utils.el")
+(declare-function calibredb-find-file-other-frame "calibredb-utils.el")
+(declare-function calibredb-open-file-with-default-tool "calibredb-utils.el")
+(declare-function calibredb-set-metadata-dispatch "calibredb-transient.el")
+(declare-function calibredb-export-dispatch "calibredb-transient.el")
+(declare-function calibredb-open-dired "calibredb-utils.el")
+(declare-function calibredb-set-metadata--tags "calibredb-utils.el")
+(declare-function calibredb-set-metadata--author_sort "calibredb-utils.el")
+(declare-function calibredb-set-metadata--authors "calibredb-utils.el")
+(declare-function calibredb-set-metadata--title "calibredb-utils.el")
+(declare-function calibredb-set-metadata--comments "calibredb-utils.el")
+(declare-function calibredb-show-entry "calibredb-search.el")
 
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")

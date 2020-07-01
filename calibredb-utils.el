@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-utils.el -*- lexical-binding: t; -*-
+;;; calibredb-utils.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -21,8 +21,22 @@
 
 ;;; Code:
 
-(require 'calibredb-core)
-(require 'calibredb-show)
+(eval-when-compile (defvar calibredb-search-entries))
+(eval-when-compile (defvar calibredb-full-entries))
+(eval-when-compile (defvar calibredb-images-path))
+
+(declare-function calibredb-search-buffer "calibredb-search.el")
+(declare-function calibredb-detail-view-insert-image "calibredb-utils.el")
+(declare-function calibredb-search-mode "calibredb-search.el")
+(declare-function calibredb-search--buffer-name "calibredb-search.el")
+(declare-function calibredb-counsel-add-file-action "calibredb-ivy.el")
+(declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
+(declare-function calibredb-show--buffer-name "calibredb-show.el")
+(declare-function calibredb-search-refresh "calibredb-search.el")
+(declare-function calibredb-show-refresh "calibredb-show.el")
+(declare-function calibredb-set-metadata-arguments "calibredb-transient.el")
+(declare-function calibredb-export-arguments "calibredb-transient.el")
+(declare-function calibredb-catalog-bib-arguments "calibredb-transient.el")
 
 ;;;###autoload
 (defun calibredb ()

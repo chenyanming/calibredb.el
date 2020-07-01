@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-annotation.el -*- lexical-binding: t; -*-
+;;; calibredb-annotation.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,7 +22,24 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-search)
+
+(declare-function calibredb-get-init "calibredb-utils.el")
+(declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
+(declare-function calibredb-read-metadatas "calibredb-utils.el")
+(declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
+
+(defvar calibredb-annotation-candidate nil
+  "Local variable used in *calibredb-annotation*.")
+(defvar calibredb-annotation-parameter nil
+  "Local variable used in *calibredb-annotation*.")
+
+(defvar calibredb-edit-annotation-header-function #'calibredb-edit-annotation-header
+  "Function that returns the string to be used for the Calibredb edit annotation header.")
+
+(defvar calibredb-edit-annotation-text-func nil
+  "Function to return default text to use for an ebook annotation.
+It takes one argument, the title of the ebook, as a string.
+It could be function `calibredb-default-annotation-text'")
 
 ;; annotation
 

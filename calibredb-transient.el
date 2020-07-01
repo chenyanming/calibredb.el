@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-transient.el -*- lexical-binding: t; -*-
+;;; calibredb-transient.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,7 +22,9 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-library)
+
+(declare-function calibredb-get-init "calibredb-utils.el")
+(declare-function calibredb-find-marked-candidates "calibredb-utils.el")
 
 ;; Transient dispatch
 
@@ -56,9 +58,9 @@
     ("x" "Archive" calibredb-toggle-archive-at-point)]]
   ["Library operaion"
    [("l" "List Libraries"   calibredb-library-list)
-   ("S" "Switch library"   calibredb-switch-library)
-   ("c" "Clone library"   calibredb-clone)
-   ("r" "Refresh Library"   calibredb-search-refresh)]
+    ("S" "Switch library"   calibredb-switch-library)
+    ("c" "Clone library"   calibredb-clone)
+    ("r" "Refresh Library"   calibredb-search-refresh)]
    [("n" "Next Library"   calibredb-library-next)
     ("p" "Previous Library"   calibredb-library-previous)
     ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]])

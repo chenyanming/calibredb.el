@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-search.el -*- lexical-binding: t; -*-
+;;; calibredb-search.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,9 +22,37 @@
 ;;; Code:
 
 (require 'calibredb-core)
-(require 'calibredb-library)
-(require 'calibredb-transient)
-(require 'calibredb-show)
+
+(eval-when-compile (defvar calibredb-show-entry))
+(eval-when-compile (defvar calibredb-show-entry-switch))
+
+(declare-function calibredb-find-file "calibredb-utils.el")
+(declare-function calibredb-add "calibredb-utils.el")
+(declare-function calibredb-add-dir "calibredb-utils.el")
+(declare-function calibredb-clone "calibredb-utils.el")
+(declare-function calibredb-remove "calibredb-utils.el")
+(declare-function calibredb-library-next "calibredb-library.el")
+(declare-function calibredb-library-previous "calibredb-library.el")
+(declare-function calibredb-set-metadata-dispatch "calibredb-transient.el")
+(declare-function calibredb-find-file-other-frame "calibredb-utils.el")
+(declare-function calibredb-open-file-with-default-tool "calibredb-utils.el")
+(declare-function calibredb-open-dired "calibredb-utils.el")
+(declare-function calibredb-catalog-bib-dispatch "calibredb-transient.el")
+(declare-function calibredb-export-dispatch "calibredb-transient.el")
+(declare-function calibredb-edit-annotation "calibredb-annotation.el")
+(declare-function calibredb-set-metadata--tags "calibredb-utils.el")
+(declare-function calibredb-set-metadata--author_sort "calibredb-utils.el")
+(declare-function calibredb-set-metadata--authors "calibredb-utils.el")
+(declare-function calibredb-set-metadata--title "calibredb-utils.el")
+(declare-function calibredb-set-metadata--comments "calibredb-utils.el")
+(declare-function calibredb-edit-annotation-header "calibredb-annotation.el")
+(declare-function calibredb-show--buffer-name "calibredb-show.el")
+(declare-function calibredb-insert-image "calibredb-utils.el")
+(declare-function calibredb-show-mode "calibredb-show.el")
+(declare-function calibredb-find-marked-candidates "calibredb-utils.el")
+(declare-function calibredb-read-metadatas "calibredb-utils.el")
+(declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
+(declare-function calibredb-show-refresh "calibredb-show.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
@@ -101,21 +129,6 @@ When live editing the filter, it is bound to :live.")
 
 (defvar calibredb-search-header-function #'calibredb-search-header
   "Function that returns the string to be used for the Calibredb search header.")
-
-(defvar calibredb-library-index 0)
-
-(defvar calibredb-edit-annotation-header-function #'calibredb-edit-annotation-header
-  "Function that returns the string to be used for the Calibredb edit annotation header.")
-
-(defvar calibredb-edit-annotation-text-func nil
-  "Function to return default text to use for an ebook annotation.
-It takes one argument, the title of the ebook, as a string.
-It could be function `calibredb-default-annotation-text'")
-
-(defvar calibredb-annotation-candidate nil
-  "Local variable used in *calibredb-annotation*.")
-(defvar calibredb-annotation-parameter nil
-  "Local variable used in *calibredb-annotation*.")
 
 (defvar calibredb-images-path (concat (file-name-directory load-file-name) "img")
   "Relative path to images.")

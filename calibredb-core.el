@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-core.el -*- lexical-binding: t; -*-
+;;; calibredb-core.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

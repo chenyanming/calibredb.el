@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-library.el -*- lexical-binding: t; -*-
+;;; calibredb-library.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,6 +22,11 @@
 ;;; Code:
 
 (require 'calibredb-core)
+
+(defvar calibredb-library-index 0)
+
+(declare-function calibredb-ref-default-bibliography "calibredb-utils.el")
+(declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
 
 ;;;###autoload
 (defun calibredb-switch-library ()

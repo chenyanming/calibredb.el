@@ -1,4 +1,4 @@
-;;; calibredb/calibredb-helm.el -*- lexical-binding: t; -*-
+;;; calibredb-helm.el -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -22,6 +22,13 @@
 ;;; Code:
 
 (require 'calibredb-core)
+
+(eval-when-compile (defvar calibredb-search-entries))
+(eval-when-compile (defvar calibredb-full-entries))
+
+(declare-function calibredb-set-metadata--tags "calibredb-utils.el")
+(declare-function calibredb-set-metadata--comments "calibredb-utils.el")
+(declare-function calibredb-show-entry "calibredb-search.el")
 
 (defvar calibredb-helm-map
   (if (boundp 'helm-map)
