@@ -314,6 +314,20 @@ Argument EVENT mouse event."
     (set-window-start (selected-window) pos)
     (goto-char beg)))
 
+(defun calibredb-search-toggle-view-refresh ()
+  "TODO Refresh calibredb when toggle view goto the the same id ebook."
+  (interactive)
+  (let ((id (calibredb-read-metadatas "id")))
+    (if (not (equal calibredb-search-filter ""))
+        (progn
+          (calibredb-search-refresh)
+          (calibredb-search-update :force))
+      (calibredb-search-refresh))
+    (while (not (equal id (calibredb-read-metadatas "id")))
+      (forward-line 1))
+    (goto-char (line-beginning-position))
+    (recenter)))
+
 (defun calibredb-search-refresh-and-clear-filter ()
   "Refresh calibredb and clear the fitler result."
   (interactive)
@@ -569,13 +583,14 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         ;; (insert "End of entries.\n")
         (goto-char (point-min))         ; back to point-min after filtering
         (setf calibredb-search-last-update (float-time))))))
-;;; view
+
+;;; detail view
 
 (defun calibredb-toggle-view ()
   "Toggle between detail view or compact view in *calibredb-search* buffer."
   (interactive)
   (setq calibredb-detial-view (if (eq calibredb-detial-view nil) t nil))
-  (calibredb-search-refresh-or-resume))
+  (calibredb-search-toggle-view-refresh))
 
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
