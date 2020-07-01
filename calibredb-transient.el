@@ -60,7 +60,7 @@
    ("r" "Refresh Library"   calibredb-search-refresh)]
    [("n" "Next Library"   calibredb-library-next)
     ("p" "Previous Library"   calibredb-library-previous)
-    ("t" "Toggle view (Detail/List)"   calibredb-toggle-view)]])
+    ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]])
 
 (define-transient-command calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."

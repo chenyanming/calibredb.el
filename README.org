@@ -462,7 +462,7 @@ M-x calibredb
 #+END_SRC
 =RET= open the entry
 
-To toggle between detail view or list view.
+To toggle between detail view or compact view.
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-toggle-view
 #+END_SRC
@@ -620,6 +620,7 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 ** =2020-07-01=
 Version *2.4.0*:
 - Add: =calibredb-toggle-view=
+- Split to multiple source files
 
 ** =2020-06-22=
 Version *2.3.2*:

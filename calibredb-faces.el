@@ -31,7 +31,7 @@
   :group 'calibredb-faces)
 
 (defface calibredb-title-face '((t :inherit default))
-  "Face used for title on list view."
+  "Face used for title on compact view."
   :group 'calibredb-faces)
 
 (defface calibredb-title-detail-view-face

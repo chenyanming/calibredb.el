@@ -128,22 +128,32 @@ time."
   'calibredb-view "calibredb 2.0.0")
 
 (defcustom calibredb-detial-view nil
-  "Set t to change detail view, nil to list view."
+  "Set Non-nil to change detail view, nil to compact view - *calibredb-search*."
   :group 'calibredb
   :type 'boolean)
 
 (defcustom calibredb-detial-view-image-show t
-  "Set Non-nil to show size indicator."
+  "Set Non-nil to show images in detail view - *calibredb-search*."
   :group 'calibredb
   :type 'boolean)
 
 (defcustom calibredb-detail-view-image-max-width 150
-  "Width for id."
+  "Max Width for images in detail view - *calibredb-search*."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-detail-view-image-max-height 150
-  "Width for id. "
+  "Max height for images in detail view - *calibredb-search*."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-list-view-image-max-width 500
+  "Max Width for images in list view - *calibredb-list*."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-list-view-image-max-height 500
+  "Max height for images in list view - *calibredb-list*."
   :group 'calibredb
   :type 'integer)
 
@@ -189,8 +199,8 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
         (insert "\n")
         (if (image-type-available-p (intern format))
-            (calibredb-insert-image file "")
-          (calibredb-insert-image cover ""))
+            (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+          (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height))
         ;; (setq end (point))
         (calibredb-show-mode)
         (setq calibredb-show-entry entry)
@@ -562,7 +572,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 ;;; view
 
 (defun calibredb-toggle-view ()
-  "Toggle between detail view or list view in *calibredb-search* buffer."
+  "Toggle between detail view or compact view in *calibredb-search* buffer."
   (interactive)
   (setq calibredb-detial-view (if (eq calibredb-detial-view nil) t nil))
   (calibredb-search-refresh-or-resume))
@@ -575,14 +585,17 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                         ((>= calibredb-id-width 0) calibredb-id-width)
                         (t 0 )))
              (file (calibredb-getattr (cdr entry) :file-path))
+             (format (calibredb-getattr (cdr entry) :book-format))
              (cover (concat (file-name-directory file) "cover.jpg")))
-        (when (file-exists-p cover)
-          (insert "\n")
-          (insert (make-string num ? ))
-          (insert-image (create-image cover 'imagemagick nil
-                                      :ascent 100
-                                      :max-width calibredb-detail-view-image-max-width
-                                      :max-height calibredb-detail-view-image-max-height))))))
+          (if (image-type-available-p (intern format))
+              (progn
+                (insert "\n")
+                (insert (make-string num ? ))
+                (calibredb-insert-image file "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))
+            (progn
+              (insert "\n")
+              (insert (make-string num ? ))
+              (calibredb-insert-image cover "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))))
 
 (provide 'calibredb-search)
 

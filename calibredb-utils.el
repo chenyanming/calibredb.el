@@ -119,8 +119,9 @@ Argument FILEPATH is the file path."
                          (t (message "unknown system!?"))) (expand-file-name filepath))))
 
 
-(defun calibredb-insert-image (path alt)
-  "TODO: Insert an image for PATH at point, falling back to ALT."
+(defun calibredb-insert-image (path alt width height)
+  "TODO: Insert an image for PATH at point with max WIDTH and max
+HEIGTH, falling back to ALT."
   (cond
    ((not (display-graphic-p))
     (insert alt))
@@ -130,12 +131,12 @@ Argument FILEPATH is the file path."
      (if (file-exists-p path)
          (create-image path 'imagemagick nil
                        :ascent 100
-                       :max-width 500
-                       :max-height 500)
+                       :max-width width
+                       :max-height height)
        (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
                      :ascent 100
-                     :max-width 500
-                     :max-height 500))))
+                     :max-width width
+                     :max-height height))))
    (t
     ;; `create-image' errors out for unsupported image types
     (let ((image (ignore-errors (create-image path nil nil :ascent 100))))
