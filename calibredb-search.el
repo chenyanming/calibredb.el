@@ -234,13 +234,13 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
 (defun calibredb-show-next-entry ()
   "Show next entry."
   (interactive)
-  (forward-line 1)
+  (calibredb-next-entry)
   (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
 
 (defun calibredb-show-previous-entry ()
   "Show previous entry."
   (interactive)
-  (forward-line -1)
+  (calibredb-previous-entry)
   (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
 
 (defun calibredb-search-buffer ()
