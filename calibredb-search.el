@@ -53,6 +53,7 @@
 (declare-function calibredb-read-metadatas "calibredb-utils.el")
 (declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
 (declare-function calibredb-show-refresh "calibredb-show.el")
+(declare-function calibredb-get-init "calibredb-utils.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
