@@ -155,12 +155,12 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-detail-view-image-max-width 150
+(defcustom calibredb-detail-view-image-max-width 250
   "Max Width for images in detail view - *calibredb-search*."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-detail-view-image-max-height 150
+(defcustom calibredb-detail-view-image-max-height 250
   "Max height for images in detail view - *calibredb-search*."
   :group 'calibredb
   :type 'integer)
@@ -268,7 +268,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "Library: %s   %s   %s"
+  (format "Library: %s   %s"
           (propertize calibredb-root-dir 'face font-lock-type-face)
           (concat
            (propertize (format "Total: %s"
@@ -280,8 +280,7 @@ Indicating the library you use."
                                       (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
            (propertize (let ((len (length (calibredb-find-marked-candidates))))
                          (if (> len 0)
-                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))
-          (if calibredb-detial-view "< >" "> <")))
+                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))))
 
 (define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.

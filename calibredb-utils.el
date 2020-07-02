@@ -412,7 +412,9 @@ Argument PROPS are the additional parameters."
   "Find candidate at point and return the list."
   (interactive)
   (if (eq major-mode 'calibredb-search-mode)
-      (list (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (list (cdr (or (get-text-property (point) 'calibredb-entry nil)
+                     (get-text-property (point) 'calibredb-detail nil)
+                     (get-text-property (point) 'calibredb-compact nil))))
     (list (get-text-property (point-min) 'calibredb-entry nil) )))
 
 (defun calibredb-find-marked-candidates ()
