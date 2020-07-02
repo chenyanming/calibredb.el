@@ -26,7 +26,12 @@
   "Face for the header at point."
   :group 'calibredb-faces)
 
-(defface calibredb-id-face '((t :inherit font-lock-keyword-face))
+(defface calibredb-id-face
+  '((((class color) (background light))
+     :foreground "#3B6EA8")
+    (((class color) (background dark))
+     :foreground "#81A1C1")
+    (t :inherit default))
   "Face used for id."
   :group 'calibredb-faces)
 
@@ -43,23 +48,48 @@
   "Face used for title on detail view."
   :group 'calibredb-faces)
 
-(defface calibredb-author-face '((t :inherit font-lock-variable-name-face))
+(defface calibredb-author-face
+  '((((class color) (background light))
+     :foreground "#3B6EA8")
+    (((class color) (background dark))
+     :foreground "#d9c6d6")
+    (t :inherit default))
   "Face used for author."
   :group 'calibredb-faces)
 
-(defface calibredb-format-face '((t :inherit font-lock-string-face))
+(defface calibredb-format-face
+  '((((class color) (background light))
+     :foreground "#4F894C")
+    (((class color) (background dark))
+     :foreground "#A3BE8C")
+    (t :inherit default))
   "Face used for format."
   :group 'calibredb-faces)
 
-(defface calibredb-comment-face '((t :inherit font-lock-type-face))
+(defface calibredb-comment-face
+  '((((class color) (background light))
+     :foreground "DarkCyan")
+    (((class color) (background dark))
+     :foreground "#8FBCBB")
+    (t :inherit default))
   "Face used for comment."
   :group 'calibredb-faces)
 
-(defface calibredb-tag-face '((t :inherit font-lock-warning-face))
+(defface calibredb-tag-face
+  '((((class color) (background light))
+     :foreground "#8b94a5")
+    (((class color) (background dark))
+     :foreground "#EBCB8B")
+    (t :inherit default))
   "Face used for tag."
   :group 'calibredb-faces)
 
-(defface calibredb-size-face '((t :inherit font-lock-comment-face))
+(defface calibredb-size-face
+  '((((class color) (background light))
+     :foreground "#8b94a5")
+    (((class color) (background dark))
+     :foreground "#6f7787")
+    (t :inherit default))
   "Face used for size."
   :group 'calibredb-faces)
 
@@ -67,7 +97,12 @@
   "Face for the publish date."
   :group 'calibredb-faces)
 
-(defface calibredb-file-face '((t :inherit font-lock-function-name-face))
+(defface calibredb-file-face
+  '((((class color) (background light))
+     :foreground "#29838D")
+    (((class color) (background dark))
+     :foreground "#8FBCBB")
+    (t :inherit default))
   "Face for the file path."
   :group 'calibredb-faces)
 
@@ -75,15 +110,34 @@
   "Face for the mark candidate."
   :group 'calibredb-faces)
 
-(defface calibredb-favorite-face '((t :inherit default :foreground "yellow"))
+(defface calibredb-favorite-face
+  '((((class color) (background light))
+     :foreground "black")
+    (((class color) (background dark))
+     :foreground "yellow")
+    (t :inherit default))
   "Face used for title."
   :group 'calibredb-faces)
 
-(defface calibredb-highlight-face '((t :inherit default :foreground "cyan"))
+(defface calibredb-highlight-face
+  '((((class color) (background light))
+     :foreground "MediumSlateBlue"
+     :weight bold)
+    (((class color) (background dark))
+     :foreground "cyan"
+     :weight bold)
+    (t :inherit default))
   "Face used for hightlight."
   :group 'calibredb-faces)
 
-(defface calibredb-archive-face '((t :inherit default :foreground "dim grey"))
+(defface calibredb-archive-face
+  '((((class color) (background light))
+     :foreground "grey"
+     :weight light)
+    (((class color) (background dark))
+     :foreground "dim grey"
+     :weight light)
+    (t :inherit default))
   "Face used for archive."
   :group 'calibredb-faces)
 
@@ -91,7 +145,12 @@
   "Face used for *calibredb-search* mouse face"
   :group 'calibredb-faces)
 
-(defface calibredb-edit-annotation-header-title-face '((t :inherit font-lock-string-face))
+(defface calibredb-edit-annotation-header-title-face
+  '((((class color) (background light))
+     :foreground "#4F894C")
+    (((class color) (background dark))
+     :foreground "#A3BE8C")
+    (t :inherit default))
   "Face used for *calibredb-edit-annotation* header tilte face"
   :group 'calibredb-faces)
 
