@@ -234,9 +234,13 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
   (interactive)
   (let ((ori "") (new ""))
     (while (and (equal new ori) new ori)
-      (setq ori (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))
+      (setq ori (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
+                                            (get-text-property (point) 'calibredb-detail nil)
+                                            (get-text-property (point) 'calibredb-compact nil))) :id))
       (forward-line 1)
-      (setq new (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id)))))
+      (setq new (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
+                                            (get-text-property (point) 'calibredb-detail nil)
+                                            (get-text-property (point) 'calibredb-compact nil))) :id)))))
 
 (defun calibredb-previous-entry ()
   "Move to previous entry."
@@ -245,9 +249,13 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
     (while (and (equal new ori) new ori (> (line-number-at-pos) 1))
       (forward-line -1)
       (save-excursion
-        (setq ori (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))
+        (setq ori (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
+                                              (get-text-property (point) 'calibredb-detail nil)
+                                              (get-text-property (point) 'calibredb-compact nil))) :id))
         (forward-line -1)
-        (setq new (calibredb-getattr (cdr (get-text-property (point) 'calibredb-entry nil)) :id))))))
+        (setq new (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
+                                              (get-text-property (point) 'calibredb-detail nil)
+                                              (get-text-property (point) 'calibredb-compact nil))) :id))))))
 
 (defun calibredb-show-next-entry ()
   "Show next entry."
