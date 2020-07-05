@@ -234,13 +234,9 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
   (interactive)
   (let ((ori "") (new ""))
     (while (and (equal new ori) new ori)
-      (setq ori (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                                            (get-text-property (point) 'calibredb-detail nil)
-                                            (get-text-property (point) 'calibredb-compact nil))) :id))
+      (setq ori (calibredb-getattr (car (calibredb-find-candidate-at-point)) :id))
       (forward-line 1)
-      (setq new (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                                            (get-text-property (point) 'calibredb-detail nil)
-                                            (get-text-property (point) 'calibredb-compact nil))) :id)))))
+      (setq new (calibredb-getattr (car (calibredb-find-candidate-at-point)) :id)))))
 
 (defun calibredb-previous-entry ()
   "Move to previous entry."
@@ -249,25 +245,21 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
     (while (and (equal new ori) new ori (> (line-number-at-pos) 1))
       (forward-line -1)
       (save-excursion
-        (setq ori (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                                              (get-text-property (point) 'calibredb-detail nil)
-                                              (get-text-property (point) 'calibredb-compact nil))) :id))
+        (setq ori (calibredb-getattr (car (calibredb-find-candidate-at-point)) :id))
         (forward-line -1)
-        (setq new (calibredb-getattr (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                                              (get-text-property (point) 'calibredb-detail nil)
-                                              (get-text-property (point) 'calibredb-compact nil))) :id))))))
+        (setq new (calibredb-getattr (car (calibredb-find-candidate-at-point)) :id))))))
 
 (defun calibredb-show-next-entry ()
   "Show next entry."
   (interactive)
   (calibredb-next-entry)
-  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
+  (calibredb-show-entry (car (calibredb-find-candidate-at-point)) :switch))
 
 (defun calibredb-show-previous-entry ()
   "Show previous entry."
   (interactive)
   (calibredb-previous-entry)
-  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
+  (calibredb-show-entry (car (calibredb-find-candidate-at-point)) :switch))
 
 (defun calibredb-search-buffer ()
   "Create buffer calibredb-search."
@@ -310,7 +302,7 @@ Argument EVENT mouse event."
         (pos (posn-point (event-end event))))
     (if (not (windowp window))
         (error "No ebook chosen"))
-    (calibredb-show-entry (cdr (get-text-property pos 'calibredb-entry nil)))
+    (calibredb-show-entry (car (calibredb-find-candidate-at-point)))
     (select-window window)
     (set-buffer (calibredb-search--buffer-name))
     (goto-char pos)))
@@ -318,7 +310,7 @@ Argument EVENT mouse event."
 (defun calibredb-view ()
   "Visit the calibredb-entry."
   (interactive)
-  (calibredb-show-entry (cdr (get-text-property (point) 'calibredb-entry nil)) :switch))
+  (calibredb-show-entry (car (calibredb-find-candidate-at-point)) :switch))
 
 (defun calibredb-search-refresh ()
   "Refresh calibredb."
