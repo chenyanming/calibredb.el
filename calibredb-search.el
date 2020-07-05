@@ -291,7 +291,8 @@ Indicating the library you use."
   (buffer-disable-undo)
   (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
   (hl-line-mode)
-  (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date))
+  (if (boundp 'ivy-sort-matches-functions-alist)
+      (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date)))
   (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
 
 (defun calibredb-search-mouse (event)
