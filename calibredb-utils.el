@@ -249,6 +249,18 @@ Others: Add only one item."
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
 
+(defun calibredb-add-format (&optional candidate)
+  "Add format to selected item.
+Optional argument CANDIDATE is the selected item."
+  (interactive)
+  (unless candidate
+    (setq candidate (car (calibredb-find-candidate-at-point))))
+  (calibredb-command :command "add_format"
+                     :input (concat (calibredb-getattr candidate :id) " " (calibredb-complete-file-quote "Add format to selected item") )
+                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (if (equal major-mode 'calibredb-search-mode)
+      (calibredb-search-refresh-or-resume)))
+
 (defun calibredb-add-dir (&optional option)
   "Add all files in a directory into calibre database.
 By default only files that have extensions of known e-book file
@@ -291,6 +303,25 @@ Optional argument CANDIDATE is the selected item."
     (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
         (calibredb-command :command "remove"
                            :id id
+                           :library (format "--library-path %s" (calibredb-root-dir-quote))))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           (kill-buffer (calibredb-show--buffer-name candidate))
+           (calibredb-search-refresh))
+          ((eq major-mode 'calibredb-search-mode)
+           (calibredb-search-refresh-or-resume)))))
+
+(defun calibredb-remove-format (&optional candidate)
+  "Remove the slected format.
+Optional argument CANDIDATE is the selected item."
+  (interactive)
+  (unless candidate
+    (setq candidate (car (calibredb-find-candidate-at-point))))
+  (let ((id (calibredb-getattr candidate :id))
+        (format (calibredb-getattr candidate :book-format))
+        (title (calibredb-getattr candidate :book-title)))
+    (if (yes-or-no-p (concat "Confirm Delete: id - " id ", title - " title ", format - " format))
+        (calibredb-command :command "remove_format"
+                           :id (concat id " " format)
                            :library (format "--library-path %s" (calibredb-root-dir-quote))))
     (cond ((equal major-mode 'calibredb-show-mode)
            (kill-buffer (calibredb-show--buffer-name candidate))
