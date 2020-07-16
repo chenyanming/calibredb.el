@@ -202,7 +202,7 @@ FROM
       ON child.tag = tags.id) as sub2
     LEFT OUTER JOIN comments
     ON sub2.id = comments.book)
-GROUP BY id"
+GROUP BY id, format"
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)
