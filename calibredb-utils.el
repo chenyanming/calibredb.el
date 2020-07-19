@@ -111,7 +111,7 @@
 Argument FILEPATH is the file path."
   (if (eq system-type 'windows-nt)
       (start-process "shell-process" "*Messages*"
-                     "cmd.exe" "/c" filepath)
+                     "cmd.exe" "/c" (expand-file-name filepath))
     (start-process "shell-process" "*Messages*"
                    (cond ((eq system-type 'gnu/linux)
                           (calibredb-chomp
