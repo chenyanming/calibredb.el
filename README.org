@@ -6,7 +6,6 @@
 
 * Table of Contents :TOC_1:noexport:
 - [[#description][Description]]
-- [[#screenshots][Screenshots]]
 - [[#installation][Installation]]
 - [[#configuration][Configuration]]
 - [[#workflows][Workflows]]
@@ -17,6 +16,9 @@
 * Description
 Yet another [[https://calibre-ebook.com/][calibre]] client for emacs.
 
+#+attr_org: :width 600px
+[[file:img/dashboard.jpg]]
+
 This package integrates calibre (using *calibredb*) into emacs.
 
 1. Powerful ebook dashboard.
@@ -25,23 +27,6 @@ This package integrates calibre (using *calibredb*) into emacs.
 4. Another bookmarks solution, by setting the tags and comments.
 5. Quick search, filter, make actions on items with ivy and helm.
 6. Org-ref support.
-
-* Screenshots
-** Dashboard
-#+attr_org: :width 600px
-[[file:img/dashboard.jpg]]
-
-** Quick search, filter with helm and ivy
-#+attr_org: :width 600px
-[[file:img/helm.png]]
-[[file:img/ivy.png]]
-** Another bookmarks solution
-*** Add tags
-#+attr_org: :width 600px
-[[file:img/tag.gif]]
-*** Add comments
-#+attr_org: :width 600px
-[[file:img/comment.gif]]
 
 * Installation
 
