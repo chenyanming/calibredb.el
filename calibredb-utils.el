@@ -20,6 +20,12 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'calibredb-core)
+(require 'calibredb-search)
+(require 'calibredb-faces)
+(require 'calibredb-show)
+(require 'calibredb-transient)
+(require 'calibredb-annotation)
 
 (eval-when-compile (defvar calibredb-search-entries))
 (eval-when-compile (defvar calibredb-full-entries))
