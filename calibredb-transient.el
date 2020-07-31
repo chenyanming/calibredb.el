@@ -106,7 +106,9 @@
    ["List fields"
     ("l" "list fileds"         calibredb-set-metadata--list-fields)]
    ["Set metadata"
-    ("s" "Set metadata"         calibredb-set-metadata--transient)]])
+    ("s" "Set metadata"         calibredb-set-metadata--transient)
+    ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
+    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]])
 
 (define-transient-command calibredb-export-dispatch ()
   "Dispatch for export."
