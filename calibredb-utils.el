@@ -20,6 +20,7 @@
 ;;; Commentary:
 
 ;;; Code:
+
 (require 'calibredb-core)
 (require 'calibredb-search)
 (require 'calibredb-faces)
@@ -473,7 +474,8 @@ This function is a slighly modified version from calibredb-show-entry"
         (when tag (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face))))
         (when comment
           (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
-        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
+        (when pubdate
+        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face))))
         (insert "\n")
         ;; (if (image-type-available-p (intern format))
         ;;     (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
@@ -540,14 +542,17 @@ ISBN. Invoke from *calibredb-search* buffer"
                           "cover.jpg"))
           (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
                  (fetched "/tmp/cover.jpg")
-                 (alist (mapcar* #'cons '("original (left)" "fetched (right)") `("exists" ,original))))
+                 (alist (mapcar* #'cons '("original (left)" "fetched (right)") (list "exists" original))))
+            (clear-image-cache "/tmp/cover.jpg")
             (with-current-buffer buff
               (calibredb-insert-image original "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+              (insert " original  fetched ")
               (calibredb-insert-image fetched "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
               (switch-to-buffer buff)
               (ivy-read "Select cover: " alist
-                        :action (lambda (x) (calibredb-set-cover-action (cdr x))) alist)
+                        :action (lambda (x) (calibredb-set-cover-action (cdr x))))
               (kill-current-buffer)))
+        (clear-image-cache original)
         (cond ((file-exists-p "/tmp/cover.jpg")
                (rename-file "/tmp/cover.jpg" original t)
                (print "Fetched cover added to entry"))
