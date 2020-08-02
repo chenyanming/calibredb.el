@@ -191,7 +191,8 @@ First,  =M-x calibredb= to enter ebook dashboard.
 You can perform the following actions:
  - Open/View the ebook
  - Open Dired the ebook located
- - Set metadata on the ebook under cursor
+ - Fetch (from Google and Amazon.com) and set metadata on the ebook under cursor
+   (fetching currently requires Ivy)
  - Set metadata on marked ebooks
  - Add/Remove ebooks on current library
  - Export the ebook under cursor
@@ -280,6 +281,15 @@ switch temporarily.
   in bulk. If you do not mark any items, actions will be performed on the item
   under cursor.
 - In =*calibredb-entry*= buffer, press =s= to set metadata.
+- In =*calibredb-search*= buffer, press =s f= to fetch metadata *(requires ivy)* by
+  author and title or =s i= to fetch by ISBN. For fetching by author and title
+  enter one (or more) full lastnames of the author(s) (or delete redundant input
+  from initial input). For fetching by ISBN enter the ISBN number (usually can
+  be found and copied from on of the first pages of a book). As the title may
+  contain the ISBN it is set as initial input. Wait few second for Emacs to
+  retrieve metadata from the sources. Subsequently use =C-M-n/C-M-p= to select and
+  preview the source to use for adding the metadata to the document. Press =RET=
+  to add selected metadata to source.
 
 Tips: You can filter the result via ~/~ before setting the metadata.
 
@@ -537,6 +547,10 @@ M-x calibredb-catalog-bib-dispatch
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
 * Logs
+
+** 2020-07-31
+- Add: =calibredb-fetch-and-set-metadata-by-author-and-title= and =calibredb-fetch-and-set-metadata-by-isbn= (thanks to Daniel Nicolai)
+
 ** =2020-07-16=
 Version *2.4.1*:
 - Add: =calibredb-add-format= and =cliabredb-remove-format=

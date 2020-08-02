@@ -28,7 +28,6 @@
 
 ;; Transient dispatch
 
-;;;###autoload (autoload 'calibredb-dispatch "calibredb-dispatch" nil t)
 (define-transient-command calibredb-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-search*."
   :man-page "calibredb"
@@ -106,7 +105,9 @@
    ["List fields"
     ("l" "list fileds"         calibredb-set-metadata--list-fields)]
    ["Set metadata"
-    ("s" "Set metadata"         calibredb-set-metadata--transient)]])
+    ("s" "Set metadata"         calibredb-set-metadata--transient)
+    ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
+    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]])
 
 (define-transient-command calibredb-export-dispatch ()
   "Dispatch for export."
