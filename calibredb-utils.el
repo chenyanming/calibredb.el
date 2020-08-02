@@ -39,36 +39,6 @@
 (declare-function calibredb-catalog-bib-arguments "calibredb-transient.el")
 
 ;;;###autoload
-(defun calibredb ()
-  "Enter calibre Search Buffer."
-  (interactive)
-  (let ((cand (if calibredb-search-entries
-                  calibredb-search-entries
-                (progn
-                  (setq calibredb-search-entries (calibredb-candidates))
-                  (setq calibredb-full-entries calibredb-search-entries)))))
-    (cond ((not cand)
-           (message "INVALID LIBRARY"))
-          (t
-           (when (get-buffer (calibredb-search-buffer))
-             (kill-buffer (calibredb-search-buffer)))
-           (switch-to-buffer (calibredb-search-buffer))
-           (goto-char (point-min))
-           (unless (equal cand '(""))   ; not empty library
-             (dolist (item cand)
-               (let (beg end)
-                 (setq beg (point))
-                 (insert (car item))
-                 (calibredb-detail-view-insert-image item)
-                 (setq end (point))
-                 (put-text-property beg end 'calibredb-entry item)
-                 (insert "\n")))
-             (goto-char (point-min)))
-           (calibredb-ref-default-bibliography)
-           (unless (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-mode))))))
-
-;;;###autoload
 (defun calibredb-list ()
   "Generate an org buffer which contain all ebooks' cover image, title and the file link."
   (interactive)
@@ -343,7 +313,7 @@ Argument CAND is the candidate."
         ((equal name "id") (calibredb-getattr cand :id))))
 
 (defun calibredb-set-metadata (name &rest props)
-  "Set metadata on filed NAME on amrked candidates.
+  "Set metadata on file NAME on marked candidates.
 Argument PROPS are the additional parameters."
   (let ((candidates (plist-get props :candidate)))
     (unless candidates
@@ -463,6 +433,156 @@ Argument PROPS are the additional parameters."
           (forward-line 1)
           (setq end (point)))
         cand-list))))
+
+;; fetch_metadata
+
+(defun calibredb-show-results (source metadata &optional switch)
+  "Display METADATA fetch results in the current buffer.
+Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
+This function is a slighly modified version from calibredb-show-entry"
+  (unless (eq major-mode 'calibredb-show-mode)
+      (when (get-buffer (calibredb-show--buffer-name metadata))
+        (kill-buffer (calibredb-show--buffer-name metadata))))
+  (let* ((buff (get-buffer-create (calibredb-show--buffer-name metadata)))
+         (tag (cdr (assoc "Tags" metadata)))
+         (comment (cdr (assoc "Comments" metadata)))
+         (author-sort (cdr (assoc "Authors" metadata)))
+         (title (cdr (assoc "Title" metadata)))
+         (pubdate (cdr (assoc "Published" metadata)))
+         ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new metadata through SQL query
+         ;; (cover (format "/tmp/%s.jpg" source))
+         (cover (concat (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) "cover.jpg"))
+         ;; (format (calibredb-getattr metadata :book-format))
+         (original (point))
+         beg end)
+    (let ((inhibit-read-only t))
+      (with-current-buffer buff
+        (erase-buffer)
+        (setq beg (point))
+        ;; (insert (propertize (calibredb-show-metadata metadata) 'calibredb-metadata metadata))
+        (setq end (point))
+        (put-text-property beg end 'calibredb-metadata metadata)
+        (insert (format "Title       %s\n" (propertize title 'face 'calibredb-title-face)))
+        (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
+        (when tag (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face))))
+        (when comment
+          (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
+        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
+        (insert "\n")
+        ;; (if (image-type-available-p (intern format))
+        ;;     (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+        ;;   (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height))
+        (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+        ;; (setq end (point))
+        (calibredb-show-mode)
+        (setq calibredb-show-metadata metadata)
+        (goto-char (point-min))))
+    (unless (eq major-mode 'calibredb-show-mode)
+      (switch-to-buffer buff)
+      (when switch
+        (switch-to-buffer-other-window (set-buffer (calibredb-search--buffer-name)))
+        (goto-char original)))))
+
+(defun calibredb-set-cover-action (dest)
+  (when (not (string= dest "exists"))
+    (rename-file "/tmp/cover.jpg" dest t)))
+
+(defun calibredb-fetch-metadata (author title &optional isbn)
+  "Fetch metadata from online source via author and title or
+ISBN. Invoke from *calibredb-search* buffer"
+  (let* ((authors (if isbn ""
+                    (read-string "Authors: " author)))
+         (title (if isbn ""
+                  (read-string "Title: " title)))
+         (isbn (if isbn (read-string "ISBN: " isbn)
+                 nil))
+         (sources '("Google" "Amazon.com"))
+         (results (mapcar
+                   (lambda (source)
+                     (let* ((md (shell-command-to-string
+                                 (if isbn (format
+                                           "fetch-ebook-metadata -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                           source
+                                           isbn)
+                                   (format
+                                    "fetch-ebook-metadata -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                    source
+                                    authors
+                                    title))))
+                            (md-split (if (string-match "No results found$" md) nil
+                                        (split-string md "Comments" nil " *")))
+                            (no-comments (if md-split
+                             (mapcar (lambda (x)
+                                       (let ((string x))
+                                         (string-match "\\([A-z]*\\)(*\\(s\\)*)* *: *\\(.*\\)" string)
+                                         (cons (format "%s%s" (match-string 1 string) (cond ((match-string 2 string))
+                                                                                            ("")))
+                                               (match-string 3 string))))
+                                     (split-string (car md-split) "\n" t " *"))
+                                         nil)))
+                       (if (nth 1 md-split)
+                           (when no-comments (cons source (append no-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
+                         (when no-comments (cons source no-comments)))))
+                   sources)))
+    (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
+        (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
+    (let ((original (concat
+                    (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+                    "cover.jpg")))
+      (if (file-exists-p (concat
+                          (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+                          "cover.jpg"))
+          (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
+                 (fetched "/tmp/cover.jpg")
+                 (alist (mapcar* #'cons '("original (left)" "fetched (right)") `("exists" ,original))))
+            (with-current-buffer buff
+              (calibredb-insert-image original "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+              (calibredb-insert-image fetched "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+              (switch-to-buffer buff)
+              (ivy-read "Select cover: " alist
+                        :action (lambda (x) (calibredb-set-cover-action (cdr x))) alist)
+              (kill-current-buffer)))
+        (cond ((file-exists-p "/tmp/cover.jpg")
+               (rename-file "/tmp/cover.jpg" original t)
+               (print "Fetched cover added to entry"))
+              (t (print "No cover could be fetched")))))
+    (let ((alist (remove nil results)))
+      (cdr (assoc (ivy-read "Select metadata source: " alist
+                            :action
+                            (lambda (x) (calibredb-show-results (car x) (cdr x)))) alist)))))
+
+(defun calibredb-fetch-and-set-metadata (arg)
+  "Add metadata from calibredb-fetch-metadata to entry at POINT"
+  (let* ((candidate (car (calibredb-find-candidate-at-point)))
+         (authors (calibredb-getattr candidate :author-sort))
+         (title (calibredb-getattr candidate :book-title))
+         (metadata
+          (cond ((string= arg "author") (calibredb-fetch-metadata authors title))
+                ((string= arg "isbn") (calibredb-fetch-metadata authors title title))))
+         (id (calibredb-getattr candidate :id)))
+    (mapcar (lambda (x)
+              (calibredb-command :command "set_metadata"
+                                 :option "--field"
+                                 :input (format "%s:\"%s\"" (downcase (car x)) (cdr x))
+                                 :id id
+                                 :library (format "--library-path \"%s\"" calibredb-root-dir)))
+            metadata)))
+  ;; (cond ((equal major-mode 'calibredb-show-mode)
+  ;;        (calibredb-show-refresh))
+  ;;       ((eq major-mode 'calibredb-search-mode)
+  ;;        (calibredb-search-refresh-or-resume))))
+
+(defun calibredb-fetch-and-set-metadata-by-author-and-title ()
+  "Fetch metadata from online source via author and title. Invoke
+from *calibredb-search* buffer"
+  (interactive)
+  (calibredb-fetch-and-set-metadata "author"))
+
+(defun calibredb-fetch-and-set-metadata-by-isbn ()
+  "Fetch metadata from online source via ISBN. Invoke from
+*calibredb-search* buffer"
+  (interactive)
+  (calibredb-fetch-and-set-metadata "isbn"))
 
 ;; show_metadata
 

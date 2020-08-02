@@ -22,6 +22,9 @@
 ;;; Code:
 
 (require 'calibredb-core)
+(require 'calibredb-search)
+(require 'calibredb-faces)
+(require 'calibredb-utils)
 
 (eval-when-compile (defvar calibredb-search-entries))
 (eval-when-compile (defvar calibredb-full-entries))
@@ -72,6 +75,7 @@
                       :caller 'calibredb-ivy-read)
           (message "INVALID LIBRARY")))))
 
+;;;###autoload
 (defun calibredb-find-counsel ()
   "Use counsel to list all ebooks details."
   (interactive)
