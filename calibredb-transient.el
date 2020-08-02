@@ -28,7 +28,6 @@
 
 ;; Transient dispatch
 
-;;;###autoload (autoload 'calibredb-dispatch "calibredb-dispatch" nil t)
 (define-transient-command calibredb-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-search*."
   :man-page "calibredb"

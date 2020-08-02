@@ -39,36 +39,6 @@
 (declare-function calibredb-catalog-bib-arguments "calibredb-transient.el")
 
 ;;;###autoload
-(defun calibredb ()
-  "Enter calibre Search Buffer."
-  (interactive)
-  (let ((cand (if calibredb-search-entries
-                  calibredb-search-entries
-                (progn
-                  (setq calibredb-search-entries (calibredb-candidates))
-                  (setq calibredb-full-entries calibredb-search-entries)))))
-    (cond ((not cand)
-           (message "INVALID LIBRARY"))
-          (t
-           (when (get-buffer (calibredb-search-buffer))
-             (kill-buffer (calibredb-search-buffer)))
-           (switch-to-buffer (calibredb-search-buffer))
-           (goto-char (point-min))
-           (unless (equal cand '(""))   ; not empty library
-             (dolist (item cand)
-               (let (beg end)
-                 (setq beg (point))
-                 (insert (car item))
-                 (calibredb-detail-view-insert-image item)
-                 (setq end (point))
-                 (put-text-property beg end 'calibredb-entry item)
-                 (insert "\n")))
-             (goto-char (point-min)))
-           (calibredb-ref-default-bibliography)
-           (unless (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-mode))))))
-
-;;;###autoload
 (defun calibredb-list ()
   "Generate an org buffer which contain all ebooks' cover image, title and the file link."
   (interactive)
@@ -343,7 +313,7 @@ Argument CAND is the candidate."
         ((equal name "id") (calibredb-getattr cand :id))))
 
 (defun calibredb-set-metadata (name &rest props)
-  "Set metadata on filed NAME on amrked candidates.
+  "Set metadata on file NAME on marked candidates.
 Argument PROPS are the additional parameters."
   (let ((candidates (plist-get props :candidate)))
     (unless candidates
