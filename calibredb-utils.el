@@ -504,17 +504,19 @@ ISBN. Invoke from *calibredb-search* buffer"
                   (read-string "Title: " title)))
          (isbn (if isbn (read-string "ISBN: " isbn)
                  nil))
-         (sources '("Google" "Amazon.com"))
+         (sources calibredb-fetch-metadata-source-alist)
          (results (mapcar
                    (lambda (source)
                      (let* ((md (shell-command-to-string
                                  (if isbn (format
-                                           "fetch-ebook-metadata -p '%s' --isbn '%s' -c /tmp/cover.jpg"
-                                           source
+                                           "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                           calibredb-fetch-metadata-program
+                                           (car source)
                                            isbn)
                                    (format
-                                    "fetch-ebook-metadata -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
-                                    source
+                                    "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                    calibredb-fetch-metadata-program
+                                    (car source)
                                     authors
                                     title))))
                             (md-split (if (string-match "No results found$" md) nil
@@ -529,17 +531,15 @@ ISBN. Invoke from *calibredb-search* buffer"
                                      (split-string (car md-split) "\n" t " *"))
                                          nil)))
                        (if (nth 1 md-split)
-                           (when no-comments (cons source (append no-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
-                         (when no-comments (cons source no-comments)))))
+                           (when no-comments (cons (car source) (append no-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
+                         (when no-comments (cons (car source) no-comments)))))
                    sources)))
     (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
         (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
     (let ((original (concat
                     (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
                     "cover.jpg")))
-      (if (file-exists-p (concat
-                          (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-                          "cover.jpg"))
+      (if (file-exists-p original)
           (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
                  (fetched "/tmp/cover.jpg")
                  (alist (mapcar* #'cons '("original (left)" "fetched (right)") (list "exists" original))))
