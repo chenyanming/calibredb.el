@@ -94,7 +94,7 @@
   :group 'calibredb)
 
 (defcustom calibredb-fetch-metadata-source-alist '(( "Google" ) ( "Amazon.com" ))
-  "Alist for all your calibre libraries."
+  "Source alist used to fetch ebook metadata."
   :type 'alist
   :group 'calibredb)
 
