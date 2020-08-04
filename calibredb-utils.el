@@ -453,7 +453,7 @@ This function is a slighly modified version from calibredb-show-entry"
   (let* ((buff (get-buffer-create (calibredb-show--buffer-name metadata)))
          (tag (cdr (assoc "Tags" metadata)))
          (comment (cdr (assoc "Comments" metadata)))
-         (author-sort (cdr (assoc "Authors" metadata)))
+         (authors (cdr (assoc "Authors" metadata)))
          (title (cdr (assoc "Title" metadata)))
          (pubdate (cdr (assoc "Published" metadata)))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new metadata through SQL query
@@ -471,7 +471,7 @@ This function is a slighly modified version from calibredb-show-entry"
         (setq end (point))
         (put-text-property beg end 'calibredb-metadata metadata)
         (insert (format "Title       %s\n" (propertize title 'face 'calibredb-title-face)))
-        (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
+        (insert (format "Author(s)   %s\n" (propertize authors 'face 'calibredb-author-face)))
         (when tag (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face))))
         (when comment
           (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
@@ -536,10 +536,15 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                                                                             ("")))
                                                                (match-string 3 string))))
                                                      (split-string (car md-split) "\n" t " *"))
-                                           nil)))
+                                           nil))
+                            (kovids-magic "calibre-debug -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
+                            (author-sort (shell-command-to-string (format
+                                                                   kovids-magic
+                                                                   (intern (cdr (assoc "Authors" no-comments))))))
+                            (new-comments (append no-comments (list (cons "Author_sort" author-sort)))))
                        (if (nth 1 md-split)
-                           (when no-comments (cons source (append no-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
-                         (when no-comments (cons source no-comments)))))
+                           (when new-comments (cons source (append new-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
+                         (when new-comments (cons source new-comments)))))
                    sources)))
     (if (remove nil results)
         (remove nil results)
@@ -605,7 +610,8 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                    metadata)
            (switch-to-buffer-other-window "*calibredb-search*")
            (calibredb-search-refresh-or-resume)
-           (calibredb-show-results metadata))
+           (calibredb-show-results metadata t))
+          ;; (switch-to-buffer-other-window "*calibredb-entry*"))
           (t (print "No metadata retrieved from sources")))))
 
 (defun calibredb-fetch-and-set-metadata-by-author-and-title (arg)
