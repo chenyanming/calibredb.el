@@ -103,9 +103,9 @@
   :type 'file
   :group 'calibredb)
 
-(defcustom calibredb-fetch-metadata-source-alist '(( "Google" ) ( "Amazon.com" ))
+(defcustom calibredb-fetch-metadata-source-list '("Google" "Amazon.com")
   "Source alist used to fetch ebook metadata."
-  :type 'alist
+  :type 'sexp
   :group 'calibredb)
 
 (defcustom calibredb-sql-separator "\3"

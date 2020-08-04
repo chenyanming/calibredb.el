@@ -513,19 +513,19 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                   (read-string "Title: " title)))
          (isbn (if isbn (read-string "ISBN: " isbn)
                  nil))
-         (sources calibredb-fetch-metadata-source-alist)
+         (sources calibredb-fetch-metadata-source-list)
          (results (mapcar
                    (lambda (source)
                      (let* ((md (shell-command-to-string
                                  (if isbn (format
                                            "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
                                            calibredb-fetch-metadata-program
-                                           (car source)
+                                           source
                                            isbn)
                                    (format
                                     "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
                                     calibredb-fetch-metadata-program
-                                    (car source)
+                                    source
                                     authors
                                     title))))
                             (md-split (if (string-match "No results found$" md) nil
@@ -539,13 +539,13 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                                (match-string 3 string))))
                                                      (split-string (car md-split) "\n" t " *"))
                                            nil))
-                            (kovids-magic (format
-                                           "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'"
-                                           calibre-debug-program))
-                            (author-sort (shell-command-to-string (format
-                                                                   kovids-magic
-                                                                   (intern (cdr (assoc "Authors" no-comments))))))
-                            (new-comments (append no-comments (list (cons "Author_sort" author-sort)))))
+                            (kovids-magic "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
+                            (author-sort (when (cdr (assoc "Authors" no-comments))
+                                           (shell-command-to-string (format
+                                                                     kovids-magic
+                                                                     calibre-debug-program
+                                                                     (intern (cdr (assoc "Authors" no-comments)))))))
+                            (new-comments (when author-sort (append no-comments (list (cons "Author_sort" author-sort))))))
                        (if (nth 1 md-split)
                            (when new-comments (cons source (append new-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
                          (when new-comments (cons source new-comments)))))
