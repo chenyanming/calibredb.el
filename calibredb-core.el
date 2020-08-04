@@ -83,6 +83,21 @@
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-fetch-metadata-program
+  (cond
+   ((eq system-type 'darwin)
+    "/Applications/calibre.app/Contents/MacOS/fetch-ebook-metadata")
+   (t
+    "fetch-ebook-metadata"))
+  "Executable used to fetch ebook metadata."
+  :type 'file
+  :group 'calibredb)
+
+(defcustom calibredb-fetch-metadata-source-alist '(( "Google" ) ( "Amazon.com" ))
+  "Source alist used to fetch ebook metadata."
+  :type 'alist
+  :group 'calibredb)
+
 (defcustom calibredb-sql-separator "\3"
   "SQL separator, used in parsing SQL result into list."
   :group 'calibredb

@@ -513,17 +513,19 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                   (read-string "Title: " title)))
          (isbn (if isbn (read-string "ISBN: " isbn)
                  nil))
-         (sources '("Google" "Amazon.com"))
+         (sources calibredb-fetch-metadata-source-alist)
          (results (mapcar
                    (lambda (source)
                      (let* ((md (shell-command-to-string
                                  (if isbn (format
-                                           "fetch-ebook-metadata -p '%s' --isbn '%s' -c /tmp/cover.jpg"
-                                           source
+                                           "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                           calibredb-fetch-metadata-program
+                                           (car source)
                                            isbn)
                                    (format
-                                    "fetch-ebook-metadata -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
-                                    source
+                                    "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                    calibredb-fetch-metadata-program
+                                    (car source)
                                     authors
                                     title))))
                             (md-split (if (string-match "No results found$" md) nil
