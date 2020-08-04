@@ -83,6 +83,16 @@
   :type 'file
   :group 'calibredb)
 
+(defcustom calibre-debug-program
+  (cond
+   ((eq system-type 'darwin)
+    "/Applications/calibre.app/Contents/MacOS/calibre-debug")
+   (t
+    "calibre-debug"))
+  "Executable for calibredb-debug which is used for author_sort algorithm."
+  :type 'file
+  :group 'calibredb)
+
 (defcustom calibredb-fetch-metadata-program
   (cond
    ((eq system-type 'darwin)

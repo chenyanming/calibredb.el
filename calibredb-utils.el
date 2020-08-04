@@ -539,7 +539,9 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                                (match-string 3 string))))
                                                      (split-string (car md-split) "\n" t " *"))
                                            nil))
-                            (kovids-magic "calibre-debug -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
+                            (kovids-magic (format
+                                           "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'"
+                                           calibre-debug-program))
                             (author-sort (shell-command-to-string (format
                                                                    kovids-magic
                                                                    (intern (cdr (assoc "Authors" no-comments))))))
