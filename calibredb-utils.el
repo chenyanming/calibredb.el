@@ -512,8 +512,9 @@ the outer alist (nil instead of (SOURCE RESULTS))."
          (title (if isbn ""
                   (read-string "Title: " title)))
          (isbn (if isbn (read-string "ISBN: " isbn)
-                 nil))
-         (sources calibredb-fetch-metadata-source-list)
+                 nil)))
+    (message "Fetching metadata from sources... may take a few seconds")
+    (let* ((sources calibredb-fetch-metadata-source-list)
          (results (mapcar
                    (lambda (source)
                      (let* ((md (shell-command-to-string
@@ -553,7 +554,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
     (if (remove nil results)
         (remove nil results)
       nil)
-    ))
+    )))
 
 (defun calibredb-select-and-set-cover (results &optional cover)
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
