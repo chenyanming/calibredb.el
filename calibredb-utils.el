@@ -219,10 +219,15 @@ Others: Add only one item."
                       "Add file(s) to calibredb: " calibredb-download-dir
                       #'calibredb-counsel-add-file-action
                       'calibredb-add)))))
-        (t
-         (calibredb-command :command "add"
-                            :input (calibredb-complete-file-quote "Add a file to Calibre")
-                            :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+        (t (let ((file (calibredb-complete-file-quote "Add a file to Calibre")))
+             (calibredb-command :command "add"
+                                :input file
+                                :library (format "--library-path %s" (calibredb-root-dir-quote)))
+             (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
+                   ((string= calibredb-add-delete-original-file "no"))
+                   ((yes-or-no-p
+                     "File has been copied to database. Subsequently delete original file(s)?")
+                    (delete-file file))))))
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
 

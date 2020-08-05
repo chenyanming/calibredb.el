@@ -73,6 +73,11 @@
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-add-delete-original-file nil
+  "After adding file, delete original file? (string \"yes\"/\"no\")."
+  :type 'string
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
