@@ -443,6 +443,64 @@ Argument PROPS are the additional parameters."
 
 ;; fetch_metadata
 
+(defun calibredb-pdf-auto-detect-isbn (&optional end-page)
+  "Invoke from calibre-search buffer. Scan for isbn from page 1
+upto (not including) END-PAGE (default 10)"
+  (if (eq major-mode 'calibredb-search-mode)
+      (let (isbn-line
+            (isbn "")
+            (page 1)
+            (file-path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+            (end-page 10))
+        (cond ((string= (url-file-extension file-path) ".pdf")
+               (while (< page end-page) ; scanning from below because we want to find first instance of ISBN
+                 (let ((match (cdr (assoc 'edges (car (pdf-info-search-string
+                                                       "isbn"
+                                                       page
+                                                       file-path))))))
+                   ;; (current-buffer)))))))
+                   (setq page (1+ page))
+                   (cond (match (setq isbn-line (pdf-info-gettext (1- page) (car match) 'line file-path)) (setq page (1+ end-page))))))
+               (cond (isbn-line
+                      (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
+                      (match-string 3 isbn-line))
+                     (t nil)))
+              (t nil)))
+    (message "Should be invoked from *calibredb-search* buffer")))
+
+(defun calibredb-djvu-auto-detect-isbn ()
+  (interactive)
+  (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+  (let* ((doc djvu-doc)
+         (match (let ((page (djvu-ref page doc))
+                      (match nil))
+                  (while (not (or match (eq page 10)))
+                    (djvu-next-page 1)
+                    (setq page (djvu-ref page doc))
+                    (when (re-search-forward "^.*isbn.*$" nil t) (setq match t)))
+                  (print match))))
+    (let ((isbn-line ""))
+      (cond (match
+             (print (format "HELLO" (match-string-no-properties 0)))
+             (setq isbn-line (match-string-no-properties 0))
+             (kill-buffer)
+             (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
+             (match-string 3 isbn-line))
+            (t (kill-buffer) nil)))))
+
+(defun calibredb-auto-detect-isbn ()
+  (interactive)
+  (let  ((file-path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)))
+    (cond ((string= (url-file-extension file-path) ".pdf")
+           (if (fboundp 'pdf-info-search-string)
+               (calibredb-pdf-auto-detect-isbn)
+             nil))
+          ((string= (url-file-extension file-path) ".djvu")
+           (if (fboundp 'djvu-find-file)
+               (calibredb-djvu-auto-detect-isbn)
+             nil))
+          (t nil))))
+
 (defun calibredb-show-results (metadata &optional switch)
   "Display METADATA fetch results in the current buffer.
 Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
@@ -515,46 +573,46 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                  nil)))
     (message "Fetching metadata from sources... may take a few seconds")
     (let* ((sources calibredb-fetch-metadata-source-list)
-         (results (mapcar
-                   (lambda (source)
-                     (let* ((md (shell-command-to-string
-                                 (if isbn (format
-                                           "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
-                                           calibredb-fetch-metadata-program
-                                           source
-                                           isbn)
-                                   (format
-                                    "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
-                                    calibredb-fetch-metadata-program
-                                    source
-                                    authors
-                                    title))))
-                            (md-split (if (string-match "No results found$" md) nil
-                                        (split-string md "Comments" nil " *")))
-                            (no-comments (if md-split
-                                             (mapcar (lambda (x)
-                                                       (let ((string x))
-                                                         (string-match "\\([A-z]*\\)(*\\(s\\)*)* *: *\\(.*\\)" string)
-                                                         (cons (format "%s%s" (match-string 1 string) (cond ((match-string 2 string))
-                                                                                                            ("")))
-                                                               (match-string 3 string))))
-                                                     (split-string (car md-split) "\n" t " *"))
-                                           nil))
-                            (kovids-magic "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
-                            (author-sort (when (cdr (assoc "Authors" no-comments))
-                                           (shell-command-to-string (format
-                                                                     kovids-magic
-                                                                     calibre-debug-program
-                                                                     (intern (cdr (assoc "Authors" no-comments)))))))
-                            (new-comments (when author-sort (append no-comments (list (cons "Author_sort" author-sort))))))
-                       (if (nth 1 md-split)
-                           (when new-comments (cons source (append new-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
-                         (when new-comments (cons source new-comments)))))
-                   sources)))
-    (if (remove nil results)
-        (remove nil results)
-      nil)
-    )))
+           (results (mapcar
+                     (lambda (source)
+                       (let* ((md (shell-command-to-string
+                                   (if isbn (format
+                                             "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                             calibredb-fetch-metadata-program
+                                             source
+                                             isbn)
+                                     (format
+                                      "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                      calibredb-fetch-metadata-program
+                                      source
+                                      authors
+                                      title))))
+                              (md-split (if (string-match "No results found$" md) nil
+                                          (split-string md "Comments" nil " *")))
+                              (no-comments (if md-split
+                                               (mapcar (lambda (x)
+                                                         (let ((string x))
+                                                           (string-match "\\([A-z]*\\)(*\\(s\\)*)* *: *\\(.*\\)" string)
+                                                           (cons (format "%s%s" (match-string 1 string) (cond ((match-string 2 string))
+                                                                                                              ("")))
+                                                                 (match-string 3 string))))
+                                                       (split-string (car md-split) "\n" t " *"))
+                                             nil))
+                              (kovids-magic "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
+                              (author-sort (when (cdr (assoc "Authors" no-comments))
+                                             (shell-command-to-string (format
+                                                                       kovids-magic
+                                                                       calibre-debug-program
+                                                                       (intern (cdr (assoc "Authors" no-comments)))))))
+                              (new-comments (when author-sort (append no-comments (list (cons "Author_sort" author-sort))))))
+                         (if (nth 1 md-split)
+                             (when new-comments (cons source (append new-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
+                           (when new-comments (cons source new-comments)))))
+                     sources)))
+      (if (remove nil results)
+          (remove nil results)
+        nil)
+      )))
 
 (defun calibredb-select-and-set-cover (results &optional cover)
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
@@ -603,7 +661,11 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                            (calibredb-fetch-metadata authors title)))
                 ((string= type "isbn") (if arg
                                            (calibredb-fetch-metadata authors title title)
-                                         (calibredb-fetch-metadata authors title "")))))
+                                         (calibredb-fetch-metadata
+                                          authors
+                                          title
+                                          (cond ((calibredb-auto-detect-isbn))
+                                                ("")))))))
          (id (calibredb-getattr candidate :id)))
     (cond (metadata
            (mapcar (lambda (x)
