@@ -23,10 +23,16 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 1. Powerful ebook dashboard.
 2. Manage ebooks, actually not only ebooks!
-3. Manage Ebook libraries.
-4. Another bookmarks solution, by setting the tags and comments.
-5. Quick search, filter, make actions on items with ivy and helm.
-6. Org-ref support.
+3. Fetch metadata from online sources incl. automatic detection of ISBN for pdf
+   and djvu files *(automatic detection of ISBN requires pdf-tools and djvu
+   package for pdf and djvu files respectively)*
+4. Manage Ebook libraries.
+5. Another bookmarks solution, by setting the tags and comments.
+6. Quick search, filter, make actions on items with ivy and helm.
+7. Org-ref support.
+
+** Related package
+- toc-mode (easily manage pdf/djvu document's Table Of Contents)
 
 * Installation
 
@@ -35,6 +41,10 @@ It's available on [[https://melpa.org/][Melpa]] :
 #+BEGIN_SRC emacs-lisp
 M-x package-install calibredb
 #+END_SRC
+
+** Spacemacs
+
+For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer]] implements calibre.el with evilified keybindings
 
 * Configuration
 
