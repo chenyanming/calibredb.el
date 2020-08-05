@@ -216,7 +216,7 @@ Others: Add only one item."
              (if ivy-mode
                  (if (fboundp 'counsel--find-file-1)
                      (counsel--find-file-1
-                      "Add file(s) to calibredb: " nil
+                      "Add file(s) to calibredb: " calibredb-download-dir
                       #'calibredb-counsel-add-file-action
                       'calibredb-add)))))
         (t

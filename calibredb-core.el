@@ -68,6 +68,11 @@
                                                   calibredb-root-dir)))
   :group 'calibredb)
 
+(defcustom calibredb-download-dir nil
+  "String with the path to main download directory for ebooks."
+  :type 'file
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
