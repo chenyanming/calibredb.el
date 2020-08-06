@@ -228,7 +228,7 @@ Others: Add only one item."
              (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
                    ((string= calibredb-add-delete-original-file "no"))
                    ((yes-or-no-p
-                     "File has been copied to database. Subsequently delete original file(s)?")
+                     (concat "File has been copied to database. Subsequently delete original file? " file))
                     (delete-file file))))))
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
