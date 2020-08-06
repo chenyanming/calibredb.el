@@ -58,7 +58,11 @@
   "Add marked FILEs."
   (calibredb-command :command "add"
                      :input (shell-quote-argument (expand-file-name file))
-                     :library (format "--library-path %s" (calibredb-root-dir-quote))))
+                     :library (format "--library-path %s" (calibredb-root-dir-quote)))
+  (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
+        ((string= calibredb-add-delete-original-file "no"))
+        ((yes-or-no-p
+          "File has been copied to database. Subsequently delete original file(s)?") (delete-file file))))
 
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
