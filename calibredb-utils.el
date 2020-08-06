@@ -551,7 +551,7 @@ This function is a slighly modified version from calibredb-show-entry"
                                     ""
                                     calibredb-list-view-image-max-width
                                     calibredb-list-view-image-max-height)
-          (print "Entry path was moved or no cover fetched"))
+          (print "No cover available"))
         ;; (setq end (point))
         (calibredb-show-mode)
         (setq calibredb-show-metadata metadata)
@@ -562,7 +562,7 @@ This function is a slighly modified version from calibredb-show-entry"
         (switch-to-buffer-other-window (set-buffer (calibredb-search--buffer-name)))
         (goto-char original)))))
 
-(defun calibredb-fetch-metadata-from-sources (author title &optional isbn)
+(defun calibredb-fetch-metadata-from-sources (author title &optional isbn fetch-cover)
   "Fetch metadata from online source via author and title or
 ISBN. Invoke from *calibredb-search* buffer.
 
@@ -584,12 +584,16 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                      (lambda (source)
                        (let* ((md (shell-command-to-string
                                    (if isbn (format
-                                             "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                             (if fetch-cover
+                                                 "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
+                                               "%s -p '%s' --isbn '%s'")
                                              calibredb-fetch-metadata-program
                                              source
                                              isbn)
                                      (format
-                                      "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                      (if fetch-cover
+                                          "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
+                                        "%s -p '%s' --authors '%s' --title '%s'")
                                       calibredb-fetch-metadata-program
                                       source
                                       authors
@@ -654,8 +658,13 @@ the outer alist (nil instead of (SOURCE RESULTS))."
 ;;)
 
 (defun calibredb-fetch-metadata (author title &optional isbn)
-  (let ((results (calibredb-fetch-metadata-from-sources author title isbn)))
-    (cond (results (calibredb-select-and-set-cover results) (calibredb-select-metadata-source results))
+  (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
+                             ((string= calibredb-fetch-covers "no") nil)
+                             (t (yes-or-no-p "Fetch cover?: "))))
+         (results (calibredb-fetch-metadata-from-sources author title isbn fetch-cover)))
+    (cond (results
+           (when fetch-cover (calibredb-select-and-set-cover results))
+           (calibredb-select-metadata-source results))
           (t nil))))
 
 (defun calibredb-fetch-and-set-metadata (type &optional arg)
