@@ -62,7 +62,7 @@
   (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
         ((string= calibredb-add-delete-original-file "no"))
         ((yes-or-no-p
-          "File has been copied to database. Subsequently delete original file(s)?") (delete-file file))))
+          (concat "File has been copied to database. Subsequently delete original file? " file)) (delete-file file))))
 
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
