@@ -356,7 +356,7 @@ Argument EVENT mouse event."
   (calibredb-search-update :force))
 
 (defun calibredb-search-quit ()
-  "Quit *calibredb-entry* then *calibredb-search*."
+  "Quit *calibredb-entry* or *calibredb-search*."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
     (cond ((get-buffer "*calibredb-entry*")

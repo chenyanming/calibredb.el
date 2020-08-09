@@ -114,8 +114,7 @@ Argument FILEPATH is the file path."
 
 
 (defun calibredb-insert-image (path alt width height)
-  "TODO: Insert an image for PATH at point with max WIDTH and max
-HEIGTH, falling back to ALT."
+  "TODO: Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
   (cond
    ((not (display-graphic-p))
     (insert alt))
@@ -451,23 +450,25 @@ Argument PROPS are the additional parameters."
 ;; fetch_metadata
 
 (defun calibredb-pdf-auto-detect-isbn (&optional end-page)
-  "Invoke from calibre-search buffer. Scan for isbn from page 1
-upto (not including) END-PAGE (default 10)"
+  "Invoke from calibre-search buffer.
+Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf file."
   (if (eq major-mode 'calibredb-search-mode)
       (let (isbn-line
-            (isbn "")
+            ;; (isbn "")
             (page 1)
-            (file-path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-            (end-page 10))
+            (file-path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)))
+        (unless end-page (setq end-page 10))
         (cond ((string= (url-file-extension file-path) ".pdf")
                (while (< page end-page) ; scanning from below because we want to find first instance of ISBN
-                 (let ((match (cdr (assoc 'edges (car (pdf-info-search-string
-                                                       "isbn"
-                                                       page
-                                                       file-path))))))
+                 (let ((match (cdr (assoc 'edges (car (if (fboundp 'pdf-info-search-string)
+                                                          (pdf-info-search-string
+                                                           "isbn"
+                                                           page
+                                                           file-path)))))))
                    ;; (current-buffer)))))))
                    (setq page (1+ page))
-                   (cond (match (setq isbn-line (pdf-info-gettext (1- page) (car match) 'line file-path)) (setq page (1+ end-page))))))
+                   (cond (match (setq isbn-line (if (fboundp 'pdf-info-gettext)
+                                                    (pdf-info-gettext (1- page) (car match) 'line file-path) )) (setq page (1+ end-page))))))
                (cond (isbn-line
                       (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
                       (match-string 3 isbn-line))
@@ -477,18 +478,20 @@ upto (not including) END-PAGE (default 10)"
 
 (defun calibredb-djvu-auto-detect-isbn ()
   (interactive)
-  (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-  (let* ((doc djvu-doc)
-         (match (let ((page (djvu-ref page doc))
+  (if (fboundp 'djvu-find-file)
+      (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) )
+  (let* ((page)
+         (doc (if (boundp 'djvu-doc) djvu-doc))
+         (match (let ((page (if (fboundp 'djvu-ref) (djvu-ref page doc) ))
                       (match nil))
                   (while (not (or match (eq page 10)))
-                    (djvu-next-page 1)
-                    (setq page (djvu-ref page doc))
+                    (if (fboundp 'djvu-next-page) (djvu-next-page 1) )
+                    (setq page (if (fboundp 'djvu-ref) (djvu-ref page doc) ))
                     (when (re-search-forward "^.*isbn.*$" nil t) (setq match t)))
                   (print match))))
     (let ((isbn-line ""))
       (cond (match
-             (print (format "HELLO" (match-string-no-properties 0)))
+             ;; (print (format "HELLO" (match-string-no-properties 0)))
              (setq isbn-line (match-string-no-properties 0))
              (kill-buffer)
              (string-match "\\(isbn\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
@@ -496,13 +499,14 @@ upto (not including) END-PAGE (default 10)"
             (t (kill-buffer) nil)))))
 
 (defun calibredb-auto-detect-isbn ()
+  "Invoke from calibre-search buffer and scan for isbn."
   (interactive)
-  (let  ((file-path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)))
-    (cond ((string= (url-file-extension file-path) ".pdf")
+  (let  ((format (calibredb-getattr (car (calibredb-find-candidate-at-point)) :book-format)))
+    (cond ((string= format "pdf")
            (if (featurep 'pdf-tools)
                (calibredb-pdf-auto-detect-isbn)
              nil))
-          ((string= (url-file-extension file-path) ".djvu")
+          ((string= format "djvu")
            (if (featurep 'djvu)
                (calibredb-djvu-auto-detect-isbn)
              nil))
@@ -511,7 +515,7 @@ upto (not including) END-PAGE (default 10)"
 (defun calibredb-show-results (metadata &optional switch)
   "Display METADATA fetch results in the current buffer.
 Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
-This function is a slighly modified version from calibredb-show-entry"
+This function is a slighly modified version from function `calibredb-show-entry'"
   (unless (eq major-mode 'calibredb-show-mode)
     (when (get-buffer (calibredb-show--buffer-name metadata))
       (kill-buffer (calibredb-show--buffer-name metadata))))
@@ -554,7 +558,7 @@ This function is a slighly modified version from calibredb-show-entry"
           (print "No cover available"))
         ;; (setq end (point))
         (calibredb-show-mode)
-        (setq calibredb-show-metadata metadata)
+        ;; (setq calibredb-show-metadata metadata)
         (goto-char (point-min))))
     (unless (eq major-mode 'calibredb-show-mode)
       (switch-to-buffer buff)
@@ -563,8 +567,8 @@ This function is a slighly modified version from calibredb-show-entry"
         (goto-char original)))))
 
 (defun calibredb-fetch-metadata-from-sources (author title &optional isbn fetch-cover)
-  "Fetch metadata from online source via author and title or
-ISBN. Invoke from *calibredb-search* buffer.
+  "Fetch metadata from online source via author and title or ISBN.
+Invoke from *calibredb-search* buffer.
 
 AUTHOR, TITLE and ISBN should be strings.
 
@@ -625,7 +629,8 @@ the outer alist (nil instead of (SOURCE RESULTS))."
         nil)
       )))
 
-(defun calibredb-select-and-set-cover (results &optional cover)
+(defun calibredb-select-and-set-cover ()
+  "Select and set cover."
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
     (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
   (let ((original (concat
@@ -649,27 +654,35 @@ the outer alist (nil instead of (SOURCE RESULTS))."
             (t (print "No cover could be fetched"))))))
 
 (defun calibredb-select-metadata-source (results)
+  "Select metadata source.
+Argument RESULTS is the source list."
   (cdr (assoc (if (fboundp 'ivy-read)
                   (ivy-read "Select metadata source (preview with C-M-n/p): " results
                             :action
                             (lambda (x) (calibredb-show-results (cdr x))))
                 (completing-read "Select metadata source : " results))
               results)))
-;;)
 
 (defun calibredb-fetch-metadata (author title &optional isbn)
+  "Fetch metadata.
+Argument AUTHOR prompts to input the author.
+Argument TITLE prompts to input the title.
+Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
                              ((string= calibredb-fetch-covers "no") nil)
                              (t (yes-or-no-p "Fetch cover?: "))))
          (results (calibredb-fetch-metadata-from-sources author title isbn fetch-cover)))
     (cond (results
-           (when fetch-cover (calibredb-select-and-set-cover results))
+           (when fetch-cover (calibredb-select-and-set-cover))
            (calibredb-select-metadata-source results))
           (t nil))))
 
 (defun calibredb-fetch-and-set-metadata (type &optional arg)
-  "Add metadata from calibredb-fetch-metadata to entry at POINT"
+  "Add metadata from `calibredb-fetch-metadata' to entry at POINT.
+Argument TYPE Either 'author' or 'isbn'.
+Optional argument ARG."
   (let* ((candidate (car (calibredb-find-candidate-at-point)))
+         (id (calibredb-getattr candidate :id))
          (authors (calibredb-getattr candidate :author-sort))
          (title (calibredb-getattr candidate :book-title))
          (metadata
@@ -684,7 +697,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                 ("")))))))
          (id (calibredb-getattr candidate :id)))
     (cond (metadata
-           (mapcar (lambda (x)
+           (mapc (lambda (x)
                      (calibredb-command :command "set_metadata"
                                         :option "--field"
                                         :input (format "%s:\"%s\"" (downcase (car x)) (cdr x))
@@ -693,23 +706,23 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                    metadata)
            (switch-to-buffer-other-window "*calibredb-search*")
            (calibredb-search-refresh-or-resume)
-           (calibredb-show-results metadata t))
+           (if calibredb-show-results (calibredb-show-results metadata t))
+           (message (format "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors)))
           ;; (switch-to-buffer-other-window "*calibredb-entry*"))
           (t (print "No metadata retrieved from sources")))))
 
 (defun calibredb-fetch-and-set-metadata-by-author-and-title (arg)
-  "Invoke from *calibredb-search* buffer. Fetch metadata from
-online source via author and title. With universal arg (C-u)
-switch initial values of authors and title."
+  "Invoke from *calibredb-search* buffer.
+Fetch metadata from online source via author and title. With universal ARG \\[universal-argument] switch initial values of authors and title."
   (interactive "P")
   (calibredb-fetch-and-set-metadata "author" arg))
 
 (defun calibredb-fetch-and-set-metadata-by-isbn (arg)
-  "Invoke from *calibredb-search* buffer. Fetch metadata from
-online source via ISBN. With universal arg (C-u) use title as
-initial value."
+  "Invoke from *calibredb-search* buffer.
+Fetch metadata from online source via ISBN.
+With universal ARG \\[universal-argument] use title as initial value."
   (interactive "P")
-  (calibredb-fetch-and-set-metadata "isbn"))
+  (calibredb-fetch-and-set-metadata "isbn" arg))
 
 ;; show_metadata
 

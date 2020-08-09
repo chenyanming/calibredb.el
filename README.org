@@ -1,5 +1,5 @@
 #+TITLE:   calibredb.el
-#+DATE:    July 16, 2020
+#+DATE:    Aug 9, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
@@ -558,7 +558,8 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 
 * Logs
 
-** 2020-07-31
+** 2020-08-09
+Version *2.5.0*:
 - Add: =calibredb-fetch-and-set-metadata-by-author-and-title= and =calibredb-fetch-and-set-metadata-by-isbn= (thanks to Daniel Nicolai)
 
 ** =2020-07-16=
