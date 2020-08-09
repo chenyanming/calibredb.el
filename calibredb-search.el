@@ -360,10 +360,9 @@ Argument EVENT mouse event."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
     (cond ((get-buffer "*calibredb-entry*")
-           (switch-to-buffer "*calibredb-entry*")
-           (kill-buffer-and-window))
-      (if (get-buffer "*calibredb-search*")
-          (kill-buffer "*calibredb-search*")))))
+           (delete-window (get-buffer-window "*calibredb-entry*")))
+          ((get-buffer "*calibredb-search*")
+           (kill-buffer "*calibredb-search*")))))
 
 (defun calibredb-mark-at-point ()
   "Mark the current line."
