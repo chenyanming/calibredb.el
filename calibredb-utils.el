@@ -682,6 +682,7 @@ Optional argument ISBN prompts to input the isbn."
 Argument TYPE Either 'author' or 'isbn'.
 Optional argument ARG."
   (let* ((candidate (car (calibredb-find-candidate-at-point)))
+         (id (calibredb-getattr candidate :id))
          (authors (calibredb-getattr candidate :author-sort))
          (title (calibredb-getattr candidate :book-title))
          (metadata
@@ -705,7 +706,8 @@ Optional argument ARG."
                    metadata)
            (switch-to-buffer-other-window "*calibredb-search*")
            (calibredb-search-refresh-or-resume)
-           (calibredb-show-results metadata t))
+           (if calibredb-show-results (calibredb-show-results metadata t))
+           (message (format "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors)))
           ;; (switch-to-buffer-other-window "*calibredb-entry*"))
           (t (print "No metadata retrieved from sources")))))
 

@@ -83,6 +83,11 @@
   :type 'string
   :group 'calibredb)
 
+(defcustom calibredb-show-results nil
+  "Set Non-nil to show results after fetching metadata."
+  :type 'boolean
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
