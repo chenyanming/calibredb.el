@@ -359,8 +359,9 @@ Argument EVENT mouse event."
   "Quit *calibredb-entry* then *calibredb-search*."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
-    (if (get-buffer "*calibredb-entry*")
-        (kill-buffer "*calibredb-entry*")
+    (cond ((get-buffer "*calibredb-entry*")
+           (switch-to-buffer "*calibredb-entry*")
+           (kill-buffer-and-window))
       (if (get-buffer "*calibredb-search*")
           (kill-buffer "*calibredb-search*")))))
 

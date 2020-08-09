@@ -78,6 +78,11 @@
   :type 'string
   :group 'calibredb)
 
+(defcustom calibredb-fetch-covers nil
+  "Fetch cover when fetching metadata? (string \"yes\"/\"no\")."
+  :type 'string
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
