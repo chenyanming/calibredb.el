@@ -476,13 +476,12 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
               (t nil)))
     (message "Should be invoked from *calibredb-search* buffer")))
 
-(defun calibredb-djvu-auto-detect-isbn ()
+(defun calibredb-djvu-auto-detect-isbn (&optional doc)
   "Invoke from calibre-search buffer and scan isbn for djvu file."
   (interactive)
   (if (fboundp 'djvu-find-file)
       (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) )
-  (let* ((page doc)
-         (match (let ((page (if (fboundp 'djvu-ref) (djvu-ref page doc)))
+  (let* ((match (let ((page (if (fboundp 'djvu-ref) (djvu-ref page doc)))
                       (match nil))
                   (while (not (or match (eq page 10)))
                     (if (fboundp 'djvu-next-page) (djvu-next-page 1) )
