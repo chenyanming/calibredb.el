@@ -356,14 +356,13 @@ Argument EVENT mouse event."
   (calibredb-search-update :force))
 
 (defun calibredb-search-quit ()
-  "Quit *calibredb-entry* then *calibredb-search*."
+  "Quit *calibredb-entry* or *calibredb-search*."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
     (cond ((get-buffer "*calibredb-entry*")
-           (switch-to-buffer "*calibredb-entry*")
-           (kill-buffer-and-window))
-      (if (get-buffer "*calibredb-search*")
-          (kill-buffer "*calibredb-search*")))))
+           (kill-buffer "*calibredb-entry*"))
+          ((get-buffer "*calibredb-search*")
+            (kill-buffer "*calibredb-search*")))))
 
 (defun calibredb-mark-at-point ()
   "Mark the current line."
