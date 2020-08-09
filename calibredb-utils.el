@@ -479,8 +479,9 @@ upto (not including) END-PAGE (default 10)"
 
 (defun calibredb-djvu-auto-detect-isbn ()
   (interactive)
-  (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-  (let* ((doc)
+  (if (fboundp 'djvu-find-file)
+      (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) )
+  (let* ((page doc)
          (match (let ((page (if (fboundp 'djvu-ref) (djvu-ref page doc)))
                       (match nil))
                   (while (not (or match (eq page 10)))
