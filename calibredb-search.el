@@ -201,7 +201,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (format (calibredb-getattr entry :book-format))
          (original (point))
          beg end)
-    (let ((inhibit-read-only t))
+    (let ((inhibit-read-only t) c-beg c-end)
       (with-current-buffer buff
         (erase-buffer)
         (setq beg (point))
@@ -212,7 +212,24 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Title       %s\n" (propertize title 'face 'calibredb-title-face)))
         (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
         (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
-        (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))
+        (cond ((equal calibredb-entry-fontify-comments "face")
+               (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
+              ((equal calibredb-entry-fontify-comments "shr")
+               (require 'shr)
+               (insert "Comments\n")
+               (setq c-beg (point))
+               (insert comment)
+               (setq c-end (point))
+               (if (fboundp 'shr-render-region)
+                   (shr-render-region c-beg c-end))
+               (insert "\n"))
+              ((equal calibredb-entry-fontify-comments "annotation")
+               (insert "Comments\n\n")
+               (require 'font-lock)
+               (insert (calibredb-fontify comment 'calibredb-edit-annotation-mode))
+               (insert "\n\n"))
+              (t
+               (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))))
         (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
         (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
         (insert "\n")
@@ -741,6 +758,16 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
                 (put-text-property beg end 'calibredb-entry list)))))
         (setq calibredb-detial-view status))))))
 
+(defun calibredb-fontify (string mode)
+  "Fontify STRING with Major MODE."
+  (with-temp-buffer
+    (insert string)
+    (delay-mode-hooks (funcall mode))
+    (if (fboundp 'font-lock-ensure)
+        (font-lock-ensure)
+      (with-no-warnings
+        (font-lock-fontify-buffer)))
+    (buffer-string)))
 
 (provide 'calibredb-search)
 
