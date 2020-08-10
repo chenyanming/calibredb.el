@@ -202,7 +202,6 @@ You can perform the following actions:
  - Open/View the ebook
  - Open Dired the ebook located
  - Fetch (from Google and Amazon.com) and set metadata on the ebook under cursor
-   (fetching currently requires Ivy)
  - Set metadata on marked ebooks
  - Add/Remove ebooks on current library
  - Export the ebook under cursor
@@ -302,6 +301,22 @@ switch temporarily.
   to add selected metadata to source.
 
 Tips: You can filter the result via ~/~ before setting the metadata.
+
+*** About ~fetch-ebook-metadata~
+We are using ~fetch-ebook-metadata~ cli tool to fetch the metadata. However,
+fetching ebook metadata is a little tricky, especially about the sources
+configurations. Since the settings on calibre GUI would affect the
+~fetch-ebook-metadata~ cli. Follow below steps to setup.
+
+1. Set up the source settings in Calibre GUI. You are right, you need to configure the settings on GUI first.
+   - Preferences -> Preferences -> Sharing/Metadata download
+   - Tick 'source' you like to use
+   - Set the 'Cover priority'
+   - Apply
+3. Specify the list of metadata download plugins to use, this should be the same as the calibre GUI configuration.
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-fetch-metadata-source-list '("Google" "Amazon.com" "Douban Books"))
+#+END_SRC
 
 ** How to mark favorite/highlight/archive on ebooks?
 - In =*calibredb-search*= buffer, =m= to mark the items, =f/h/x= to toggle

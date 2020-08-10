@@ -659,7 +659,8 @@ Argument RESULTS is the source list."
   (cdr (assoc (if (fboundp 'ivy-read)
                   (ivy-read "Select metadata source (preview with C-M-n/p): " results
                             :action
-                            (lambda (x) (calibredb-show-results (cdr x))))
+                            (lambda (x) (if calibredb-show-results
+                                            (calibredb-show-results (cdr x)))))
                 (completing-read "Select metadata source : " results))
               results)))
 
