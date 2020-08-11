@@ -228,7 +228,7 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-entry-fontify-comments "shr"
+(defcustom calibredb-entry-render-comments "shr"
   "Render comments in *calibredb-entry* buffer.
 1. face: Render with face `calibredb-comment-face'.
 2. shr: Render with shr (Simple HTML Render).
