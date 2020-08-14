@@ -228,6 +228,14 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'boolean)
 
+(defcustom calibredb-entry-render-comments "shr"
+  "Render comments in *calibredb-entry* buffer.
+1. face: Render with face `calibredb-comment-face'.
+2. shr: Render with shr (Simple HTML Render).
+3. annotation: Render with `calibredb-edit-annotation-mode'."
+  :group 'calibredb
+  :type 'string)
+
 (defvar calibredb-query-string "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
