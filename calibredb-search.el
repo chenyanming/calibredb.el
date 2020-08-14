@@ -377,7 +377,7 @@ Argument EVENT mouse event."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
     (cond ((get-buffer "*calibredb-entry*")
-           (delete-window (get-buffer-window "*calibredb-entry*")))
+           (kill-buffer "*calibredb-entry*"))
           ((get-buffer "*calibredb-search*")
            (kill-buffer "*calibredb-search*")))))
 

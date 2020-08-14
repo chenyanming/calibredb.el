@@ -97,14 +97,13 @@ Argument FILEPATH is the file path."
                            (shell-command-to-string
                             (concat
                              "grep Exec "
-                             (if (fboundp 'first)
-                                 (first
-                                  (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
-                                                                                  "kde4-" "kde4/"
-                                                                                  (shell-command-to-string "xdg-mime query default application/pdf")))))
-                                              (mapcar
-                                               (lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
-                                               '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications"))))) )
+                             (car
+                              (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
+                                                                              "kde4-" "kde4/"
+                                                                              (shell-command-to-string "xdg-mime query default application/pdf")))))
+                                          (mapcar
+                                           (lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
+                                           '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications")))))
                              "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
                          ((eq system-type 'windows-nt)
                           "start")
@@ -451,6 +450,7 @@ Argument PROPS are the additional parameters."
 
 (defun calibredb-pdf-auto-detect-isbn (&optional end-page)
   "Invoke from calibre-search buffer.
+This function requires the pdf-tools (pdf-tools.el) to be installed.
 Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf file."
   (if (eq major-mode 'calibredb-search-mode)
       (let (isbn-line
@@ -460,33 +460,35 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
         (unless end-page (setq end-page 10))
         (cond ((string= (url-file-extension file-path) ".pdf")
                (while (< page end-page) ; scanning from below because we want to find first instance of ISBN
-                 (let ((match (cdr (assoc 'edges (car (if (fboundp 'pdf-info-search-string)
-                                                          (pdf-info-search-string
-                                                           "isbn"
-                                                           page
-                                                           file-path)))))))
+                 (let ((match (cdr (assoc 'edges (car (pdf-info-search-string
+                                                       "isbn"
+                                                       page
+                                                       file-path))))))
                    ;; (current-buffer)))))))
                    (setq page (1+ page))
-                   (cond (match (setq isbn-line (if (fboundp 'pdf-info-gettext)
-                                                    (pdf-info-gettext (1- page) (car match) 'line file-path) )) (setq page (1+ end-page))))))
+                   (cond (match (setq isbn-line
+                                      (pdf-info-gettext
+                                       (1- page)
+                                       (car match)
+                                       'line file-path))
+                                (setq page (1+ end-page))))))
                (cond (isbn-line
-                      (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
+                      (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
                       (match-string 3 isbn-line))
                      (t nil)))
               (t nil)))
     (message "Should be invoked from *calibredb-search* buffer")))
 
 (defun calibredb-djvu-auto-detect-isbn ()
-  (interactive)
-  (if (fboundp 'djvu-find-file)
-      (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) )
-  (let* ((page)
-         (doc (if (boundp 'djvu-doc) djvu-doc))
-         (match (let ((page (if (fboundp 'djvu-ref) (djvu-ref page doc) ))
+  "Invoke from calibre-search buffer.
+This function requires the djvu (djvu.el) package to be installed.
+Scan for isbn from the first 9 pages of the djvu file."
+  (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+  (let* ((match (let ((page (djvu-ref page) )
                       (match nil))
                   (while (not (or match (eq page 10)))
-                    (if (fboundp 'djvu-next-page) (djvu-next-page 1) )
-                    (setq page (if (fboundp 'djvu-ref) (djvu-ref page doc) ))
+                    (djvu-next-page 1)
+                    (setq page (djvu-ref page) )
                     (when (re-search-forward "^.*isbn.*$" nil t) (setq match t)))
                   (print match))))
     (let ((isbn-line ""))
@@ -494,7 +496,7 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
              ;; (print (format "HELLO" (match-string-no-properties 0)))
              (setq isbn-line (match-string-no-properties 0))
              (kill-buffer)
-             (string-match "\\(isbn\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- ]*\\) *" isbn-line)
+             (string-match "\\(isbn\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
              (match-string 3 isbn-line))
             (t (kill-buffer) nil)))))
 
@@ -569,9 +571,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
 (defun calibredb-fetch-metadata-from-sources (author title &optional isbn fetch-cover)
   "Fetch metadata from online source via author and title or ISBN.
 Invoke from *calibredb-search* buffer.
-
 AUTHOR, TITLE and ISBN should be strings.
-
 Returns an alist with elements (SOURCE RESULTS) where SOURCE is a
 string and RESULTS is an alist with elements (PROP VALUE). If no
 metadata was found from a source then in then nil is returned in
@@ -670,8 +670,8 @@ Argument AUTHOR prompts to input the author.
 Argument TITLE prompts to input the title.
 Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
-                             ((string= calibredb-fetch-covers "no") nil)
-                             (t (yes-or-no-p "Fetch cover?: "))))
+                            ((string= calibredb-fetch-covers "no") nil)
+                            (t (yes-or-no-p "Fetch cover?: "))))
          (results (calibredb-fetch-metadata-from-sources author title isbn fetch-cover)))
     (cond (results
            (when fetch-cover (calibredb-select-and-set-cover))
@@ -699,12 +699,12 @@ Optional argument ARG."
          (id (calibredb-getattr candidate :id)))
     (cond (metadata
            (mapc (lambda (x)
-                     (calibredb-command :command "set_metadata"
-                                        :option "--field"
-                                        :input (format "%s:\"%s\"" (downcase (car x)) (cdr x))
-                                        :id id
-                                        :library (format "--library-path \"%s\"" calibredb-root-dir)))
-                   metadata)
+                   (calibredb-command :command "set_metadata"
+                                      :option "--field"
+                                      :input (format "%s:\"%s\"" (downcase (car x)) (cdr x))
+                                      :id id
+                                      :library (format "--library-path \"%s\"" calibredb-root-dir)))
+                 metadata)
            (switch-to-buffer-other-window "*calibredb-search*")
            (calibredb-search-refresh-or-resume)
            (if calibredb-show-results (calibredb-show-results metadata t))
