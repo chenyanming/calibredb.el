@@ -589,7 +589,28 @@ Argument KEYWORD is the tag keyword."
             (calibredb-search-update :force)))))))
 
 (defun calibredb-search-live-filter ()
-  "Filter the calibredb-search buffer as the filter is written."
+  "Filter the calibredb-search buffer as the filter is written.
+Currently, the filtering is column-oriented, not buffer oriented.
+The following columns will be searched:
+
+- id
+- text
+- tag
+- title
+- format
+- author_sort
+
+If the keyword occurs in any of the columns above, the matched
+ebook record will be shown.
+
+1. Live filter is faster than before since it search the results
+   in =calibredb-full-entries= rather than query the database.
+
+2. The keyword supports REGEX.
+
+3. Inserting Spaces between
+   keywords can narrow down the search results."
+ 
   (interactive)
   (unwind-protect
       (let ((calibredb-search-filter-active :live))
@@ -622,7 +643,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (setf calibredb-search-last-update (float-time))))))
 
 (defun calibredb-search-parse-filter (filter)
-  "Parse the elements of a search filter into a plist."
+  "Parse the elements of a search FILTER into a plist."
   (let ((matches ()))
     (cl-loop for element in (split-string filter) collect
              (when (calibredb-valid-regexp-p element)
