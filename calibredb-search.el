@@ -554,7 +554,7 @@ Argument KEYWORD is the tag keyword."
 (defun calibredb-search--update-list ()
   "Update `calibredb-search-entries' list."
   ;; replace space with _ (SQL) The underscore represents a single character
-  (let* ((filter calibredb-search-filter) ;; (replace-regexp-in-string " " "_" calibredb-search-filter)
+  (let* ((filter (calibredb-search-parse-filter calibredb-search-filter)) ;; (replace-regexp-in-string " " "_" calibredb-search-filter)
          (head (calibredb-candidate-filter filter)))
     ;; Determine the final list order
     (let ((entries head))
@@ -620,6 +620,38 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         ;; (insert "End of entries.\n")
         (goto-char (point-min))         ; back to point-min after filtering
         (setf calibredb-search-last-update (float-time))))))
+
+(defun calibredb-search-parse-filter (filter)
+  "Parse the elements of a search filter into a plist."
+  (let ((matches ()))
+    (cl-loop for element in (split-string filter) collect
+             (when (calibredb-valid-regexp-p element)
+               (push element matches)))
+    `(,@(if matches
+            (list :matches matches)))))
+
+(defun calibredb-valid-regexp-p (regexp)
+  "Return t if REGEXP is a valid REGEXP."
+  (ignore-errors
+    (prog1 t
+      (string-match-p regexp ""))))
+
+(defun calibredb-candidate-filter (filter)
+  "Generate ebook candidate alist.
+ARGUMENT FILTER is the filter string."
+  (let ((matches (plist-get filter :matches))
+        res-list)
+    (cl-loop for line in calibredb-full-entries do
+             (if (eval `(and ,@(cl-loop for regex in matches collect
+                                        (or
+                                         (unless (equal calibredb-id-width 0) (string-match-p regex (calibredb-getattr (cdr line) :id)))
+                                         (unless (equal (calibredb-title-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-title)))
+                                         (unless (equal (calibredb-format-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-format)))
+                                         (unless (equal (calibredb-tag-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :tag)))
+                                         (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort)))
+                                         (unless (equal (calibredb-comment-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :comment)))))))
+                 (push line res-list)))
+    (nreverse res-list)))
 
 ;;; detail view
 

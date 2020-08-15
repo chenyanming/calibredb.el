@@ -25,6 +25,7 @@
 (require 'dash)
 (require 'org)
 (require 'cl-lib)
+(require 'cl-macs)
 (require 'sql)
 (require 'hl-line)
 (require 'transient)
@@ -470,21 +471,6 @@ ARGUMENT FILTER is the filter string."
                    ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
                    ))
                (calibredb-getbooklist (nreverse res-list))) ))))
-
-(defun calibredb-candidate-filter (filter)
-  "Generate ebook candidate alist.
-ARGUMENT FILTER is the filter string."
-  (let (res-list)
-    (dolist (line calibredb-full-entries)
-      (if (or
-           (unless (equal calibredb-id-width 0) (string-match-p filter (calibredb-getattr (cdr line) :id)))
-           (unless (equal (calibredb-title-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :book-title)))
-           (unless (equal (calibredb-format-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :book-format)))
-           (unless (equal (calibredb-tag-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :tag)))
-           (unless (equal (calibredb-author-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :author-sort)))
-           (unless (equal (calibredb-comment-width) 0) (string-match-p filter (calibredb-getattr (cdr line) :comment))))
-          (push line res-list)))
-    (nreverse res-list)))
 
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.
