@@ -23,7 +23,6 @@
 
 (require 's)
 (require 'dash)
-(require 'org)
 (require 'cl-lib)
 (require 'cl-macs)
 (require 'sql)
