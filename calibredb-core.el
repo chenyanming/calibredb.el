@@ -511,7 +511,7 @@ Argument BOOK-ALIST ."
                     " "))
            (calibredb-format-icons-in-terminal
             (concat (if (fboundp 'icons-in-terminal-icon-for-file)
-                        (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
+                        (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path) :v-adjust 0 :height 1) "")
                     " "))
            (t ""))
      (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face)) calibredb-id-width :left)
