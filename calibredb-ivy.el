@@ -51,7 +51,10 @@
        ("m" (lambda (candidate)
               (mail-add-attachment (calibredb-getattr (cdr candidate) :file-path))) "Mail add attachment")
        ("i" (lambda (candidate)
-              (org-insert-link nil (calibredb-getattr (cdr candidate) :file-path) (calibredb-getattr (cdr candidate) :book-title))) "Insert an org link"))))
+              (unless (featurep 'org)
+                (require 'org))
+              (if (fboundp 'org-insert-link)
+                  (org-insert-link nil (calibredb-getattr (cdr candidate) :file-path) (calibredb-getattr (cdr candidate) :book-title)) )) "Insert an org link"))))
 
 
 (defun calibredb-counsel-add-file-action (file)

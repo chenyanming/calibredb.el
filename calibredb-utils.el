@@ -80,8 +80,10 @@
     (when (buffer-live-p occur-buf)
       (switch-to-buffer-other-window occur-buf)
       (read-only-mode)
-      (require 'org)
-      (org-mode)
+      (unless (featurep 'org)
+        (require 'org))
+      (if (fboundp 'org-mode)
+          (org-mode))
       (goto-char (point-min)))))
 
 (defun calibredb-open-with-default-tool (filepath)
