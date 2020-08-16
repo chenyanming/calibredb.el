@@ -62,7 +62,8 @@
     ("r" "Refresh Library"   calibredb-search-refresh)]
    [("n" "Next Library"   calibredb-library-next)
     ("p" "Previous Library"   calibredb-library-previous)
-    ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]])
+    ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]]
+  [("q" "Quit"   transient-quit-one)])
 
 (define-transient-command calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
@@ -76,7 +77,8 @@
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
     ("." "Open dired"  calibredb-open-dired)]
-   [("e" "Export" calibredb-export-dispatch)]])
+   [("e" "Export" calibredb-export-dispatch)]]
+  [("q" "Quit"   transient-quit-one)])
 
 (define-transient-command calibredb-set-metadata-dispatch ()
   "Dispatch for set-metadata."
@@ -107,7 +109,8 @@
    ["Set metadata"
     ("s" "Set metadata"         calibredb-set-metadata--transient)
     ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
-    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]])
+    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]]
+  [("q" "Quit"   transient-quit-one)])
 
 (define-transient-command calibredb-export-dispatch ()
   "Dispatch for export."
@@ -126,7 +129,8 @@
    ("-l" "Convert paths to lowercase." "--to-lowercase")
    ("-A" "Export all books in database, ignoring the list of ids" "--all")]
   [["Export"
-    ("e" "Export"         calibredb-export)]])
+    ("e" "Export"         calibredb-export)]]
+  [("q" "Quit"   transient-quit-one)])
 
 (define-transient-command calibredb-catalog-bib-dispatch ()
   "Dispatch for catalog BibTex."
@@ -141,7 +145,8 @@
    ("-E" "BibTeX file encoding flag. Default: strict"  "--choose-encoding-configuration " calibredb-transient-read-choose-encoding-configuration)]
   [["Bibtex"
     ("o" "Find BibTex file"         calibredb-find-bib)
-    ("b" "Update BibTex file"         calibredb-catalog-bib--transient)]])
+    ("b" "Update BibTex file"         calibredb-catalog-bib--transient)]]
+  [("q" "Quit"   transient-quit-one)])
 
 (defun calibredb-transient-read-bib-fields (prompt _initial-input _history)
   "TODO: Read a BibTex --fields value.
