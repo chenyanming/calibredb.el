@@ -54,7 +54,10 @@
        "Export"                      'calibredb-export
        "Remove"                      'calibredb-remove
        "Insert an org link"          (lambda (candidate)
-                                       (org-insert-link nil (calibredb-getattr candidate :file-path) (calibredb-getattr candidate :book-title)))
+                                       (unless (featurep 'org)
+                                         (require 'org))
+                                       (if (fboundp 'org-insert-link)
+                                           (org-insert-link nil (calibredb-getattr candidate :file-path) (calibredb-getattr candidate :book-title))))
        "Mail Add attachment"         (lambda (candidate)
                                        (mail-add-attachment (calibredb-getattr candidate :file-path)))))
   "Default actions for calibredb helm."
