@@ -47,8 +47,9 @@
 (declare-function pdf-info-search-string "pdf-info")
 (declare-function pdf-info-gettext "pdf-info")
 (declare-function djvu-find-file "djvu")
-(declare-function djvu-ref "djvu")
 (declare-function djvu-next-page "djvu")
+
+(defvar djvu-doc-page)
 
 ;;;###autoload
 (defun calibredb-list ()
@@ -491,11 +492,11 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
 This function requires the djvu (djvu.el) package to be installed.
 Scan for isbn from the first 9 pages of the djvu file."
   (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-  (let* ((match (let ((page (djvu-ref page) )
+  (let* ((match (let ((page djvu-doc-page)
                       (match nil))
                   (while (not (or match (eq page 10)))
                     (djvu-next-page 1)
-                    (setq page (djvu-ref page) )
+                    (setq page djvu-doc-page)
                     (when (re-search-forward "^.*isbn.*$" nil t) (setq match t)))
                   (print match))))
     (let ((isbn-line ""))
