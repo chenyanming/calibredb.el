@@ -28,7 +28,7 @@
 
 ;; Transient dispatch
 
-(define-transient-command calibredb-dispatch ()
+(transient-define-prefix calibredb-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-search*."
   :man-page "calibredb"
   ["Metadata"
@@ -65,7 +65,7 @@
     ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]]
   [("q" "Quit"   transient-quit-one)])
 
-(define-transient-command calibredb-entry-dispatch ()
+(transient-define-prefix calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
   :man-page "calibredb"
   ["Metadata"
@@ -80,7 +80,7 @@
    [("e" "Export" calibredb-export-dispatch)]]
   [("q" "Quit"   transient-quit-one)])
 
-(define-transient-command calibredb-set-metadata-dispatch ()
+(transient-define-prefix calibredb-set-metadata-dispatch ()
   "Dispatch for set-metadata."
   ["Arguments"
    ("-a" "author_sort"  "author_sort:" calibredb-transient-read-metadata-author-sort)
@@ -112,7 +112,7 @@
     ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]]
   [("q" "Quit"   transient-quit-one)])
 
-(define-transient-command calibredb-export-dispatch ()
+(transient-define-prefix calibredb-export-dispatch ()
   "Dispatch for export."
   ["Arguments"
    ("-a" "Do not convert non English characters for the file names"  "--dont-asciiize")
@@ -132,7 +132,7 @@
     ("e" "Export"         calibredb-export)]]
   [("q" "Quit"   transient-quit-one)])
 
-(define-transient-command calibredb-catalog-bib-dispatch ()
+(transient-define-prefix calibredb-catalog-bib-dispatch ()
   "Dispatch for catalog BibTex."
   ["Arguments"
    ("-f" "The fields (comma-separated) to output. Default: all" "--fields " calibredb-transient-read-bib-fields)
@@ -195,79 +195,7 @@ Argument PROMPT prompt to show."
 Argument PROMPT prompt to show."
   (expand-file-name (read-file-name prompt)))
 
-(defun calibredb-transient-read-metadata-tags (prompt _initial-input _history)
-  "Read metadata - tags.
-Argument PROMPT prompt to show."
-  (let ((cand))
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
-    (let ((last-input))
-        (let* ((title (calibredb-getattr cand :book-title))
-               (id (calibredb-getattr cand :id))
-               (init (calibredb-get-init "tags" cand))
-               (num (length (calibredb-find-marked-candidates)))
-               (input (or last-input (read-string (if (> num 0)
-                                                      (concat "Set tags for " (number-to-string num) " items: ")
-                                                    (concat prompt id " " title ": ") ) init))))
-          ;; set the input as last input, so that all items use the same input
-          (setq last-input input)))))
-
-(defun calibredb-transient-read-metadata-comments (prompt _initial-input _history)
-  "Read metadata - comments.
-Argument PROMPT prompt to show."
-  (let ((cand))
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
-    (let ((last-input))
-      (let* ((title (calibredb-getattr cand :book-title))
-             (id (calibredb-getattr cand :id))
-             (init (calibredb-get-init "comments" cand))
-             (num (length (calibredb-find-marked-candidates)))
-             (input (or last-input (read-string (if (> num 0)
-                                                    (concat "Set comments for " (number-to-string num) " items: ")
-                                                  (concat prompt id " " title ": ") ) init))))
-        ;; set the input as last input, so that all items use the same input
-        (setq last-input input)))))
-
-(defun calibredb-transient-read-metadata-author-sort (prompt _initial-input _history)
-  "Read metadata - author_sort.
-Argument PROMPT prompt to show."
-  (let ((cand))
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
-    (let ((last-input))
-      (let* ((title (calibredb-getattr cand :book-title))
-             (id (calibredb-getattr cand :id))
-             (init (calibredb-get-init "author_sort" cand))
-             (num (length (calibredb-find-marked-candidates)))
-             (input (or last-input (read-string (if (> num 0)
-                                                    (concat "Set author_sort for " (number-to-string num) " items: ")
-                                                  (concat prompt id " " title ": ") ) init))))
-        ;; set the input as last input, so that all items use the same input
-        (setq last-input input)))))
-
-(defun calibredb-transient-read-metadata-authors (prompt _initial-input _history)
-  "Read metadata - authors.
-Argument PROMPT prompt to show."
-  (let ((cand))
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq cand (get-text-property (point-min) 'calibredb-entry nil)))
-    (let ((last-input))
-      (let* ((title (calibredb-getattr cand :book-title))
-             (id (calibredb-getattr cand :id))
-             (init (calibredb-get-init "authors" cand))
-             (num (length (calibredb-find-marked-candidates)))
-             (input (or last-input (read-string (if (> num 0)
-                                                    (concat "Set authors for " (number-to-string num) " items: ")
-                                                  (concat prompt id " " title ": ") ) init))))
-        ;; set the input as last input, so that all items use the same input
-        (setq last-input input)))))
-
-(defun calibredb-transient-read-metadata-title (prompt _initial-input _history)
+(defun calibredb-transient-read-metadata (prompt _initial-input _history type)
   "Read metadata - title.
 Argument PROMPT prompt to show."
   (let ((cand))
@@ -277,13 +205,28 @@ Argument PROMPT prompt to show."
     (let ((last-input))
       (let* ((title (calibredb-getattr cand :book-title))
              (id (calibredb-getattr cand :id))
-             (init (calibredb-get-init "title" cand))
+             (init (calibredb-get-init type cand))
              (num (length (calibredb-find-marked-candidates)))
              (input (or last-input (read-string (if (> num 0)
-                                                    (concat "Set title for " (number-to-string num) " items: ")
+                                                    (concat "Set " type " for " (number-to-string num) " items: ")
                                                   (concat prompt id " " title ": ") ) init))))
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
+
+(defun calibredb-transient-read-metadata-tags (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "tags"))
+
+(defun calibredb-transient-read-metadata-comments (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "comments"))
+
+(defun calibredb-transient-read-metadata-author-sort (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "author_sort"))
+
+(defun calibredb-transient-read-metadata-authors (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "authors"))
+
+(defun calibredb-transient-read-metadata-title (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "title"))
 
 ;; Get
 
