@@ -379,7 +379,7 @@ Argument EVENT mouse event."
     (cond ((get-buffer "*calibredb-entry*")
            (kill-buffer "*calibredb-entry*"))
           ((get-buffer "*calibredb-search*")
-            (kill-buffer "*calibredb-search*")))))
+           (kill-buffer "*calibredb-search*")))))
 
 (defun calibredb-mark-at-point ()
   "Mark the current line."
