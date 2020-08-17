@@ -46,6 +46,11 @@
 (declare-function calibredb-set-metadata-arguments "calibredb-transient.el")
 (declare-function calibredb-export-arguments "calibredb-transient.el")
 (declare-function calibredb-catalog-bib-arguments "calibredb-transient.el")
+(declare-function pdf-info-search-string "pdf-info")
+(declare-function pdf-info-gettext "pdf-info")
+(declare-function djvu-find-file "djvu")
+(declare-function djvu-ref "djvu")
+(declare-function djvu-next-page "djvu")
 
 ;;;###autoload
 (defun calibredb-list ()
