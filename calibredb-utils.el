@@ -27,8 +27,6 @@
 (require 'calibredb-show)
 (require 'calibredb-transient)
 (require 'calibredb-annotation)
-(require 'pdf-tools nil t)
-(require 'djvu nil t)
 
 (eval-when-compile (defvar calibredb-search-entries))
 (eval-when-compile (defvar calibredb-full-entries))
@@ -87,7 +85,10 @@
     (when (buffer-live-p occur-buf)
       (switch-to-buffer-other-window occur-buf)
       (read-only-mode)
-      (org-mode)
+      (unless (featurep 'org)
+        (require 'org))
+      (if (fboundp 'org-mode)
+          (org-mode))
       (goto-char (point-min)))))
 
 (defun calibredb-open-with-default-tool (filepath)
@@ -457,6 +458,7 @@ Argument PROPS are the additional parameters."
   "Invoke from calibre-search buffer.
 This function requires the pdf-tools (pdf-tools.el) to be installed.
 Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf file."
+  (require 'pdf-tools nil t)
   (if (eq major-mode 'calibredb-search-mode)
       (let (isbn-line
             ;; (isbn "")
@@ -700,8 +702,7 @@ Optional argument ARG."
                                           authors
                                           title
                                           (cond ((calibredb-auto-detect-isbn))
-                                                ("")))))))
-         (id (calibredb-getattr candidate :id)))
+                                                (""))))))))
     (cond (metadata
            (mapc (lambda (x)
                    (calibredb-command :command "set_metadata"
