@@ -50,13 +50,11 @@ For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer
 * Configuration
 
 ** Quick Start
-
+*** require
 #+BEGIN_SRC emacs-lisp
 (require 'calibredb)
-(setq sql-sqlite-program "/usr/bin/sqlite3")
 (setq calibredb-root-dir "~/OneDrive/Doc/Calibre")
 (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-(setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 (setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
                                 ("/Users/damonchan/Documents/Books Library")
                                 ("/Users/damonchan/Documents/HELLO")
@@ -64,27 +62,27 @@ For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer
                                 ("/Users/damonchan/Documents/World")))
 #+END_SRC
 
-** use-package!
-Here is the example in Doom Emacs.
+PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
 
 #+BEGIN_SRC emacs-lisp
-(use-package! calibredb
+(setq sql-sqlite-program "/usr/bin/sqlite3")
+(setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
+#+END_SRC
+
+*** use-package
+
+#+BEGIN_SRC emacs-lisp
+(use-package calibredb
   :defer t
   :init
   (autoload 'calibredb "calibredb")
-  (map! :leader (:desc "calibredb" :n "ac" #'calibredb))
   :config
   (setq calibredb-root-dir "~/OneDrive/Org/Doc/Calibre")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
   (setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre")
                                   ("~/Documents/Books Library")
                                   ("~/Documents/LIB1")
-                                  ("/Volumes/ShareDrive/Documents/Library/")))
-  (setq calibredb-format-icons-in-terminal t)
-  (setq calibredb-comment-width -1)
-  (setq calibredb-title-width 60)
-  (setq calibredb-id-width 0)
-  (setq calibredb-fetch-metadata-source-list '("Google" "Amazon.com" "Douban Books")))
+                                  ("/Volumes/ShareDrive/Documents/Library/"))))
 #+END_SRC
 
 ** Configure to support org-ref
