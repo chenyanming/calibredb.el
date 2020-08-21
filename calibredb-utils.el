@@ -421,12 +421,12 @@ Argument PROPS are the additional parameters."
         (calibredb-command :command "set_metadata"
                            :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
                            :id id
-                           :library (format "--library-path \"%s\"" calibredb-root-dir))
-        (cond ((equal major-mode 'calibredb-show-mode)
-               (calibredb-show-refresh))
-              ((eq major-mode 'calibredb-search-mode)
-               (calibredb-search-refresh-or-resume))
-              (t nil))))))
+                           :library (format "--library-path \"%s\"" calibredb-root-dir))))
+    (cond ((equal major-mode 'calibredb-show-mode)
+           (calibredb-show-refresh))
+          ((eq major-mode 'calibredb-search-mode)
+           (calibredb-search-refresh-or-resume))
+          (t nil))))
 
 (defun calibredb-find-candidate-at-point ()
   "Find candidate at point and return the list."
