@@ -33,6 +33,7 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 ** Related package
 - toc-mode (easily manage pdf/djvu document's Table Of Contents)
+- centaur-tabs/awesome-tab (Enable tab in emacs, turn eamcs into a modern multiple tabs pdf/epub reader.)
 
 * Installation
 
