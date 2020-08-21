@@ -312,6 +312,8 @@ Indicating the library you use."
   (hl-line-mode)
   (if (boundp 'ivy-sort-matches-functions-alist)
       (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date)))
+  (if (boundp 'ivy-alt-done-functions-alist)
+      (add-to-list 'ivy-alt-done-functions-alist '(calibredb-add . ivy--directory-done)))
   (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
 
 (defun calibredb-search-mouse (event)
