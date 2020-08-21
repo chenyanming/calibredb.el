@@ -225,7 +225,7 @@ Others: Add only one item."
                      (counsel--find-file-1
                       "Add file(s) to calibredb: " calibredb-download-dir
                       #'calibredb-counsel-add-file-action
-                      'counsel-find-file)))))
+                      'calibredb-add)))))
         (t (let ((file (calibredb-complete-file-quote "Add a file to Calibre")))
              (calibredb-command :command "add"
                                 :input file
