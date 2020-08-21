@@ -64,6 +64,29 @@ For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer
                                 ("/Users/damonchan/Documents/World")))
 #+END_SRC
 
+** use-package!
+Here is the example in Doom Emacs.
+
+#+BEGIN_SRC emacs-lisp
+(use-package! calibredb
+  :defer t
+  :init
+  (autoload 'calibredb "calibredb")
+  (map! :leader (:desc "calibredb" :n "ac" #'calibredb))
+  :config
+  (setq calibredb-root-dir "~/OneDrive/Org/Doc/Calibre")
+  (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
+  (setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre")
+                                  ("~/Documents/Books Library")
+                                  ("~/Documents/LIB1")
+                                  ("/Volumes/ShareDrive/Documents/Library/")))
+  (setq calibredb-format-icons-in-terminal t)
+  (setq calibredb-comment-width -1)
+  (setq calibredb-title-width 60)
+  (setq calibredb-id-width 0)
+  (setq calibredb-fetch-metadata-source-list '("Google" "Amazon.com" "Douban Books")))
+#+END_SRC
+
 ** Configure to support org-ref
 You can output a BibTex file which can be used in org-ref.
 #+BEGIN_SRC emacs-lisp
