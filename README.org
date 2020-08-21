@@ -263,7 +263,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
    - Perform remove action as shown in the menu.
 
-PS: In case of wrong deletion, you can only delete one file each time.
+PS: If you want to delete in bulk with marked items, use ~calibredb-remove-marked-items~ instead.
 
 ** How to switch to different library?
 First, set =calibredb-library-alist= to include the calibre libraries.
@@ -548,9 +548,17 @@ M-x calibredb-add-dir
 #+END_SRC
 
 ** remove
-Remove an item.
 
-PS: In case of wrong deletion, you can only delete one file each time.
+To remove an item, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-remove
+#+END_SRC
+
+To remove the marked items, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-remove-marked-items
+#+END_SRC
+
 
 ** show_metadata
 

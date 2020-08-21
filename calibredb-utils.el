@@ -299,6 +299,23 @@ Optional argument CANDIDATE is the selected item."
           ((eq major-mode 'calibredb-search-mode)
            (calibredb-search-refresh-or-resume)))))
 
+(defun calibredb-remove-marked-items ()
+  "Remove the marked item(s).
+Optional argument CANDIDATE is the marked item(s)."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (dolist (cand candidates)
+      (let ((id (calibredb-getattr cand :id))
+            (title (calibredb-getattr cand :book-title)))
+        (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
+            (calibredb-command :command "remove"
+                               :id id
+                               :library (format "--library-path %s" (calibredb-root-dir-quote))))))
+    (if (eq major-mode 'calibredb-search-mode)
+     (calibredb-search-refresh-or-resume))))
+
 (defun calibredb-remove-format (&optional candidate)
   "Remove the slected format.
 Optional argument CANDIDATE is the selected item."
