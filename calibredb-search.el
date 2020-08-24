@@ -201,6 +201,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (file (calibredb-getattr entry :file-path))
          (cover (concat (file-name-directory file) "cover.jpg"))
          (format (calibredb-getattr entry :book-format))
+         (size (calibredb-getattr entry :size))
          (ids (calibredb-getattr entry :ids))
          (original (point))
          (file-map (make-sparse-keymap))
@@ -225,6 +226,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
                                                        'mouse-face 'calibredb-mouse-face
                                                        'help-echo file
                                                        'keymap file-map)))
+        (insert (format "size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
         (cond ((equal calibredb-entry-render-comments "face")
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
               ((equal calibredb-entry-render-comments "shr")
