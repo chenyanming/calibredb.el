@@ -216,6 +216,8 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
         (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
         (insert (format "Ids         %s\n" (propertize ids 'face 'calibredb-ids-face)))
+        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
+        (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
         (cond ((equal calibredb-entry-render-comments "face")
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
               ((equal calibredb-entry-render-comments "shr")
@@ -234,8 +236,6 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
                (insert "\n\n"))
               (t
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))))
-        (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
-        (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
         (insert "\n")
         (if (image-type-available-p (intern format))
             (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
