@@ -84,6 +84,15 @@
   "Face used for tag."
   :group 'calibredb-faces)
 
+(defface calibredb-ids-face
+  '((((class color) (background light))
+     :foreground "#8b94a5")
+    (((class color) (background dark))
+     :foreground "#EBCB8B")
+    (t :inherit default))
+  "Face used for ids."
+  :group 'calibredb-faces)
+
 (defface calibredb-size-face
   '((((class color) (background light))
      :foreground "#8b94a5")

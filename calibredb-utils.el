@@ -346,7 +346,8 @@ Argument CAND is the candidate."
         ((equal name "author_sort") (calibredb-getattr cand :author-sort))
         ((equal name "authors") (calibredb-getattr cand :author-sort))
         ((equal name "title") (calibredb-getattr cand :book-title))
-        ((equal name "id") (calibredb-getattr cand :id))))
+        ((equal name "id") (calibredb-getattr cand :id))
+        ((equal name "ids") (calibredb-getattr cand :ids))))
 
 (defun calibredb-set-metadata (name &rest props)
   "Set metadata on file NAME on marked candidates.

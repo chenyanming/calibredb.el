@@ -87,7 +87,7 @@
    ("-A" "authors"  "authors:" calibredb-transient-read-metadata-authors)
    ("-c" "comments"  "comments:" calibredb-transient-read-metadata-comments)
    ("-C" "cover" "cover:" calibredb-transient-read-file)
-   ("-i" "identifiers"  "identifiers:" read-string)
+   ("-i" "identifiers"  "identifiers:" calibredb-transient-read-metadata-ids)
    ("-l" "languages"  "languages:" read-string)
    ("-p" "pubdate" "pubdate:" transient-read-date)
    ("-P" "publisher" "publisher:" read-string)
@@ -215,6 +215,9 @@ Argument PROMPT prompt to show."
 
 (defun calibredb-transient-read-metadata-tags (prompt _initial-input _history)
   (calibredb-transient-read-metadata prompt _initial-input _history "tags"))
+
+(defun calibredb-transient-read-metadata-ids (prompt _initial-input _history)
+  (calibredb-transient-read-metadata prompt _initial-input _history "ids"))
 
 (defun calibredb-transient-read-metadata-comments (prompt _initial-input _history)
   (calibredb-transient-read-metadata prompt _initial-input _history "comments"))

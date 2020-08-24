@@ -159,6 +159,13 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
+(defcustom calibredb-ids-width -1
+  "Width for ids.
+Set 0 to hide,
+Set negative to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
 (defcustom calibredb-title-width 50
   "Width for title.
 Set 0 to hide,
@@ -236,7 +243,7 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'string)
 
-(defvar calibredb-query-string "
+(defvar calibredb-query-string-old "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
   (SELECT sub2.id, sub2.author_sort, sub2.path, sub2.name, sub2.format, sub2.pubdate, sub2.title, sub2.tag, sub2.uncompressed_size, comments.text, sub2.last_modified
@@ -256,6 +263,44 @@ FROM
     LEFT OUTER JOIN comments
     ON sub2.id = comments.book)
 GROUP BY id, format"
+  "TODO calibre database query statement.")
+
+(defvar calibredb-query-string "
+WITH LEVEL1 AS (
+    SELECT books.id, books.author_sort, books.path, data.name, data.format, books.pubdate, books.title, books.last_modified, data.uncompressed_size
+    FROM data
+    LEFT OUTER JOIN books
+    ON data.book = books.id
+), LEVEL2 AS (
+    SELECT LEVEL1.id, LEVEL1.author_sort, LEVEL1.path, LEVEL1.name, LEVEL1.format, LEVEL1.pubdate, LEVEL1.title, LEVEL1.last_modified, LEVEL1.uncompressed_size, books_tags_link.tag
+    FROM LEVEL1
+    LEFT OUTER JOIN books_tags_link
+    ON LEVEL1.id = books_tags_link.book
+), LEVEL3 AS (
+    SELECT LEVEL2.id, LEVEL2.author_sort, LEVEL2.path, LEVEL2.name, LEVEL2.format, LEVEL2.pubdate, LEVEL2.title, LEVEL2.last_modified, tags.name AS tag, LEVEL2.uncompressed_size
+    FROM LEVEL2
+    LEFT OUTER JOIN tags
+    ON LEVEL2.tag = tags.id
+), LEVEL4 AS (
+    SELECT LEVEL3.id, LEVEL3.author_sort, LEVEL3.path, LEVEL3.name, LEVEL3.format, LEVEL3.pubdate, LEVEL3.title, LEVEL3.tag, LEVEL3.uncompressed_size, comments.text, LEVEL3.last_modified
+    FROM LEVEL3
+    LEFT OUTER JOIN comments
+    ON LEVEL3.id = comments.book
+), LEVEL5 AS (
+    SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
+    FROM LEVEL4
+    GROUP BY id, format
+), LEVEL6 AS (
+    SELECT LEVEL5.id, LEVEL5.author_sort, LEVEL5.path, LEVEL5.name, LEVEL5.format, LEVEL5.pubdate, LEVEL5.title, LEVEL5.tag, LEVEL5.uncompressed_size, LEVEL5.text, LEVEL5.last_modified, identifiers.type, identifiers.val
+    FROM LEVEL5
+    LEFT OUTER JOIN identifiers
+    ON identifiers.book = LEVEL5.id
+)
+
+SELECT id, author_sort, path, name, format, pubdate, title, tag, uncompressed_size, text, group_concat(type || ':' || val) AS ids, last_modified
+FROM LEVEL6
+GROUP BY id"
+
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)
@@ -351,7 +396,8 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:comment                ,(format "%s"
                                             (if (not (nth 9 spl-query-result))
                                                 ""
-                                              (nth 9 spl-query-result))))))))
+                                              (nth 9 spl-query-result))))
+          (:ids                    ,(nth 10 spl-query-result))))))
 
 (defun calibredb-getattr (my-alist key)
   "Get the attribute.
@@ -390,6 +436,12 @@ ALIGN should be a keyword :left or :right."
   (if calibredb-detial-view
       -1
     calibredb-tag-width))
+
+(defun calibredb-ids-width ()
+  "Return the ids width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-ids-width))
 
 (defun calibredb-author-width ()
   "Return the author width base on the view."
@@ -481,6 +533,7 @@ Argument BOOK-ALIST ."
         (tag (calibredb-getattr (list book-alist) :tag))
         (comment (calibredb-getattr (list book-alist) :comment))
         (size (calibredb-getattr (list book-alist) :size))
+        (ids (calibredb-getattr (list book-alist) :ids))
         (favorite-map (make-sparse-keymap))
         (tag-map (make-sparse-keymap))
         (format-map (make-sparse-keymap))
@@ -502,9 +555,10 @@ Argument BOOK-ALIST ."
             (calibredb-format-column (format "%sFormat:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sAuthor:" (make-string num ? ))  (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sTag:" (make-string num ? )) (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sIds:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sComment:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sSize:" (make-string num ? )) (+ 8 num) :left) "%s"))
-       "%s%s%s %s %s (%s) %s %s")
+       "%s%s%s %s %s (%s) %s %s %s")
      (cond (calibredb-format-all-the-icons
             (concat (if (fboundp 'all-the-icons-icon-for-file)
                         (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
@@ -544,6 +598,7 @@ Argument BOOK-ALIST ."
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this tag"
                                           'keymap tag-map) (calibredb-tag-width) :left)
+     (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)
          (calibredb-format-column (propertize (if calibredb-condense-comments
                                                   (calibredb-condense-comments comment)
