@@ -203,9 +203,12 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (format (calibredb-getattr entry :book-format))
          (ids (calibredb-getattr entry :ids))
          (original (point))
+         (file-map (make-sparse-keymap))
          beg end)
     (let ((inhibit-read-only t) c-beg c-end)
       (with-current-buffer buff
+        (define-key file-map [mouse-1] 'calibredb-file-mouse-1)
+        (define-key file-map [mouse-3] 'calibredb-file-mouse-3)
         (erase-buffer)
         (setq beg (point))
         ;; (insert (propertize (calibredb-show-metadata entry) 'calibredb-entry entry))
@@ -217,7 +220,11 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
         (insert (format "Ids         %s\n" (propertize ids 'face 'calibredb-ids-face)))
         (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
-        (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
+        (insert (format "File        %s\n" (propertize file
+                                                       'face 'calibredb-file-face
+                                                       'mouse-face 'calibredb-mouse-face
+                                                       'help-echo file
+                                                       'keymap file-map)))
         (cond ((equal calibredb-entry-render-comments "face")
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
               ((equal calibredb-entry-render-comments "shr")
@@ -448,7 +455,7 @@ Argument EVENT mouse event."
   (let ((window (posn-window (event-end event)))
         (pos (posn-point (event-end event))))
     (if (not (windowp window))
-        (error "No favorite chosen"))
+        (error "No tag chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
       (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
@@ -460,7 +467,7 @@ Argument EVENT mouse event."
   (let ((window (posn-window (event-end event)))
         (pos (posn-point (event-end event))))
     (if (not (windowp window))
-        (error "No favorite chosen"))
+        (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
       (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
@@ -472,10 +479,33 @@ Argument EVENT mouse event."
   (let ((window (posn-window (event-end event)))
         (pos (posn-point (event-end event))))
     (if (not (windowp window))
-        (error "No favorite chosen"))
+        (error "No format chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
       (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+
+
+(defun calibredb-file-mouse-1 (event)
+  "Visit the file click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No ebook chosen"))
+    (with-current-buffer (window-buffer window)
+      (find-file-other-window (get-text-property pos 'help-echo nil)))))
+
+(defun calibredb-file-mouse-3 (event)
+  "Visit the file click on in default tool.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No ebook chosen"))
+    (with-current-buffer (window-buffer window)
+      (calibredb-open-with-default-tool (get-text-property pos 'help-echo nil)))))
 
 ;; favorite
 
