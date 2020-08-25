@@ -106,6 +106,18 @@
   "Face for the publish date."
   :group 'calibredb-faces)
 
+(defface calibredb-publisher-face '((t :inherit default))
+  "Face for the publisher."
+  :group 'calibredb-faces)
+
+(defface calibredb-series-face '((t :inherit default))
+  "Face for the series."
+  :group 'calibredb-faces)
+
+(defface calibredb-language-face '((t :inherit default))
+  "Face for the language."
+  :group 'calibredb-faces)
+
 (defface calibredb-file-face
   '((((class color) (background light))
      :foreground "#29838D")

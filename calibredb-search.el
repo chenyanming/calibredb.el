@@ -203,6 +203,9 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (format (calibredb-getattr entry :book-format))
          (size (calibredb-getattr entry :size))
          (ids (calibredb-getattr entry :ids))
+         (publisher (calibredb-getattr entry :publisher))
+         (series (calibredb-getattr entry :series))
+         (lang_code (calibredb-getattr entry :lang_code))
          (original (point))
          (file-map (make-sparse-keymap))
          beg end)
@@ -221,12 +224,16 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
         (insert (format "Ids         %s\n" (propertize ids 'face 'calibredb-ids-face)))
         (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
+        (insert (format "Publisher   %s\n" (propertize publisher 'face 'calibredb-publisher-face)))
+        (insert (format "Series      %s\n" (propertize series 'face 'calibredb-series-face)))
+        (insert (format "Language    %s\n" (propertize lang_code 'face 'calibredb-language-face)))
         (insert (format "File        %s\n" (propertize file
                                                        'face 'calibredb-file-face
                                                        'mouse-face 'calibredb-mouse-face
                                                        'help-echo file
                                                        'keymap file-map)))
-        (insert (format "size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
+        (insert (format "Format      %s\n" (propertize format 'face 'calibredb-format-face)))
+        (insert (format "Size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
         (cond ((equal calibredb-entry-render-comments "face")
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
               ((equal calibredb-entry-render-comments "shr")

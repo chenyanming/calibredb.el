@@ -266,41 +266,51 @@ GROUP BY id, format"
   "TODO calibre database query statement.")
 
 (defvar calibredb-query-string "
-WITH LEVEL1 AS (
-    SELECT books.id, books.author_sort, books.path, data.name, data.format, books.pubdate, books.title, books.last_modified, data.uncompressed_size
+WITH d AS (
+    SELECT *
     FROM data
-    LEFT OUTER JOIN books
-    ON data.book = books.id
-), LEVEL2 AS (
-    SELECT LEVEL1.id, LEVEL1.author_sort, LEVEL1.path, LEVEL1.name, LEVEL1.format, LEVEL1.pubdate, LEVEL1.title, LEVEL1.last_modified, LEVEL1.uncompressed_size, books_tags_link.tag
-    FROM LEVEL1
-    LEFT OUTER JOIN books_tags_link
-    ON LEVEL1.id = books_tags_link.book
-), LEVEL3 AS (
-    SELECT LEVEL2.id, LEVEL2.author_sort, LEVEL2.path, LEVEL2.name, LEVEL2.format, LEVEL2.pubdate, LEVEL2.title, LEVEL2.last_modified, tags.name AS tag, LEVEL2.uncompressed_size
-    FROM LEVEL2
-    LEFT OUTER JOIN tags
-    ON LEVEL2.tag = tags.id
-), LEVEL4 AS (
-    SELECT LEVEL3.id, LEVEL3.author_sort, LEVEL3.path, LEVEL3.name, LEVEL3.format, LEVEL3.pubdate, LEVEL3.title, LEVEL3.tag, LEVEL3.uncompressed_size, comments.text, LEVEL3.last_modified
-    FROM LEVEL3
-    LEFT OUTER JOIN comments
-    ON LEVEL3.id = comments.book
-), LEVEL5 AS (
-    SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
-    FROM LEVEL4
-    GROUP BY id, format
-), LEVEL6 AS (
-    SELECT LEVEL5.id, LEVEL5.author_sort, LEVEL5.path, LEVEL5.name, LEVEL5.format, LEVEL5.pubdate, LEVEL5.title, LEVEL5.tag, LEVEL5.uncompressed_size, LEVEL5.text, LEVEL5.last_modified, identifiers.type, identifiers.val
-    FROM LEVEL5
-    LEFT OUTER JOIN identifiers
-    ON identifiers.book = LEVEL5.id
+), t AS (
+    SELECT books_tags_link.book, group_concat(DISTINCT tags.name) AS tag
+    FROM books_tags_link
+    LEFT JOIN tags
+    ON books_tags_link.tag = tags.id
+    GROUP BY books_tags_link.book
+), p AS (
+    SELECT books_publishers_link.book, publishers.name
+    FROM books_publishers_link
+    LEFT JOIN publishers
+    ON books_publishers_link.publisher = publishers.id
+), s AS (
+    SELECT books_series_link.book, series.name
+    FROM books_series_link
+    LEFT JOIN series
+    ON books_series_link.series = series.id
+), l AS (
+    SELECT books_languages_link.book, languages.lang_code
+    FROM books_languages_link
+    LEFT JOIN languages
+    ON books_languages_link.lang_code = languages.id
+), b AS (
+    SELECT *
+    FROM books
 )
-
-SELECT id, author_sort, path, name, format, pubdate, title, tag, uncompressed_size, text, group_concat(type || ':' || val) AS ids, last_modified
-FROM LEVEL6
-GROUP BY id"
-
+SELECT d.book, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, t.tag, d.uncompressed_size, c.text, group_concat(i.type || ':' || i.val) AS ids, p.name AS publisher, s.name AS series, l.lang_code, b.last_modified
+FROM d
+LEFT JOIN p
+ON d.book = p.book
+LEFT JOIN s
+ON d.book = s.book
+LEFT JOIN t
+ON d.book = t.book
+LEFT JOIN l
+ON d.book = l.book
+LEFT JOIN comments AS c
+ON d.book = c.book
+LEFT JOIN b
+ON d.book = b.id
+LEFT JOIN identifiers AS i
+ON d.book = i.book
+GROUP BY d.book, d.format"
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)
@@ -391,13 +401,32 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
                                   (file-name-as-directory (nth 2 spl-query-result))
                                   (nth 3 spl-query-result) "." (downcase (nth 4 spl-query-result))))
-          (:tag                    ,(nth 7 spl-query-result))
+          (:tag                    ,(format "%s"
+                                            (if (not (nth 7 spl-query-result))
+                                                ""
+                                              (nth 7 spl-query-result))))
           (:size                   ,(format "%.2f" (/ (string-to-number (nth 8 spl-query-result) ) 1048576.0) ))
           (:comment                ,(format "%s"
                                             (if (not (nth 9 spl-query-result))
                                                 ""
                                               (nth 9 spl-query-result))))
-          (:ids                    ,(nth 10 spl-query-result))))))
+          (:ids                    ,(format "%s"
+                                            (if (not (nth 10 spl-query-result))
+                                                ""
+                                              (nth 10 spl-query-result))))
+          (:publisher              ,(format "%s"
+                                            (if (not (nth 11 spl-query-result))
+                                                ""
+                                              (nth 11 spl-query-result))))
+          (:series                 ,(format "%s"
+                                            (if (not (nth 12 spl-query-result))
+                                                ""
+                                              (nth 12 spl-query-result))))
+          (:lang_code              ,(format "%s"
+                                            (if (not (nth 13 spl-query-result))
+                                                ""
+                                              (nth 13 spl-query-result))))
+          (:last_modified          ,(nth 14 spl-query-result))))))
 
 (defun calibredb-getattr (my-alist key)
   "Get the attribute.
