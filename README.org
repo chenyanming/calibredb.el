@@ -37,13 +37,30 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 * Installation
 
+** Install sqlite and calibre
+
+*** MacOS
+#+BEGIN_SRC sh
+brew install sqlite
+#+END_SRC
+
+Download calibre's DMG file from https://calibre-ebook.com/download_osx, install calibre.app to /Applications
+
+*** Windows
+With chocolatey
+#+BEGIN_SRC sh
+choco intall sqlite calibre
+#+END_SRC
+
+
+** Install calibredb.el
 It's available on [[https://melpa.org/][Melpa]] :
 
 #+BEGIN_SRC emacs-lisp
 M-x package-install calibredb
 #+END_SRC
 
-** Spacemacs
+** Spacemacs Layer
 
 For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer]] implements calibre.el with evilified keybindings
 
