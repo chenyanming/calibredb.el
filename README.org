@@ -439,6 +439,14 @@ change to other filed, please set with the following statement:
 
 Please notice: Due to the limitation of *calibredb*, the blank new lines will be deleted.
 
+** How to search in ebooks directly?
+We wrap ~counsel-ag~ in ~calibredb-rga~, using the power of [[https://github.com/phiresky/ripgrep-all][ripgrep-all]].
+First, install [[https://github.com/phiresky/ripgrep-all][ripgrep-all]],
+then in =*calibredb-search*=, =*calibredb-entry*= buffer or under =pdf-view-mode= / =nov-view-mode=,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-rga
+#+END_SRC
+
 ** More examples?
 Please check
 #+html: <a href="#keybindings">keybindings</a> .
@@ -475,11 +483,12 @@ M-x calibredb-search-live-filter
 Please notice: currently, the filtering is column-oriented, not buffer oriented.
 The following columns will be searched:
 - id
-- text
+- text (comment)
 - tag
 - title
 - format
 - author_sort
+- ids
 
 If the keyword occurs in any of the columns above, the matched ebook record will
 be shown.
@@ -598,9 +607,6 @@ To remove the marked items, call
 M-x calibredb-remove-marked-items
 #+END_SRC
 
-
-** show_metadata
-
 ** set_metadata
 To set metadata,
 #+BEGIN_SRC emacs-lisp
@@ -621,9 +627,21 @@ M-x calibredb-catalog-bib-dispatch
 #+END_SRC
 PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
 
+** calibredb-rga
+Search in ebooks.
+
 * Logs
 
-** 2020-08-09
+** =2020-08-29=
+Version *2.6.0*:
+- Add fields: ids, publisher, series and lang_code.
+- Add: =calibredb-rga=.
+- Add: =calibredb-remove-marked-items=.
+- Improve live filter: support space-separated multiple keywords.
+- Add configuration: =calibredb-show-results=
+- Add configuration: =calibredb-entry-render-comments=
+ 
+** =2020-08-09=
 Version *2.5.0*:
 - Add: =calibredb-fetch-and-set-metadata-by-author-and-title= and =calibredb-fetch-and-set-metadata-by-isbn= (thanks to Daniel Nicolai)
 
