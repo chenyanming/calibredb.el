@@ -36,6 +36,7 @@
 (declare-function calibredb-set-metadata--title "calibredb-utils.el")
 (declare-function calibredb-set-metadata--comments "calibredb-utils.el")
 (declare-function calibredb-show-entry "calibredb-search.el")
+(declare-function calibredb-rga "calibredb-ivy.el")
 
 (defvar calibredb-show-entry nil
   "The entry being displayed in this buffer.")

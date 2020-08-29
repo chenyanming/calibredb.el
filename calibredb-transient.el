@@ -25,6 +25,7 @@
 
 (declare-function calibredb-get-init "calibredb-utils.el")
 (declare-function calibredb-find-marked-candidates "calibredb-utils.el")
+(declare-function calibredb-rga "calibredb-ivy.el")
 
 ;; Transient dispatch
 
