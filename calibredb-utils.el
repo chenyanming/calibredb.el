@@ -643,7 +643,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                               (author-sort (when (cdr (assoc "Authors" no-comments))
                                              (shell-command-to-string (format
                                                                        kovids-magic
-                                                                       calibre-debug-program
+                                                                       calibredb-debug-program
                                                                        (intern (cdr (assoc "Authors" no-comments)))))))
                               (new-comments (when author-sort (append no-comments (list (cons "Author_sort" author-sort))))))
                          (if (nth 1 md-split)

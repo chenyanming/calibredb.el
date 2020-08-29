@@ -103,7 +103,7 @@
   :type 'file
   :group 'calibredb)
 
-(defcustom calibre-debug-program
+(defcustom calibredb-debug-program
   (cond
    ((eq system-type 'darwin)
     "/Applications/calibre.app/Contents/MacOS/calibre-debug")
