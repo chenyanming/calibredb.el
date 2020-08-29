@@ -31,19 +31,12 @@
 (transient-define-prefix calibredb-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-search*."
   :man-page "calibredb"
-  ["Metadata"
-   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ;; ("S" "show_metadata"         calibredb-show-metadata)
-    ]]
-  ["Catalog"
-   [("b" "BibTex"   calibredb-catalog-bib-dispatch)]]
-  ["File operaion"
+  ["File operation"
    [("a" "Add a file"   calibredb-add)
     ("A" "Add a directory"   calibredb-add-dir)
     ("d" "Remove a file"   calibredb-remove)
     ("e" "Export" calibredb-export-dispatch)
-    ("/" "Live Filter" calibredb-search-live-filter)
-    ("i" "Edit Annotation" calibredb-edit-annotation)]
+    ("s" "set_metadata"   calibredb-set-metadata-dispatch)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("v" "View details"  calibredb-view)
@@ -55,7 +48,7 @@
     ("f" "Favorite" calibredb-toggle-favorite-at-point)
     ("h" "Highlight" calibredb-toggle-highlight-at-point)
     ("x" "Archive" calibredb-toggle-archive-at-point)]]
-  ["Library operaion"
+  ["Library operation"
    [("l" "List Libraries"   calibredb-library-list)
     ("S" "Switch library"   calibredb-switch-library)
     ("c" "Clone library"   calibredb-clone)
@@ -63,21 +56,24 @@
    [("n" "Next Library"   calibredb-library-next)
     ("p" "Previous Library"   calibredb-library-previous)
     ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]]
+  ["Other operation"
+   [("b" "BibTex"   calibredb-catalog-bib-dispatch)
+   ("i" "Edit Annotation" calibredb-edit-annotation)]
+   [("'" "Search with rga" calibredb-rga)
+   ("/" "Live Filter" calibredb-search-live-filter)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
   :man-page "calibredb"
-  ["Metadata"
-   [("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ;; ("S" "show_metadata"         calibredb-show-metadata)
-    ]]
   ["File operaion"
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
     ("." "Open dired"  calibredb-open-dired)]
-   [("e" "Export" calibredb-export-dispatch)]]
+   [("e" "Export" calibredb-export-dispatch)
+    ("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ("'" "Search with rga" calibredb-rga)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-set-metadata-dispatch ()
@@ -195,7 +191,7 @@ Argument PROMPT prompt to show."
 Argument PROMPT prompt to show."
   (expand-file-name (read-file-name prompt)))
 
-(defun calibredb-transient-read-metadata (prompt _initial-input _history type)
+(defun calibredb-transient-read-metadata (prompt _initial-input _history &optional type)
   "Read metadata - title.
 Argument PROMPT prompt to show."
   (let ((cand))
@@ -213,23 +209,23 @@ Argument PROMPT prompt to show."
         ;; set the input as last input, so that all items use the same input
         (setq last-input input)))))
 
-(defun calibredb-transient-read-metadata-tags (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "tags"))
+(defun calibredb-transient-read-metadata-tags (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "tags"))
 
-(defun calibredb-transient-read-metadata-ids (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "ids"))
+(defun calibredb-transient-read-metadata-ids (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "ids"))
 
-(defun calibredb-transient-read-metadata-comments (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "comments"))
+(defun calibredb-transient-read-metadata-comments (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "comments"))
 
-(defun calibredb-transient-read-metadata-author-sort (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "author_sort"))
+(defun calibredb-transient-read-metadata-author-sort (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "author_sort"))
 
-(defun calibredb-transient-read-metadata-authors (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "authors"))
+(defun calibredb-transient-read-metadata-authors (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "authors"))
 
-(defun calibredb-transient-read-metadata-title (prompt _initial-input _history)
-  (calibredb-transient-read-metadata prompt _initial-input _history "title"))
+(defun calibredb-transient-read-metadata-title (prompt initial-input history)
+  (calibredb-transient-read-metadata prompt initial-input history "title"))
 
 ;; Get
 

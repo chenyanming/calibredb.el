@@ -50,6 +50,7 @@
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
     (define-key map "." #'calibredb-open-dired)
+    (define-key map "\M-/" #'calibredb-rga)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
     (define-key map "\M-A" #'calibredb-set-metadata--authors)

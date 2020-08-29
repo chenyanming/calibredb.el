@@ -28,6 +28,8 @@
 
 (eval-when-compile (defvar calibredb-search-entries))
 (eval-when-compile (defvar calibredb-full-entries))
+(eval-when-compile (defvar counsel-ag-base-command))
+(declare-function counsel-ag "counsel")
 
 (if (fboundp 'ivy-set-actions)
     (ivy-set-actions
@@ -88,6 +90,32 @@
   (interactive)
   (calibredb-ivy-read))
 
+(defun calibredb-rga ()
+  "Search calibredb with rga, using `counsel-ag'.
+1. In `calibredb-search-mode', search in the `calibredb-root-dir'.
+2. In `calibredb-show-mode', search in the corresponding format under the working directory.
+3. In `pdf-view-mode', search in PDF files under the working directory.
+4. In `nov-mode', search in EPUB files under the working directory."
+  (interactive)
+  (setq-local counsel-ag-base-command "rga --color never --no-heading --smart-case --line-number --with-filename %s")
+  (cond
+   ((eq major-mode 'calibredb-search-mode)
+    (counsel-ag nil calibredb-root-dir nil "Search Calibredb: "))
+   ((eq major-mode 'calibredb-show-mode)
+    (let ((format (calibredb-getattr (car (calibredb-find-candidate-at-point)) :book-format))
+          (path (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)))
+      (cond ((equal format "epub")
+             (counsel-ag nil (file-name-directory path) "--rga-adapters=pandoc" "Search EPUB: "))
+            ((equal format "pdf")
+             (counsel-ag nil (file-name-directory path) "--rga-adapters=poppler" "Search PDF: "))
+            (t
+             (counsel-ag nil (file-name-directory path) nil (concat "Search " format ": "))))))
+   ((eq major-mode 'pdf-view-mode)
+    (counsel-ag nil nil "--rga-adapters=poppler" "Search PDF: "))
+   ((eq major-mode 'nov-mode)
+    (counsel-ag nil nil "--rga-adapters=pandoc" "Search EPUB: "))
+   (t
+    (message (concat "Calibredb-counsel-ag does not support " (symbol-name major-mode))))))
 (provide 'calibredb-ivy)
 
 ;;; calibredb-ivy.el ends here
