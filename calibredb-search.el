@@ -401,7 +401,10 @@ Argument EVENT mouse event."
   (interactive)
   (when (eq major-mode 'calibredb-search-mode)
     (cond ((get-buffer "*calibredb-entry*")
-           (kill-buffer "*calibredb-entry*"))
+           (pop-to-buffer "*calibredb-entry*")
+           (if (< (length (window-prev-buffers)) 2)
+               (kill-buffer-and-window)
+             (kill-buffer)))
           ((get-buffer "*calibredb-search*")
            (kill-buffer "*calibredb-search*")))))
 
