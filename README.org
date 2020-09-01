@@ -49,9 +49,14 @@ Download calibre's DMG file from https://calibre-ebook.com/download_osx, install
 *** Windows
 With chocolatey
 #+BEGIN_SRC sh
-choco intall sqlite calibre
+choco install sqlite calibre
 #+END_SRC
 
+*** Linux
+For example, in Ubuntu 18.04:
+#+BEGIN_SRC sh
+sudo apt install sqlite3 calibre
+#+END_SRC
 
 ** Install calibredb.el
 It's available on [[https://melpa.org/][Melpa]] :
@@ -329,7 +334,7 @@ switch temporarily.
   in bulk. If you do not mark any items, actions will be performed on the item
   under cursor.
 - In =*calibredb-entry*= buffer, press =s= to set metadata.
-- In =*calibredb-search*= buffer, press =s f= to fetch metadata *(requires ivy)* by
+- In =*calibredb-search*= buffer, press =s f= to fetch metadata by
   author and title or =s i= to fetch by ISBN. For fetching by author and title
   enter one (or more) full lastnames of the author(s) (or delete redundant input
   from initial input). For fetching by ISBN enter the ISBN number (usually can
