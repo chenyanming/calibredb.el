@@ -158,22 +158,26 @@ time."
   :type 'boolean)
 
 (defcustom calibredb-detail-view-image-max-width 250
-  "Max Width for images in detail view - *calibredb-search*."
+  "Max Width for images in detail view - *calibredb-search*.
+For emacs 27.1+, if imagemagick is disabled, it would the image width."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-detail-view-image-max-height 250
-  "Max height for images in detail view - *calibredb-search*."
+  "Max height for images in detail view - *calibredb-search*.
+For emacs 27.1+, if imagemagick is disabled, the image height is ignored."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-list-view-image-max-width 500
-  "Max Width for images in list view - *calibredb-list*."
+  "Max Width for images in list view - *calibredb-list*.
+For emacs 27.1+, if imagemagick is disabled, it is the image width."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-list-view-image-max-height 500
-  "Max height for images in list view - *calibredb-list*."
+  "Max height for images in list view - *calibredb-list*.
+For Emacs 27.1+, if imagemagick is disabled, the image height is ignored."
   :group 'calibredb
   :type 'integer)
 

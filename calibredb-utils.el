@@ -137,8 +137,8 @@ Argument FILEPATH is the file path."
                      :max-width width
                      :max-height height))))
    (t
-    ;; `create-image' errors out for unsupported image types
-    (let ((image (ignore-errors (create-image path nil nil :ascent 100))))
+    ;; emacs 27.1
+    (let ((image (ignore-errors (create-image path nil nil :width width :height nil))))
       (if image
           (insert-image image)
         (insert alt))))))
