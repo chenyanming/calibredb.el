@@ -518,9 +518,16 @@ be shown.
 3. Each keyword supports REGEX.
 
 For example, to search Ebooks may contain a tag - *work*, and the format maybe pdf
-or epub. You can insert ~work \(pdf\|epub\)~ in mini buffer. If you set the filter
-keywords in ~calibredb-virtual-library-alist~, you should set ~"work
-\\(pdf\\|epub\\)"~ instead.
+or epub. You can insert ~work \(pdf\|epub\)~ (Notice the single backslash) in mini buffer.
+
+If you set the filter keywords in ~calibredb-virtual-library-alist~, you should
+(Notice the double backslashes):
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+                                        ("2. Read it later" . "Readit epub")
+                                        ("3. Development - rust" . "rust")))
+#+END_SRC
+
 
 Check REGEX https://www.gnu.org/software/emacs/manual/html_node/efaq/Using-regular-expressions.html.
 
