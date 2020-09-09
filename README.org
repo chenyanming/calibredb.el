@@ -26,8 +26,8 @@ This package integrates calibre (using *calibredb*) into emacs.
 3. Fetch metadata from online sources incl. automatic detection of ISBN for pdf
    and djvu files *(automatic detection of ISBN requires pdf-tools and djvu
    package for pdf and djvu files respectively)*
-4. Manage Ebook libraries.
-5. Another bookmarks solution, by setting the tags and comments.
+4. Manage Ebooks' libraries and virtual libraries.
+5. Customized Metadata: Tag, comment, highlight, favorite, archive etc.
 6. Quick search, filter, make actions on items with ivy and helm.
 7. Org-ref support.
 
