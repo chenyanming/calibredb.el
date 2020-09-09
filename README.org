@@ -107,6 +107,16 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
                                   ("/Volumes/ShareDrive/Documents/Library/"))))
 #+END_SRC
 
+** Virtual Libraries
+Virtual libraries are some convenient shortcuts for quick filtering the Ebooks
+by setting the ~calibredb-search-filter~.
+
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work python")
+                                        ("2. Read it later" . "Readit epub")
+                                        ("3. Development - rust" . "rust")))
+#+END_SRC
+
 ** Configure to support org-ref
 You can output a BibTex file which can be used in org-ref.
 #+BEGIN_SRC emacs-lisp
@@ -197,11 +207,15 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "A" #'calibredb-add-dir)
     (define-key map "c" #'calibredb-clone)
     (define-key map "d" #'calibredb-remove)
+    (define-key map "D" #'calibredb-remove-marked-items)
     (define-key map "j" #'calibredb-next-entry)
     (define-key map "k" #'calibredb-previous-entry)
-    (define-key map "l" #'calibredb-library-list)
-    (define-key map "n" #'calibredb-library-next)
-    (define-key map "p" #'calibredb-library-previous)
+    (define-key map "l" #'calibredb-virtual-library-list)
+    (define-key map "L" #'calibredb-library-list)
+    (define-key map "n" #'calibredb-virtual-library-next)
+    (define-key map "N" #'calibredb-library-next)
+    (define-key map "p" #'calibredb-virtual-library-previous)
+    (define-key map "P" #'calibredb-library-previous)
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
@@ -211,8 +225,8 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
-    (define-key map "R" #'calibredb-search-refresh-or-resume)
+    (define-key map "r" #'calibredb-search-clear-filter)
+    (define-key map "R" #'calibredb-search-refresh-and-clear-filter)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "f" #'calibredb-toggle-favorite-at-point)
@@ -636,6 +650,21 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
+** =2020-09-10=
+Version  *2.7.0:*
+- Add feature: Virtual Library
+- Add configuration: =calibredb-virtual-library-alist=
+- Adjust keybindings:
+    #+BEGIN_SRC emacs-lisp
+    (define-key map "l" #'calibredb-virtual-library-list)
+    (define-key map "L" #'calibredb-library-list) ; previous l
+    (define-key map "n" #'calibredb-virtual-library-next)
+    (define-key map "N" #'calibredb-library-next) ; previous n
+    (define-key map "p" #'calibredb-virtual-library-previous)
+    (define-key map "P" #'calibredb-library-previous) ; previous p
+    (define-key map "r" #'calibredb-search-clear-filter)
+    (define-key map "R" #'calibredb-search-refresh-and-clear-filter) ; previous r
+    #+END_SRC
 
 ** =2020-08-29=
 Version *2.6.0*:

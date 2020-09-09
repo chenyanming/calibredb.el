@@ -25,6 +25,7 @@
 
 (eval-when-compile (defvar calibredb-show-entry))
 (eval-when-compile (defvar calibredb-show-entry-switch))
+(eval-when-compile (defvar calibredb-virtual-library-name))
 
 (declare-function calibredb-find-file "calibredb-utils.el")
 (declare-function calibredb-add "calibredb-utils.el")
@@ -89,9 +90,12 @@ When live editing the filter, it is bound to :live.")
     (define-key map "D" #'calibredb-remove-marked-items)
     (define-key map "j" #'calibredb-next-entry)
     (define-key map "k" #'calibredb-previous-entry)
-    (define-key map "l" #'calibredb-library-list)
-    (define-key map "n" #'calibredb-library-next)
-    (define-key map "p" #'calibredb-library-previous)
+    (define-key map "l" #'calibredb-virtual-library-list)
+    (define-key map "L" #'calibredb-library-list)
+    (define-key map "n" #'calibredb-virtual-library-next)
+    (define-key map "N" #'calibredb-library-next)
+    (define-key map "p" #'calibredb-virtual-library-previous)
+    (define-key map "P" #'calibredb-library-previous)
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "o" #'calibredb-find-file)
@@ -101,8 +105,8 @@ When live editing the filter, it is bound to :live.")
     (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
-    (define-key map "R" #'calibredb-search-refresh-or-resume)
+    (define-key map "r" #'calibredb-search-clear-filter)
+    (define-key map "R" #'calibredb-search-refresh-and-clear-filter)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "f" #'calibredb-toggle-favorite-at-point)
@@ -311,7 +315,8 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
-  (format "Library: %s   %s"
+  (format "%s: %s   %s"
+          calibredb-virtual-library-name
           (propertize calibredb-root-dir 'face font-lock-type-face)
           (concat
            (propertize (format "Total: %s"
@@ -394,11 +399,19 @@ Argument EVENT mouse event."
     (recenter)))
 
 (defun calibredb-search-refresh-and-clear-filter ()
-  "Refresh calibredb and clear the fitler result."
+  "Refresh calibredb and clear the fitler keyword."
   (interactive)
   (setq calibredb-search-filter "")
+  (setq calibredb-virtual-library-name "Library")
   (calibredb-search-refresh)
   (calibredb-search-update :force))
+
+(defun calibredb-search-clear-filter ()
+  "Clear the fitler keyword."
+  (interactive)
+  (setq calibredb-search-filter "")
+  (setq calibredb-virtual-library-name "Library")
+  (calibredb-search-keyword-filter calibredb-search-filter))
 
 (defun calibredb-search-quit ()
   "Quit *calibredb-entry* or *calibredb-search*."
@@ -665,6 +678,7 @@ ebook record will be shown.
   (interactive)
   (unwind-protect
       (let ((calibredb-search-filter-active :live))
+        (setq calibredb-virtual-library-name "Library")
         (setq calibredb-search-filter
               (read-from-minibuffer "Filter: " calibredb-search-filter))
         (message calibredb-search-filter))

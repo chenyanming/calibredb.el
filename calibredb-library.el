@@ -24,9 +24,12 @@
 (require 'calibredb-core)
 
 (defvar calibredb-library-index 0)
+(defvar calibredb-virtual-library-index 0)
+(defvar calibredb-virtual-library-name "Library")
 
 (declare-function calibredb-ref-default-bibliography "calibredb-utils.el")
 (declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
+(declare-function calibredb-search-keyword-filter "calibredb-search.el")
 
 ;;;###autoload
 (defun calibredb-switch-library ()
@@ -92,6 +95,45 @@ selecting the new item."
           (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
       (message "INVALID LIBRARY"))))
+
+(defun calibredb-virtual-library-filter (keyword)
+  "Filter the virtual library based on keyword."
+  (calibredb-search-keyword-filter
+   (cdr (assoc keyword calibredb-virtual-library-alist))))
+
+(defun calibredb-virtual-library-list ()
+  "List all virtual libraries."
+  (interactive)
+  (if (eq (length calibredb-virtual-library-alist) 0)
+      (message "No virtual libraries. Set `calibredb-virtual-library-alist' with '((name . keywords))." )
+    (let ((keyword (completing-read "Switch Virutal Library: " calibredb-virtual-library-alist)))
+        (setq calibredb-virtual-library-name keyword)
+        (calibredb-virtual-library-filter keyword))))
+
+(defun calibredb-virtual-library-next ()
+  "Swith to next virtual library."
+  (interactive)
+  (if (eq (length calibredb-virtual-library-alist) 0)
+      (message "No virtual libraries. Set `calibredb-virtual-library-alist' with '((name . keywords))." )
+      (let* ((index (setq calibredb-virtual-library-index
+                          (if (< calibredb-virtual-library-index (1- (length calibredb-virtual-library-alist)))
+                              (1+ calibredb-virtual-library-index) 0)))
+             (keyword (car (nth index calibredb-virtual-library-alist))))
+        (setq calibredb-virtual-library-name keyword)
+        (calibredb-virtual-library-filter keyword))))
+
+(defun calibredb-virtual-library-previous ()
+  "Swith to previous virtual library."
+  (interactive)
+  (if (eq (length calibredb-virtual-library-alist) 0)
+      (message "No virtual libraries. Set `calibredb-virtual-library-alist' with '((name . keywords))." )
+      (let* ((index (setq calibredb-virtual-library-index
+                          (if (> calibredb-virtual-library-index 0)
+                              (1- calibredb-virtual-library-index)
+                            (1- (length calibredb-virtual-library-alist)))))
+             (keyword (car (nth index calibredb-virtual-library-alist))))
+        (setq calibredb-virtual-library-name keyword)
+        (calibredb-virtual-library-filter keyword))))
 
 (provide 'calibredb-library)
 
