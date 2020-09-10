@@ -667,12 +667,13 @@ Argument BOOK-ALIST ."
                                           'keymap tag-map) (calibredb-tag-width) :left)
      (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)
-         (calibredb-format-column (propertize (let ((c (if calibredb-condense-comments (calibredb-condense-comments comment) comment))
-                                                    (w calibredb-comment-width))
-                                                (if (> w 0) (s-truncate w c) c))
-                                              'face 'calibredb-comment-face)
-                                  (calibredb-comment-width) :left)
-       "")
+         (propertize
+          (let ((c (if calibredb-condense-comments (calibredb-condense-comments comment) comment))
+                (w calibredb-comment-width))
+            (cond ((> w 0) (s-truncate w c))
+                  ((= w 0) "")
+                  (t c)))
+          'face 'calibredb-comment-face) "")
      (format "%s%s"
              (if calibredb-size-show
                  (propertize size 'face 'calibredb-size-face) "")
