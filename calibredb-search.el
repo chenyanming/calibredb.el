@@ -232,7 +232,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Author_sort %s\n" (propertize author-sort 'face 'calibredb-author-face)))
         (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face)))
         (insert (format "Ids         %s\n" (propertize ids 'face 'calibredb-ids-face)))
-        (insert (format "Timestamp   %s\n" (propertize last_modified 'face 'calibredb-timestamp-face)))
+        (insert (format "Date        %s\n" (propertize last_modified 'face 'calibredb-date-face)))
         (insert (format "Published   %s\n" (propertize pubdate 'face 'calibredb-pubdate-face)))
         (insert (format "Publisher   %s\n" (propertize publisher 'face 'calibredb-publisher-face)))
         (insert (format "Series      %s\n" (propertize series 'face 'calibredb-series-face)))
@@ -484,7 +484,7 @@ Argument EVENT mouse event."
         (error "No tag chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+      (calibredb-search-keyword-filter (word-at-point t)))))
 
 (defun calibredb-author-mouse-1 (event)
   "Visit the location click on.
@@ -496,7 +496,7 @@ Argument EVENT mouse event."
         (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+      (calibredb-search-keyword-filter (word-at-point t)))))
 
 (defun calibredb-format-mouse-1 (event)
   "Visit the location click on.
@@ -508,8 +508,19 @@ Argument EVENT mouse event."
         (error "No format chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
-      (calibredb-search-keyword-filter (substring-no-properties (word-at-point))))))
+      (calibredb-search-keyword-filter (word-at-point t)))))
 
+(defun calibredb-date-mouse-1 (event)
+  "Visit the location click on.
+Argument EVENT mouse event."
+  (interactive "e")
+  (let ((window (posn-window (event-end event)))
+        (pos (posn-point (event-end event))))
+    (if (not (windowp window))
+        (error "No author chosen"))
+    (with-current-buffer (window-buffer window)
+      (goto-char pos)
+      (calibredb-search-keyword-filter (thing-at-point 'symbol t)))))
 
 (defun calibredb-file-mouse-1 (event)
   "Visit the file click on.
@@ -736,6 +747,7 @@ ARGUMENT FILTER is the filter string."
                                          (unless (equal (calibredb-tag-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :tag)))
                                          (unless (equal (calibredb-ids-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :ids)))
                                          (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort)))
+                                         (unless (equal (calibredb-date-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :last_modified)))
                                          (unless (equal (calibredb-comment-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :comment)))))))
                  (push line res-list)))
     (nreverse res-list)))

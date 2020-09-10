@@ -155,7 +155,7 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-format-width 4
+(defcustom calibredb-format-width 5
   "Width for file format.
 Set 0 to hide,
 Set negative to keep original length."
@@ -191,7 +191,14 @@ Set negative to keep original length."
   :type 'integer)
 
 (defcustom calibredb-comment-width -1
-  "Width for width.
+  "Width for comment.
+Set 0 to hide,
+Set negative to keep original length."
+  :group 'calibredb
+  :type 'integer)
+
+(defcustom calibredb-date-width 11
+  "Width for last_modified date.
 Set 0 to hide,
 Set negative to keep original length."
   :group 'calibredb
@@ -494,6 +501,12 @@ ALIGN should be a keyword :left or :right."
       -1
     calibredb-comment-width))
 
+(defun calibredb-date-width ()
+  "Return the last_modified date width base on the view."
+  (if calibredb-detial-view
+      -1
+    calibredb-date-width))
+
 (defun calibredb-getbooklist (calibre-item-list)
   "Get book list.
 Argument CALIBRE-ITEM-LIST is the calibred item list."
@@ -573,14 +586,17 @@ Argument BOOK-ALIST ."
         (comment (calibredb-getattr (list book-alist) :comment))
         (size (calibredb-getattr (list book-alist) :size))
         (ids (calibredb-getattr (list book-alist) :ids))
+        (date (calibredb-getattr (list book-alist) :last_modified))
         (favorite-map (make-sparse-keymap))
         (tag-map (make-sparse-keymap))
         (format-map (make-sparse-keymap))
-        (author-map (make-sparse-keymap)))
+        (author-map (make-sparse-keymap))
+        (date-map (make-sparse-keymap)))
     (define-key favorite-map [mouse-1] 'calibredb-favorite-mouse-1)
     (define-key tag-map [mouse-1] 'calibredb-tag-mouse-1)
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
+    (define-key date-map [mouse-1] 'calibredb-date-mouse-1)
     (if calibredb-detial-view
         (setq title (concat title "\n")))
     (format
@@ -592,12 +608,13 @@ Argument BOOK-ALIST ."
            (concat
             "%s%s%s"
             (calibredb-format-column (format "%sFormat:" (make-string num ? )) (+ 8 num) :left) "%s\n"
+            (calibredb-format-column (format "%sDate:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sAuthor:" (make-string num ? ))  (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sTag:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sIds:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sComment:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sSize:" (make-string num ? )) (+ 8 num) :left) "%s"))
-       "%s%s%s %s %s (%s) %s %s %s")
+       "%s%s%s %s %s %s (%s) %s %s %s")
      (cond (calibredb-format-all-the-icons
             (concat (if (fboundp 'all-the-icons-icon-for-file)
                         (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
@@ -627,6 +644,10 @@ Argument BOOK-ALIST ."
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this format"
                                           'keymap format-map) (calibredb-format-width) :left)
+     (calibredb-format-column (propertize (s-left 10 date) 'face 'calibredb-date-face ; only keep YYYY-MM-DD
+                                          'mouse-face 'calibredb-mouse-face
+                                          'help-echo "Filter with this date"
+                                          'keymap date-map) (calibredb-date-width) :left)
      (calibredb-format-column (propertize author
                                           'face 'calibredb-author-face
                                           'mouse-face 'calibredb-mouse-face

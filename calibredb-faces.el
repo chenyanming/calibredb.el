@@ -118,8 +118,13 @@
   "Face for the language."
   :group 'calibredb-faces)
 
-(defface calibredb-timestamp-face '((t :inherit default))
-  "Face for the timestamp (last_modified)."
+(defface calibredb-date-face
+  '((((class color) (background light))
+     :foreground "#29838D")
+    (((class color) (background dark))
+     :foreground "#8FBCBB")
+    (t :inherit default))
+  "Face for the date (last_modified)."
   :group 'calibredb-faces)
 
 (defface calibredb-file-face
