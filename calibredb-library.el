@@ -98,6 +98,7 @@ selecting the new item."
 
 (defun calibredb-virtual-library-filter (keyword)
   "Filter the virtual library based on keyword."
+  (setq calibredb-virtual-library-name keyword) ; set calibredb-virtual-library-name
   (calibredb-search-keyword-filter
    (cdr (assoc keyword calibredb-virtual-library-alist))))
 
@@ -107,7 +108,6 @@ selecting the new item."
   (if (eq (length calibredb-virtual-library-alist) 0)
       (message "No virtual libraries. Set `calibredb-virtual-library-alist' with '((name . keywords))." )
     (let ((keyword (completing-read "Switch Virutal Library: " calibredb-virtual-library-alist)))
-      (setq calibredb-virtual-library-name keyword)
       (calibredb-virtual-library-filter keyword)
       (message keyword))))
 
@@ -120,7 +120,6 @@ selecting the new item."
                           (if (< calibredb-virtual-library-index (1- (length calibredb-virtual-library-alist)))
                               (1+ calibredb-virtual-library-index) 0)))
              (keyword (car (nth index calibredb-virtual-library-alist))))
-        (setq calibredb-virtual-library-name keyword)
         (calibredb-virtual-library-filter keyword)
         (message keyword))))
 
@@ -134,7 +133,6 @@ selecting the new item."
                               (1- calibredb-virtual-library-index)
                             (1- (length calibredb-virtual-library-alist)))))
              (keyword (car (nth index calibredb-virtual-library-alist))))
-        (setq calibredb-virtual-library-name keyword)
         (calibredb-virtual-library-filter keyword)
         (message keyword))))
 

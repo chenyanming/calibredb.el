@@ -402,7 +402,6 @@ Argument EVENT mouse event."
   "Refresh calibredb and clear the fitler keyword."
   (interactive)
   (setq calibredb-search-filter "")
-  (setq calibredb-virtual-library-name "Library")
   (calibredb-search-refresh)
   (calibredb-search-update :force))
 
@@ -410,7 +409,6 @@ Argument EVENT mouse event."
   "Clear the fitler keyword."
   (interactive)
   (setq calibredb-search-filter "")
-  (setq calibredb-virtual-library-name "Library")
   (calibredb-search-keyword-filter calibredb-search-filter))
 
 (defun calibredb-search-quit ()
@@ -678,7 +676,6 @@ ebook record will be shown.
   (interactive)
   (unwind-protect
       (let ((calibredb-search-filter-active :live))
-        (setq calibredb-virtual-library-name "Library")
         (setq calibredb-search-filter
               (read-from-minibuffer "Filter: " calibredb-search-filter))
         (message calibredb-search-filter))
@@ -698,6 +695,9 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
       (let ((inhibit-read-only t)
             (standard-output (current-buffer)))
         (erase-buffer)
+        ;; reset calibredb-virtual-library-name
+        (unless (-contains? (mapcar 'cdr calibredb-virtual-library-alist) calibredb-search-filter)
+          (setq calibredb-virtual-library-name "Library"))
         (calibredb-search--update-list)
         ;; (setq calibredb-search-entries (calibredb-candidates))
         (dolist (entry calibredb-search-entries)
