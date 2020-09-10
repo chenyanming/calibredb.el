@@ -176,7 +176,7 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-ids-width -1
+(defcustom calibredb-ids-width 0
   "Width for ids.
 Set 0 to hide,
 Set negative to keep original length."
@@ -197,7 +197,7 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-comment-width -1
+(defcustom calibredb-comment-width 100
   "Width for comment.
 Set 0 to hide,
 Set negative to keep original length."
@@ -667,9 +667,9 @@ Argument BOOK-ALIST ."
                                           'keymap tag-map) (calibredb-tag-width) :left)
      (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)
-         (calibredb-format-column (propertize (if calibredb-condense-comments
-                                                  (calibredb-condense-comments comment)
-                                                comment)
+         (calibredb-format-column (propertize (let ((c (if calibredb-condense-comments (calibredb-condense-comments comment) comment))
+                                                    (w calibredb-comment-width))
+                                                (if (> w 0) (s-truncate w c) c))
                                               'face 'calibredb-comment-face)
                                   (calibredb-comment-width) :left)
        "")

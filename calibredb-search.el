@@ -750,7 +750,11 @@ ARGUMENT FILTER is the filter string."
                                          (unless (equal (calibredb-ids-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :ids)))
                                          (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort)))
                                          (unless (equal (calibredb-date-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :last_modified)))
-                                         (unless (equal (calibredb-comment-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :comment)))))))
+                                         ;; Normally, comments are long, it is necessary to trancate the comments to speed up the searching
+                                         ;; except calibredb-comment-width is -1.
+                                         (unless (equal (calibredb-comment-width) 0) (string-match-p regex (let ((c (calibredb-getattr (cdr line) :comment))
+                                                                                                                 (w calibredb-comment-width))
+                                                                                                             (if (> w 0) (s-truncate w c) c))))))))
                  (push line res-list)))
     (nreverse res-list)))
 
