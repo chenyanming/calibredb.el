@@ -323,8 +323,27 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
 
 PS: If you want to delete in bulk with marked items, use ~calibredb-remove-marked-items~ instead.
 
-** How to switch to different library?
-First, set =calibredb-library-alist= to include the calibre libraries.
+** How to switch virtual libraries?
+First, set =calibredb-library-alist= to include the calibre virtual libraries.
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+                                        ("2. Read it later" . "Readit epub")
+                                        ("3. Development - rust" . "rust")))
+#+END_SRC
+Then, in =*calibredb-search*= buffer,
+ - Press =l= to open the library list and select the library.
+ - Press =n= or =p= to switch to next or previous library.
+
+Or, in =*calibredb-search*= buffer, call =calibredb-virtual-library-list= directly and select
+the library.
+
+** How to switch libraries?
+Set =calibredb-library-alist= to include the calibre libraries.
+
+Make sure the libraries are valid calibre library, where should contains a
+*metadata.db* file into. Create libraries using calibre GUI or with ~M-x
+calibredb-clone~ to clone the existing library to a new library.
+
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
                                   ("/Users/damonchan/Documents/Books Library")
@@ -333,10 +352,10 @@ First, set =calibredb-library-alist= to include the calibre libraries.
                                   ("/Users/damonchan/Documents/World")))
 #+END_SRC
 Then, in =*calibredb-search*= buffer,
- - Press =l= to open the library list and select the library.
- - Press =n= or =p= to switch to next or previous library.
+ - Press =L= to open the library list and select the library.
+ - Press =N= or =P= to switch to next or previous library.
 
-In =*calibredb-search*= buffer, call =calibredb-library-list= directly and select
+Or in =*calibredb-search*= buffer, call =calibredb-library-list= directly and select
 the library.
 
 If the library is not defined in =calibredb-library-alist=, you can call
