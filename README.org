@@ -117,15 +117,6 @@ by setting the ~calibredb-search-filter~.
                                         ("3. Development - rust" . "rust")))
 #+END_SRC
 
-** Configure to support org-ref
-You can output a BibTex file which can be used in org-ref.
-#+BEGIN_SRC emacs-lisp
-(require 'org-ref)
-(setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
-(add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
-(setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
-#+END_SRC
-
 ** Column width
 You can configure the column width:
 
@@ -177,6 +168,15 @@ you imagine.
 
 TODO: Auto disable format icons when dealing with big libraries.
 
+** Configure to support org-ref
+You can output a BibTex file which can be used in org-ref.
+#+BEGIN_SRC emacs-lisp
+(require 'org-ref)
+(setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+(add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
+(setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
+#+END_SRC
+
 ** keybindings
 
 #+BEGIN_SRC emacs-lisp
@@ -225,8 +225,8 @@ TODO: Auto disable format icons when dealing with big libraries.
     (define-key map "." #'calibredb-open-dired)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
-    (define-key map "r" #'calibredb-search-clear-filter)
-    (define-key map "R" #'calibredb-search-refresh-and-clear-filter)
+    (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
+    (define-key map "R" #'calibredb-search-clear-filter)
     (define-key map "q" #'calibredb-search-quit)
     (define-key map "m" #'calibredb-mark-and-forward)
     (define-key map "f" #'calibredb-toggle-favorite-at-point)
@@ -340,9 +340,9 @@ the library.
 ** How to switch libraries?
 Set =calibredb-library-alist= to include the calibre libraries.
 
-Make sure the libraries are valid calibre library, where should contains a
-*metadata.db* file into. Create libraries using calibre GUI or with ~M-x
-calibredb-clone~ to clone the existing library to a new library.
+Make sure the libraries are valid. Create libraries using Calibre GUI or ~M-x
+calibredb-clone~ to clone the existing library to a new library, before setting
+it in ~calibredb-library-alist~.
 
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
@@ -691,8 +691,7 @@ Version  *2.7.0:*
     (define-key map "N" #'calibredb-library-next) ; previous n
     (define-key map "p" #'calibredb-virtual-library-previous)
     (define-key map "P" #'calibredb-library-previous) ; previous p
-    (define-key map "r" #'calibredb-search-clear-filter)
-    (define-key map "R" #'calibredb-search-refresh-and-clear-filter) ; previous r
+    (define-key map "R" #'calibredb-search-clear-filter)
     #+END_SRC
 
 ** =2020-08-29=
