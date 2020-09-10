@@ -68,6 +68,13 @@
                                                   calibredb-root-dir)))
   :group 'calibredb)
 
+(defcustom calibredb-virtual-library-default-name "Library"
+  "The default virtual library name."
+  :group 'calibredb
+  :type 'string)
+
+(defvar calibredb-virtual-library-name `,calibredb-virtual-library-default-name)
+
 (defcustom calibredb-download-dir nil
   "String with the path to main download directory for ebooks."
   :type 'file

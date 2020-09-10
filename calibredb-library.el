@@ -25,7 +25,6 @@
 
 (defvar calibredb-library-index 0)
 (defvar calibredb-virtual-library-index 0)
-(defvar calibredb-virtual-library-name "Library")
 
 (declare-function calibredb-ref-default-bibliography "calibredb-utils.el")
 (declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
@@ -109,6 +108,7 @@ selecting the new item."
       (message "No virtual libraries. Set `calibredb-virtual-library-alist' with '((name . keywords))." )
     (let ((keyword (completing-read "Switch Virutal Library: " calibredb-virtual-library-alist)))
       (calibredb-virtual-library-filter keyword)
+      (calibredb-search-header)
       (message keyword))))
 
 (defun calibredb-virtual-library-next ()
@@ -121,6 +121,7 @@ selecting the new item."
                               (1+ calibredb-virtual-library-index) 0)))
              (keyword (car (nth index calibredb-virtual-library-alist))))
         (calibredb-virtual-library-filter keyword)
+        (calibredb-search-header)
         (message keyword))))
 
 (defun calibredb-virtual-library-previous ()
@@ -134,6 +135,7 @@ selecting the new item."
                             (1- (length calibredb-virtual-library-alist)))))
              (keyword (car (nth index calibredb-virtual-library-alist))))
         (calibredb-virtual-library-filter keyword)
+        (calibredb-search-header)
         (message keyword))))
 
 (provide 'calibredb-library)

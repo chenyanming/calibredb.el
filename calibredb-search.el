@@ -25,7 +25,6 @@
 
 (eval-when-compile (defvar calibredb-show-entry))
 (eval-when-compile (defvar calibredb-show-entry-switch))
-(eval-when-compile (defvar calibredb-virtual-library-name))
 
 (declare-function calibredb-find-file "calibredb-utils.el")
 (declare-function calibredb-add "calibredb-utils.el")
@@ -316,7 +315,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
   (format "%s: %s   %s"
-          calibredb-virtual-library-name
+          (propertize calibredb-virtual-library-name 'face font-lock-preprocessor-face)
           (propertize calibredb-root-dir 'face font-lock-type-face)
           (concat
            (propertize (format "Total: %s"
@@ -708,7 +707,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
         (erase-buffer)
         ;; reset calibredb-virtual-library-name
         (unless (-contains? (mapcar 'cdr calibredb-virtual-library-alist) calibredb-search-filter)
-          (setq calibredb-virtual-library-name "Library"))
+          (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
         (calibredb-search--update-list)
         ;; (setq calibredb-search-entries (calibredb-candidates))
         (dolist (entry calibredb-search-entries)
