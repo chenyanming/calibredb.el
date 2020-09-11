@@ -50,12 +50,16 @@
     ("h" "Highlight" calibredb-toggle-highlight-at-point)
     ("x" "Archive" calibredb-toggle-archive-at-point)]]
   ["Library operation"
-   [("l" "List Libraries"   calibredb-library-list)
-    ("S" "Switch library"   calibredb-switch-library)
-    ("c" "Clone library"   calibredb-clone)
-    ("r" "Refresh Library"   calibredb-search-refresh)]
-   [("n" "Next Library"   calibredb-library-next)
-    ("p" "Previous Library"   calibredb-library-previous)
+   [("l" "List Virtual Libraries"   calibredb-virtual-library-list)
+    ("n" "Next Virtual Library"   calibredb-virtual-library-next)
+    ("p" "Previous Virtual Library"   calibredb-virtual-library-previous)]
+   [("L" "List Libraries"   calibredb-library-list)
+    ("N" "Next Library"   calibredb-library-next)
+    ("P" "Previous Library"   calibredb-library-previous)
+    ("S" "Switch Library"   calibredb-switch-library)]
+   [("c" "Clone Library"   calibredb-clone)
+    ("r" "Refresh Library"   calibredb-search-refresh-and-clear-filter)
+    ("R" "Clear Filter"   calibredb-search-clear-filter)
     ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]]
   ["Other operation"
    [("b" "BibTex"   calibredb-catalog-bib-dispatch)
