@@ -214,27 +214,32 @@ directory, open this directory."
       (dired (file-name-directory file))
       (dired-goto-file file))))
 
-(defun calibredb-add ()
+(defun calibredb-add (arg)
   "Add file(s) into calibredb.
 With ivy-mode: Add marked items.
-Others: Add only one item."
-  (interactive)
+Others: Add only one item.
+If prefix ARG is non-nil, keep the files after adding without prompt."
+  (interactive "P")
   (cond ((if (boundp 'ivy-mode)
              (if ivy-mode
                  (if (fboundp 'counsel--find-file-1)
                      (counsel--find-file-1
                       "Add file(s) to calibredb: " calibredb-download-dir
-                      #'calibredb-counsel-add-file-action
+                      (lambda (file)
+                        (calibredb-counsel-add-file-action arg file))
                       'calibredb-add)))))
         (t (let ((file (calibredb-complete-file-quote "Add a file to Calibre")))
              (calibredb-command :command "add"
                                 :input file
                                 :library (format "--library-path %s" (calibredb-root-dir-quote)))
-             (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
+             (cond ((string= calibredb-add-delete-original-file "yes")
+                    (if arg (message "Adding files succeeded, files were kept.")
+                      (delete-file file)))
                    ((string= calibredb-add-delete-original-file "no"))
-                   ((yes-or-no-p
-                     (concat "File has been copied to database. Subsequently delete original file? " file))
-                    (delete-file file))))))
+                   (t (unless arg
+                        (if (yes-or-no-p
+                             (concat "File has been copied to database. Subsequently delete original file? " file))
+                            (delete-file file)) ))))))
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
 
@@ -299,20 +304,27 @@ Optional argument CANDIDATE is the selected item."
           ((eq major-mode 'calibredb-search-mode)
            (calibredb-search-refresh-or-resume)))))
 
-(defun calibredb-remove-marked-items ()
+(defun calibredb-remove-marked-items (arg)
   "Remove the marked item(s).
-Optional argument CANDIDATE is the marked item(s)."
-  (interactive)
+If prefix ARG is non-nil, delete the files without prompt."
+  (interactive "P")
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
     (dolist (cand candidates)
       (let ((id (calibredb-getattr cand :id))
             (title (calibredb-getattr cand :book-title)))
-        (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
-            (calibredb-command :command "remove"
-                               :id id
-                               :library (format "--library-path %s" (calibredb-root-dir-quote))))))
+        ;; If with prefix, delete without prompt
+        (if arg
+            (progn
+              (calibredb-command :command "remove"
+                                 :id id
+                                 :library (format "--library-path %s" (calibredb-root-dir-quote)))
+              (message (format "Deleted %s - %s" id title)))
+          (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
+              (calibredb-command :command "remove"
+                                 :id id
+                                 :library (format "--library-path %s" (calibredb-root-dir-quote)))))))
     (if (eq major-mode 'calibredb-search-mode)
      (calibredb-search-refresh-or-resume))))
 

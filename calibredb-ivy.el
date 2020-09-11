@@ -59,15 +59,21 @@
                   (org-insert-link nil (calibredb-getattr (cdr candidate) :file-path) (calibredb-getattr (cdr candidate) :book-title)) )) "Insert an org link"))))
 
 
-(defun calibredb-counsel-add-file-action (file)
-  "Add marked FILEs."
+(defun calibredb-counsel-add-file-action (arg file)
+  "Add marked FILEs.
+If prefix ARG is non-nil, keep the files after adding without prompt."
+  (interactive "P")
   (calibredb-command :command "add"
                      :input (shell-quote-argument (expand-file-name file))
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
-  (cond ((string= calibredb-add-delete-original-file "yes") (delete-file file))
+  (cond ((string= calibredb-add-delete-original-file "yes")
+         (if arg (message "Adding files succeeded, files were kept.")
+           (delete-file file)))
         ((string= calibredb-add-delete-original-file "no"))
-        ((yes-or-no-p
-          (concat "File has been copied to database. Subsequently delete original file? " file)) (delete-file file))))
+        (t (unless arg
+             (if (yes-or-no-p
+                  (concat "File has been copied to database. Subsequently delete original file? " file))
+                 (delete-file file)) ))))
 
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."

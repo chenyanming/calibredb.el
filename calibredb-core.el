@@ -81,7 +81,10 @@
   :group 'calibredb)
 
 (defcustom calibredb-add-delete-original-file nil
-  "After adding file, delete original file? (string \"yes\"/\"no\")."
+  "After adding file, delete original file? (string \"yes\"/\"no\").
+yes: Delete without prompt.
+no: No deletion without prompt.
+nil: Prompt delete or not."
   :type 'string
   :group 'calibredb)
 
