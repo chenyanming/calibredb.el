@@ -1,4 +1,4 @@
-;;; calibredb-search.el -*- lexical-binding: t; -*-
+;;; calibredb-search.el --- Books search buffer for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

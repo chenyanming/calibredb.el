@@ -1,4 +1,4 @@
-;;; calibredb-faces.el -*- lexical-binding: t; -*-
+;;; calibredb-faces.el --- Faces for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

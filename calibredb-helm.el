@@ -1,4 +1,4 @@
-;;; calibredb-helm.el -*- lexical-binding: t; -*-
+;;; calibredb-show.el --- Helm for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

@@ -1,4 +1,4 @@
-;;; calibredb-ivy.el -*- lexical-binding: t; -*-
+;;; calibredb-ivy.el --- Ivy/counsel for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

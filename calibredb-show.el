@@ -1,4 +1,4 @@
-;;; calibredb-show.el -*- lexical-binding: t; -*-
+;;; calibredb-show.el --- Book detail buffer for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
