@@ -1,4 +1,4 @@
-;;; calibredb-library.el -*- lexical-binding: t; -*-
+;;; calibredb-library.el --- Library for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 

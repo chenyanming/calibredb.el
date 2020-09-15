@@ -1,4 +1,4 @@
-;;; calibredb-utils.el -*- lexical-binding: t; -*-
+;;; calibredb-utils.el --- Utils for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
@@ -685,7 +685,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
             (switch-to-buffer buff)
             (when (string= (completing-read "Select cover: " '("original" "fetched")) "fetched")
               (rename-file "/tmp/cover.jpg" original t))
-            (kill-current-buffer)))
+            (kill-buffer)))
       (cond ((file-exists-p "/tmp/cover.jpg")
              (rename-file "/tmp/cover.jpg" original t)
              (print "Fetched cover added to entry"))

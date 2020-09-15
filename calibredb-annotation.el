@@ -1,4 +1,4 @@
-;;; calibredb-annotation.el -*- lexical-binding: t; -*-
+;;; calibredb-annotation.el --- Annotation for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
