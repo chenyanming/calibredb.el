@@ -400,15 +400,13 @@ Argument EVENT mouse event."
 (defun calibredb-search-refresh-and-clear-filter ()
   "Refresh calibredb and clear the fitler keyword."
   (interactive)
-  (setq calibredb-search-filter "")
   (calibredb-search-refresh)
-  (calibredb-search-update :force))
+  (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-clear-filter ()
   "Clear the fitler keyword."
   (interactive)
-  (setq calibredb-search-filter "")
-  (calibredb-search-keyword-filter calibredb-search-filter))
+  (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-quit ()
   "Quit *calibredb-entry* or *calibredb-search*."
