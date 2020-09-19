@@ -228,18 +228,20 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
                       (lambda (file)
                         (calibredb-counsel-add-file-action arg file))
                       'calibredb-add)))))
-        (t (let ((file (calibredb-complete-file-quote "Add a file to Calibre")))
-             (calibredb-command :command "add"
-                                :input file
-                                :library (format "--library-path %s" (calibredb-root-dir-quote)))
-             (cond ((string= calibredb-add-delete-original-file "yes")
-                    (if arg (message "Adding files succeeded, files were kept.")
-                      (delete-file file)))
-                   ((string= calibredb-add-delete-original-file "no"))
-                   (t (unless arg
-                        (if (yes-or-no-p
-                             (concat "File has been copied to database. Subsequently delete original file? " file))
-                            (delete-file file)) ))))))
+        (t (let* ((file (calibredb-complete-file-quote "Add a file to Calibre"))
+                 (output (calibredb-command :command "add"
+                                            :input file
+                                            :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+             (if (s-contains? "Added book ids" output)
+                 (cond ((string= calibredb-add-delete-original-file "yes")
+                        (if arg (message "Adding files succeeded, files were kept.")
+                          (delete-file file)))
+                       ((string= calibredb-add-delete-original-file "no"))
+                       (t (unless arg
+                            (if (yes-or-no-p
+                                 (concat "File has been copied to database. Subsequently delete original file? " file))
+                                (delete-file file)))))
+               (message "Adding book failed, please add it manually.")))))
   (if (equal major-mode 'calibredb-search-mode)
       (calibredb-search-refresh-or-resume)))
 
