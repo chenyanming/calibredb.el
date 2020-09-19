@@ -626,22 +626,22 @@ the outer alist (nil instead of (SOURCE RESULTS))."
     (let* ((sources calibredb-fetch-metadata-source-list)
            (results (mapcar
                      (lambda (source)
-                       (let* ((md (shell-command-to-string
-                                   (if isbn (format
+                       (let* ((cmd (if isbn (format
                                              (if fetch-cover
-                                                 "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg"
-                                               "%s -p '%s' --isbn '%s'")
+                                                 "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg  2>/dev/null"
+                                               "%s -p '%s' --isbn '%s' 2>/dev/null")
                                              calibredb-fetch-metadata-program
                                              source
                                              isbn)
                                      (format
                                       (if fetch-cover
-                                          "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg"
-                                        "%s -p '%s' --authors '%s' --title '%s'")
+                                          "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg  2>/dev/null"
+                                        "%s -p '%s' --authors '%s' --title '%s' 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
                                       authors
-                                      title))))
+                                      title)))
+                              (md (shell-command-to-string cmd))
                               (md-split (if (string-match "No results found$" md) nil
                                           (split-string md "Comments" nil " *")))
                               (no-comments (if md-split
@@ -660,6 +660,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                                        calibredb-debug-program
                                                                        (intern (cdr (assoc "Authors" no-comments)))))))
                               (new-comments (when author-sort (append no-comments (list (cons "Author_sort" author-sort))))))
+                         (message cmd)
                          (if (nth 1 md-split)
                              (when new-comments (cons source (append new-comments (list (cons "Comments" (substring (nth 1 md-split) 2))))))
                            (when new-comments (cons source new-comments)))))
