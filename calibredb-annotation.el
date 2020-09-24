@@ -111,16 +111,13 @@ Bound to \\<C-cC-c> in `calibredb-edit-annotation-mode'."
   (let ((annotation      (buffer-substring-no-properties (point-min) (point-max)))
         (candidate        calibredb-annotation-candidate)
         (beg        (car calibredb-annotation-parameter))
-        (pos        (cdr calibredb-annotation-parameter))
-        (annotation-buf  (current-buffer)))
+        (pos        (cdr calibredb-annotation-parameter)))
     (when (string= annotation "") (setq annotation nil))
     (calibredb-command :command "set_metadata"
                        :option (format "--field %s:%s " calibredb-annotation-field (prin1-to-string annotation))
                        :id (calibredb-getattr candidate :id)
                        :library (format "--library-path \"%s\"" calibredb-root-dir))
-    (if (fboundp 'kill-buffer-and-its-windows)
-        (kill-buffer-and-its-windows annotation-buf) ; Defined in `misc-cmds.el'.
-      (kill-buffer annotation-buf))
+    (calibredb-annotation-quit)
     (calibredb-search-refresh-or-resume beg pos)))
 
 (defun calibredb-annotation-quit ()
@@ -128,13 +125,9 @@ Bound to \\<C-cC-c> in `calibredb-edit-annotation-mode'."
 Bound to \\<C-cC-k> in `calibredb-edit-annotation-mode'."
   (interactive)
   (when (eq major-mode 'calibredb-edit-annotation-mode)
-    (cond ((get-buffer "*calibredb-edit-annatation*")
-           (pop-to-buffer "*calibredb-edit-annatation*")
-           (if (< (length (window-prev-buffers)) 2)
-               (kill-buffer-and-window)
-             (kill-buffer)))
-          ((get-buffer "*calibredb-search*")
-           (kill-buffer "*calibredb-search*")))))
+    (if (< (length (window-prev-buffers)) 2)
+        (kill-buffer-and-window)
+      (kill-buffer))))
 
 (provide 'calibredb-annotation)
 
