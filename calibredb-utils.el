@@ -740,8 +740,7 @@ Optional argument ARG."
     (cond (metadata
            (mapc (lambda (x)
                    (calibredb-command :command "set_metadata"
-                                      :option "--field"
-                                      :input (format "%s:\"%s\"" (downcase (car x)) (cdr x))
+                                      :option (format "--field %s:%s " (downcase (car x)) (prin1-to-string (cdr x)))
                                       :id id
                                       :library (format "--library-path \"%s\"" calibredb-root-dir)))
                  metadata)
