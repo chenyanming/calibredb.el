@@ -128,8 +128,13 @@ Bound to \\<C-cC-c> in `calibredb-edit-annotation-mode'."
 Bound to \\<C-cC-k> in `calibredb-edit-annotation-mode'."
   (interactive)
   (when (eq major-mode 'calibredb-edit-annotation-mode)
-    (if (get-buffer "*calibredb-edit-annatation*")
-        (kill-buffer "*calibredb-edit-annatation*"))))
+    (cond ((get-buffer "*calibredb-edit-annatation*")
+           (pop-to-buffer "*calibredb-edit-annatation*")
+           (if (< (length (window-prev-buffers)) 2)
+               (kill-buffer-and-window)
+             (kill-buffer)))
+          ((get-buffer "*calibredb-search*")
+           (kill-buffer "*calibredb-search*")))))
 
 (provide 'calibredb-annotation)
 
