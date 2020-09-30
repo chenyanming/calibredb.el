@@ -667,8 +667,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                      sources)))
       (if (remove nil results)
           (remove nil results)
-        nil)
-      )))
+        nil))))
 
 (defun calibredb-select-and-set-cover ()
   "Select and set cover."
