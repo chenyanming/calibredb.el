@@ -39,7 +39,7 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 ** Install sqlite and calibre
 
-*** MacOS
+*** macOS
 #+BEGIN_SRC sh
 brew install sqlite
 #+END_SRC
@@ -533,7 +533,7 @@ be shown.
 1. Live filter searches the results in =calibredb-full-entries= rather than query
    the database.
 2. Keywords are separated by "Spaces" (AND operation, mainly used to narrow down
-   the results, the more spaces you insert, the less results.)
+   the results, the more spaces you insert, the fewer results.)
 3. Each keyword supports REGEX.
 
 For example, to search Ebooks may contain a tag - *work*, and the format maybe pdf
