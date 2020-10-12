@@ -55,6 +55,9 @@
 (declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
 (declare-function calibredb-show-refresh "calibredb-show.el")
 (declare-function calibredb-get-init "calibredb-utils.el")
+(declare-function calibredb-virtual-library-list "calibredb-library.el")
+(declare-function calibredb-virtual-library-next "calibredb-library.el")
+(declare-function calibredb-virtual-library-previous "calibredb-library.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
