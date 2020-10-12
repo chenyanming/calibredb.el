@@ -229,9 +229,9 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
                         (calibredb-counsel-add-file-action arg file))
                       'calibredb-add)))))
         (t (let* ((file (calibredb-complete-file-quote "Add a file to Calibre"))
-                 (output (calibredb-command :command "add"
-                                            :input file
-                                            :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+                  (output (calibredb-command :command "add"
+                                             :input file
+                                             :library (format "--library-path %s" (calibredb-root-dir-quote)))))
              (if (s-contains? "Added book ids" output)
                  (cond ((string= calibredb-add-delete-original-file "yes")
                         (if arg (message "Adding files succeeded, files were kept.")
@@ -328,7 +328,7 @@ If prefix ARG is non-nil, delete the files without prompt."
                                  :id id
                                  :library (format "--library-path %s" (calibredb-root-dir-quote)))))))
     (if (eq major-mode 'calibredb-search-mode)
-     (calibredb-search-refresh-or-resume))))
+        (calibredb-search-refresh-or-resume))))
 
 (defun calibredb-remove-format (&optional candidate)
   "Remove the slected format.
@@ -608,7 +608,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
         (switch-to-buffer-other-window (set-buffer (calibredb-search--buffer-name)))
         (goto-char original)))))
 
-(defun calibredb-fetch-metadata-from-sources (author title &optional isbn fetch-cover)
+(defun calibredb-fetch-metadata-from-sources (author title &optional ids isbn fetch-cover)
   "Fetch metadata from online source via author and title or ISBN.
 Invoke from *calibredb-search* buffer.
 AUTHOR, TITLE and ISBN should be strings.
@@ -616,23 +616,36 @@ Returns an alist with elements (SOURCE RESULTS) where SOURCE is a
 string and RESULTS is an alist with elements (PROP VALUE). If no
 metadata was found from a source then in then nil is returned in
 the outer alist (nil instead of (SOURCE RESULTS))."
-  (let* ((authors (if isbn ""
+  (let* ((authors (if (or isbn ids) ""
                     (read-string "Authors: " author)))
-         (title (if isbn ""
+         (title (if (or isbn ids) ""
                   (read-string "Title: " title)))
+         (id (if ids (completing-read "ID: " ids)
+               nil))
          (isbn (if isbn (read-string "ISBN: " isbn)
                  nil)))
     (message "Fetching metadata from sources... may take a few seconds")
     (let* ((sources calibredb-fetch-metadata-source-list)
            (results (mapcar
                      (lambda (source)
-                       (let* ((cmd (if isbn (format
-                                             (if fetch-cover
-                                                 "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg  2>/dev/null"
-                                               "%s -p '%s' --isbn '%s' 2>/dev/null")
-                                             calibredb-fetch-metadata-program
-                                             source
-                                             isbn)
+                       (let* ((cmd (cond
+                                    (id
+                                     (format
+                                      (if fetch-cover
+                                          "%s -p '%s' --identifier '%s' -c /tmp/cover.jpg  2>/dev/null"
+                                        "%s -p '%s' --identifier '%s' 2>/dev/null")
+                                      calibredb-fetch-metadata-program
+                                      source
+                                      id))
+                                    (isbn
+                                     (format
+                                      (if fetch-cover
+                                          "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg 2>/dev/null"
+                                        "%s -p '%s' --isbn '%s' 2>/dev/null")
+                                      calibredb-fetch-metadata-program
+                                      source
+                                      isbn))
+                                    (t
                                      (format
                                       (if fetch-cover
                                           "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg  2>/dev/null"
@@ -640,7 +653,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                       calibredb-fetch-metadata-program
                                       source
                                       authors
-                                      title)))
+                                      title))))
                               (md (shell-command-to-string cmd))
                               (md-split (if (string-match "No results found$" md) nil
                                           (split-string md "Comments" nil " *")))
@@ -704,7 +717,7 @@ Argument RESULTS is the source list."
                 (completing-read "Select metadata source : " results))
               results)))
 
-(defun calibredb-fetch-metadata (author title &optional isbn)
+(defun calibredb-fetch-metadata (author title &optional ids isbn)
   "Fetch metadata.
 Argument AUTHOR prompts to input the author.
 Argument TITLE prompts to input the title.
@@ -712,7 +725,7 @@ Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
                             ((string= calibredb-fetch-covers "no") nil)
                             (t (yes-or-no-p "Fetch cover?: "))))
-         (results (calibredb-fetch-metadata-from-sources author title isbn fetch-cover)))
+         (results (calibredb-fetch-metadata-from-sources author title ids isbn fetch-cover)))
     (cond (results
            (when fetch-cover (calibredb-select-and-set-cover))
            (calibredb-select-metadata-source results))
@@ -724,10 +737,12 @@ Argument TYPE Either 'author' or 'isbn'.
 Optional argument ARG."
   (let* ((candidate (car (calibredb-find-candidate-at-point)))
          (id (calibredb-getattr candidate :id))
+         (ids (split-string (calibredb-getattr candidate :ids) ","))
          (authors (calibredb-getattr candidate :author-sort))
          (title (calibredb-getattr candidate :book-title))
          (metadata
-          (cond ((string= type "author") (if arg (calibredb-fetch-metadata title authors)
+          (cond ((string= type "id") (calibredb-fetch-metadata title authors ids))
+                ((string= type "author") (if arg (calibredb-fetch-metadata title authors)
                                            (calibredb-fetch-metadata authors title)))
                 ((string= type "isbn") (if arg
                                            (calibredb-fetch-metadata authors title title)
@@ -755,6 +770,13 @@ Optional argument ARG."
 Fetch metadata from online source via author and title. With universal ARG \\[universal-argument] switch initial values of authors and title."
   (interactive "P")
   (calibredb-fetch-and-set-metadata "author" arg))
+
+(defun calibredb-fetch-and-set-metadata-by-id (arg)
+  "Invoke from *calibredb-search* buffer.
+Fetch metadata from online source via Identifier.
+With universal ARG \\[universal-argument] use title as initial value."
+  (interactive "P")
+  (calibredb-fetch-and-set-metadata "id" arg))
 
 (defun calibredb-fetch-and-set-metadata-by-isbn (arg)
   "Invoke from *calibredb-search* buffer.
@@ -797,10 +819,10 @@ With universal ARG \\[universal-argument] use title as initial value."
   "TODO Export the catalog."
   (interactive)
   (calibredb-command :command "catalog"
-                     ;; :option (s-join " " (-remove 's-blank? (-flatten (calibredb-export-arguments))))
-                     :input (format "%s" (calibredb-complete-file-quote "Export to (select a path)"))
-                     ;; :id id
-                     :library (format "--library-path %s" (calibredb-root-dir-quote))))
+    ;; :option (s-join " " (-remove 's-blank? (-flatten (calibredb-export-arguments))))
+    :input (format "%s" (calibredb-complete-file-quote "Export to (select a path)"))
+    ;; :id id
+    :library (format "--library-path %s" (calibredb-root-dir-quote))))
 
 (defun calibredb-catalog-bib--transient ()
   "Export the catalog with BibTex file."
