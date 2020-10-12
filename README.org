@@ -679,7 +679,7 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
-** =2020-09-10=
+** =2020-10-12=
 Version  *2.7.0:*
 - Add feature: Virtual Library
 - Add configuration: =calibredb-virtual-library-alist=
