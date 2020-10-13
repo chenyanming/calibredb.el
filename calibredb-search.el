@@ -907,6 +907,30 @@ ARGUMENT FILTER is the filter string."
         (font-lock-fontify-buffer)))
     (buffer-string)))
 
+(defun calibredb-copy-as-org-link ()
+  "Copy the marked items as org links."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (kill-new
+     (with-temp-buffer
+       (dolist (cand candidates)
+         (let ((id (calibredb-getattr cand :id))
+               (path (calibredb-getattr cand :file-path))
+               (title (calibredb-getattr cand :book-title)))
+           (insert (format "[[%s][%s %s - %s]]\n"
+                           path
+                           (cond (calibredb-format-all-the-icons
+                                  (if (fboundp 'all-the-icons-icon-for-file)
+                                      (all-the-icons-icon-for-file path) ""))
+                                 (calibredb-format-icons-in-terminal
+                                  (if (fboundp 'icons-in-terminal-icon-for-file)
+                                      (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
+                                 (t "")) id title))
+           (message "Copied: %s - \"%s\" as org link." id title)))
+       (buffer-string)))))
+
 (provide 'calibredb-search)
 
 ;;; calibredb-search.el ends here
