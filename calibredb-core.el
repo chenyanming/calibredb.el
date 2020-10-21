@@ -98,6 +98,11 @@ nil: Prompt delete or not."
   :type 'boolean
   :group 'calibredb)
 
+(defcustom calibredb-preferred-format "epub"
+  "Set to your preferred book format for sorting"
+  :type 'string
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
@@ -423,6 +428,7 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:book-dir               ,(nth 2 spl-query-result))
           (:book-name              ,(nth 3 spl-query-result))
           (:book-format  ,(downcase (nth 4 spl-query-result)))
+          (:pref-format  ,(if (cl-equalp (nth 4 spl-query-result) calibredb-preferred-format) 1 0))
           (:book-pubdate           ,(nth 5 spl-query-result))
           (:book-title             ,(nth 6 spl-query-result))
           (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
@@ -525,6 +531,15 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       (setq display-alist
             (cons (list (calibredb-format-item item) item) display-alist)))))
 
+(defun calibredb-sort-preferred-format (alist)
+  "Sort book list by preferred format."
+  (setq alist (cl-sort alist '>
+                       :key (lambda (x)
+                              (calibredb-getattr (list x) :pref-format))))
+  (setq alist (cl-stable-sort alist '>
+                              :key (lambda (x)
+                                     (string-to-number (calibredb-getattr (list x) :id))))))
+
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
   (let* ((query-result (calibredb-query calibredb-query-string))
@@ -536,6 +551,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                  (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                      ;; decode and push to res-list
                      (push (calibredb-query-to-alist line) res-list)))
+               (setq res-list (calibredb-sort-preferred-format res-list))
                ;; filter archive/highlight/favorite items
                (dolist (item res-list)
                  (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
@@ -548,6 +564,9 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                         (setq res-list (remove item res-list))
                         (setq h-list (cons item h-list)))))
                ;; merge archive/highlight/favorite/rest items
+               (setq a-list (calibredb-sort-preferred-format a-list))
+               (setq f-list (calibredb-sort-preferred-format f-list))
+               (setq h-list (calibredb-sort-preferred-format h-list))
                (setq res-list (nconc f-list h-list res-list a-list))
                (calibredb-getbooklist (nreverse res-list)))))))
 
