@@ -113,7 +113,8 @@
    ["Set metadata"
     ("s" "Set metadata With Arguments"         calibredb-set-metadata--transient)
     ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
-    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)]]
+    ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)
+    ("d" "Fetch and set metadata by identifier"  calibredb-fetch-and-set-metadata-by-id)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-export-dispatch ()
