@@ -745,10 +745,11 @@ Optional argument ARG."
                 ((string= type "author") (if arg (calibredb-fetch-metadata title authors)
                                            (calibredb-fetch-metadata authors title)))
                 ((string= type "isbn") (if arg
-                                           (calibredb-fetch-metadata authors title title)
+                                           (calibredb-fetch-metadata authors title nil title)
                                          (calibredb-fetch-metadata
                                           authors
                                           title
+                                          nil
                                           (cond ((calibredb-auto-detect-isbn))
                                                 (""))))))))
     (cond (metadata
