@@ -80,9 +80,11 @@
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
+    ("." "Quick Look"  calibredb-quick-look)
     ("." "Open dired"  calibredb-open-dired)]
    [("e" "Export" calibredb-export-dispatch)
     ("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ("y" "Yank"   calibredb-yank-dispatch)
     ("'" "Search with rga" calibredb-rga)]]
   [("q" "Quit"   transient-quit-one)])
 

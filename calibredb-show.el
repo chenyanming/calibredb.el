@@ -50,6 +50,8 @@
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
+    (define-key map "y" #'calibredb-yank-dispatch)
+    (define-key map "," #'calibredb-quick-look)
     (define-key map "." #'calibredb-open-dired)
     (define-key map "\M-/" #'calibredb-rga)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
