@@ -270,6 +270,12 @@ Set negative to keep original length."
   :group 'calibredb
   :type 'string)
 
+(defcustom calibredb-add-duplicate t
+  "Add file to calibredb even it is duplicated, when using
+`calibredb-add'. Set nil to Disable it."
+  :type 'boolean
+  :group 'calibredb)
+
 (defvar calibredb-query-string-old "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM

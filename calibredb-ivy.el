@@ -65,7 +65,9 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
   (interactive "P")
   (let ((output (calibredb-command :command "add"
                                    :input (shell-quote-argument (expand-file-name file))
-                                   :library (format "--library-path %s" (calibredb-root-dir-quote)))))
+                                   :library (if calibredb-add-duplicate
+                                                (format "--library-path %s -d" (calibredb-root-dir-quote))
+                                              (format "--library-path %s" (calibredb-root-dir-quote))))))
     (if (s-contains? "Added book ids" output)
         (cond ((string= calibredb-add-delete-original-file "yes")
                (if arg (message "Adding files succeeded, files were kept.")
