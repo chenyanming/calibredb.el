@@ -167,6 +167,18 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
 
+(defun calibredb-quick-look (&optional candidate)
+  "Quick the file with the qlmanage, but it only Support macOS.
+Optional argument CANDIDATE is the selected item."
+  (interactive)
+  (unless candidate
+    (setq candidate (car (calibredb-find-candidate-at-point))))
+  (let ((file (shell-quote-argument
+               (expand-file-name (calibredb-getattr candidate :file-path)))))
+    (if (eq system-type 'darwin)
+        (call-process-shell-command (concat "qlmanage -p " file) nil 0)
+      (message "This feature only supports macOS."))))
+
 (defun calibredb-read-metadatas (field &optional candidate)
   "Read metadata.
 Argument FIELD is the field to read.

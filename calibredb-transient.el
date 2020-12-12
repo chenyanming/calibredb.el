@@ -45,6 +45,7 @@
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("v" "View details"  calibredb-view)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
+    ("," "Quick Look"  calibredb-quick-look)
     ("." "Open dired"  calibredb-open-dired)]
    [("m" "Mark" calibredb-mark-and-forward)
     ("u" "Unmark and forward" calibredb-unmark-and-forward)
@@ -66,9 +67,10 @@
     ("t" "Toggle view (Compact/Detail)"   calibredb-toggle-view)]]
   ["Other operation"
    [("b" "BibTex"   calibredb-catalog-bib-dispatch)
-   ("i" "Edit Annotation" calibredb-edit-annotation)]
+    ("i" "Edit Annotation" calibredb-edit-annotation)]
    [("'" "Search with rga" calibredb-rga)
-   ("/" "Live Filter" calibredb-search-live-filter)]]
+    ("/" "Live Filter" calibredb-search-live-filter)]
+   [("y" "Yank" calibredb-yank-dispatch)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-entry-dispatch ()
@@ -151,6 +153,13 @@
   [["Bibtex"
     ("o" "Find BibTex file"         calibredb-find-bib)
     ("b" "Update BibTex file"         calibredb-catalog-bib--transient)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-yank-dispatch ()
+  "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
+  :man-page "calibredb"
+  ["Yank operaion"
+   [("y" "Copy as org links"         calibredb-copy-as-org-link)]]
   [("q" "Quit"   transient-quit-one)])
 
 (defun calibredb-transient-read-bib-fields (prompt _initial-input _history)

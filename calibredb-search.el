@@ -104,7 +104,9 @@ When live editing the filter, it is bound to :live.")
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-view)
     (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "," #'calibredb-quick-look)
     (define-key map "." #'calibredb-open-dired)
+    (define-key map "y" #'calibredb-yank-dispatch)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
@@ -686,7 +688,7 @@ ebook record will be shown.
 
 3. Inserting Spaces between
    keywords can narrow down the search results."
- 
+
   (interactive)
   (unwind-protect
       (let ((calibredb-search-filter-active :live))
@@ -929,7 +931,13 @@ ARGUMENT FILTER is the filter string."
                                       (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
                                  (t "")) id title))
            (message "Copied: %s - \"%s\" as org link." id title)))
-       (buffer-string)))))
+       (buffer-string)))
+    ;; remove overlays and text properties
+    (let* ((beg (point-min))
+           (end (point-max))
+           (inhibit-read-only t))
+      (remove-overlays beg end)
+      (remove-text-properties beg end '(calibredb-mark nil)))))
 
 (provide 'calibredb-search)
 
