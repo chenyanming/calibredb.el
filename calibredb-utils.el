@@ -514,10 +514,14 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
         (unless end-page (setq end-page 10))
         (cond ((string= (url-file-extension file-path) ".pdf")
                (while (< page end-page) ; scanning from below because we want to find first instance of ISBN
-                 (let ((match (cdr (assoc 'edges (car (pdf-info-search-string
-                                                       "isbn"
-                                                       page
-                                                       file-path))))))
+                 (let ((match (cdr (assoc 'edges (car (or (pdf-info-search-string
+                                                        "isbn"
+                                                        page
+                                                        file-path)
+                                                          (pdf-info-search-string
+                                                           "number-"
+                                                           page
+                                                           file-path)))))))
                    ;; (current-buffer)))))))
                    (setq page (1+ page))
                    (cond (match (setq isbn-line
@@ -527,8 +531,10 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
                                        'line file-path))
                                 (setq page (1+ end-page))))))
                (cond (isbn-line
-                      (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
-                      (match-string 3 isbn-line))
+                      (cond ((string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
+                             (match-string 3 isbn-line))
+                            ((string-match "13: *\\([0-9- x]*\\) *" isbn-line)
+                             (match-string 1 isbn-line))))
                      (t nil)))
               (t nil)))
     (message "Should be invoked from *calibredb-search* buffer")))
