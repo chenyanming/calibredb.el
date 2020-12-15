@@ -514,10 +514,14 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
         (unless end-page (setq end-page 10))
         (cond ((string= (url-file-extension file-path) ".pdf")
                (while (< page end-page) ; scanning from below because we want to find first instance of ISBN
-                 (let ((match (cdr (assoc 'edges (car (pdf-info-search-string
-                                                       "isbn"
-                                                       page
-                                                       file-path))))))
+                 (let ((match (cdr (assoc 'edges (car (or (pdf-info-search-string
+                                                        "isbn"
+                                                        page
+                                                        file-path)
+                                                          (pdf-info-search-string
+                                                           "number-"
+                                                           page
+                                                           file-path)))))))
                    ;; (current-buffer)))))))
                    (setq page (1+ page))
                    (cond (match (setq isbn-line
@@ -527,8 +531,10 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
                                        'line file-path))
                                 (setq page (1+ end-page))))))
                (cond (isbn-line
-                      (string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
-                      (match-string 3 isbn-line))
+                      (cond ((string-match "\\(ISBN\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
+                             (match-string 3 isbn-line))
+                            ((string-match "13: *\\([0-9- x]*\\) *" isbn-line)
+                             (match-string 1 isbn-line))))
                      (t nil)))
               (t nil)))
     (message "Should be invoked from *calibredb-search* buffer")))
@@ -538,9 +544,10 @@ Scan for isbn from page 1 upto (not including) END-PAGE (default 10) for pdf fil
 This function requires the djvu (djvu.el) package to be installed.
 Scan for isbn from the first 9 pages of the djvu file."
   (djvu-find-file (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
+  (djvu-goto-page 1)
   (let* ((match (let ((page djvu-doc-page)
                       (match nil))
-                  (while (not (or match (eq page 10)))
+                  (while (not (or match (> page 10)))
                     (djvu-next-page 1)
                     (setq page djvu-doc-page)
                     (when (re-search-forward "^.*isbn.*$" nil t) (setq match t)))
@@ -549,10 +556,13 @@ Scan for isbn from the first 9 pages of the djvu file."
       (cond (match
              ;; (print (format "HELLO" (match-string-no-properties 0)))
              (setq isbn-line (match-string-no-properties 0))
+             (set-buffer-modified-p nil)
              (kill-buffer)
              (string-match "\\(isbn\\)[^0-9]*\\(10\\|13\\)*[^0-9]* *\\([0-9- x]*\\) *" isbn-line)
              (match-string 3 isbn-line))
-            (t (kill-buffer) nil)))))
+            (t
+             (set-buffer-modified-p nil)
+             (kill-buffer) nil)))))
 
 (defun calibredb-auto-detect-isbn ()
   "Invoke from calibre-search buffer and scan for isbn."
