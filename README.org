@@ -282,10 +282,10 @@ You can perform the following actions:
 PS:
 Workflows might be slightly changed in future versions.
 
-Notice: This package use *calibredb* update the *metadata.db* file rather than use
-sqlite to update the database. Sqlite is only used for reading rather than
-updating and deleting. But it is still very important to do backup by yourself.
-For example, with cloud services.
+Notice: This package use *[[https://manual.calibre-ebook.com/generated/en/calibredb.html][calibredb]]* update the *metadata.db* file rather than use sqlite to update
+the database. *Sqlite* is only used for reading rather than updating and deleting. It should be
+safe to modify the database with this package, but it is still very important to do backup by
+yourself. For example, with cloud services.
 
 * Q&A
 The keybindings mentioned below are referenced from
@@ -294,8 +294,8 @@ The keybindings mentioned below are referenced from
 ** Transient commands
 ~calibredb~ supports ~Transient commands~ just like ~magit~. Most of the features are binded in ~Transient commands~. You can press ~?~ to checkout.
 
-- ~calibredb-dispatch~: Invoke a calibredb command from a list of available commands in **calibredb-search** buffer.
-- ~calibredb-entry-dispatch~: Invoke a calibredb command from a list of available commands in **calibredb-entry** buffer.
+- ~calibredb-dispatch~: Invoke a calibredb command from a list of available commands in ~*calibredb-search*~ buffer.
+- ~calibredb-entry-dispatch~: Invoke a calibredb command from a list of available commands in ~*calibredb-entry*~ buffer.
 - ~calibredb-set-metadata-dispatch~: Set metadata.
 - ~calibredb-export-dispatch~: Export files.
 - ~calibredb-catalog-bib-dispatch~: BibTex operation.
