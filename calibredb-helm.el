@@ -45,7 +45,8 @@
        "Open file"                   'calibredb-find-file
        "View details"                'calibredb-show-entry
        "Open file other frame"       'calibredb-find-file-other-frame
-       "Open file with default tool" 'calibredb-open-file-with-default-tool
+       "Open file with default tool" (lambda (candidate)
+                                        (calibredb-open-file-with-default-tool nil candidate))
        "Open Cover Page"             'calibredb-find-cover
        "Set tags"          'calibredb-set-metadata--tags
        "Set comments"      'calibredb-set-metadata--comments
