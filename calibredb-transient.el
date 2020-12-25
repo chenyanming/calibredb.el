@@ -122,7 +122,7 @@
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-export-dispatch ()
-  "Dispatch for export."
+  "Dispatch for export files."
   ["Arguments"
    ("-a" "Do not convert non English characters for the file names"  "--dont-asciiize")
    ("-c" "Do not save cover"  "--dont-save-cover")
@@ -158,7 +158,7 @@
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-yank-dispatch ()
-  "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
+  "Invoke a Yank operation."
   :man-page "calibredb"
   ["Yank operaion"
    [("y" "Copy as org links"         calibredb-copy-as-org-link)]]

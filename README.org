@@ -189,7 +189,10 @@ You can output a BibTex file which can be used in org-ref.
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "q" #'calibredb-entry-quit)
+    (define-key map "y" #'calibredb-yank-dispatch)
+    (define-key map "," #'calibredb-quick-look)
     (define-key map "." #'calibredb-open-dired)
+    (define-key map "\M-/" #'calibredb-rga)
     (define-key map "\M-t" #'calibredb-set-metadata--tags)
     (define-key map "\M-a" #'calibredb-set-metadata--author_sort)
     (define-key map "\M-A" #'calibredb-set-metadata--authors)
@@ -222,7 +225,9 @@ You can output a BibTex file which can be used in org-ref.
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-view)
     (define-key map "V" #'calibredb-open-file-with-default-tool)
+    (define-key map "," #'calibredb-quick-look)
     (define-key map "." #'calibredb-open-dired)
+    (define-key map "y" #'calibredb-yank-dispatch)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
     (define-key map "r" #'calibredb-search-refresh-and-clear-filter)
@@ -286,6 +291,16 @@ For example, with cloud services.
 The keybindings mentioned below are referenced from
 #+html: <a href="#keybindings">keybindings</a>.
 
+** Transient commands
+~calibredb~ supports ~Transient commands~ just like ~magit~. Most of the features are binded in ~Transient commands~. You can press ~?~ to checkout.
+
+- ~calibredb-dispatch~: Invoke a calibredb command from a list of available commands in **calibredb-search** buffer.
+- ~calibredb-entry-dispatch~: Invoke a calibredb command from a list of available commands in **calibredb-entry** buffer.
+- ~calibredb-set-metadata-dispatch~: Set metadata.
+- ~calibredb-export-dispatch~: Export files.
+- ~calibredb-catalog-bib-dispatch~: BibTex operation.
+- ~calibredb-yank-dispatch~: Invoke a Yank operation.
+
 ** What is my working library?
 =M-x calibredb=, your current library path shows in the header in buffer =*calibredb-search*=
 Besides, variable =calibredb-root-dir= also saves the current library location.
@@ -294,6 +309,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
 1. =M-x calibredb=
    - In =*calibredb-search*= buffer, move the cursor to the ebook you want to open.
    - Press =RET/o/O/V= to open it.
+   - If you are using macOS, you can also press ~,~ to quick look the ebook.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
    - Select the ebook you want to open in the list
@@ -303,13 +319,17 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - In =*calibredb-search*= buffer, move the cursor to the ebook and press =v= to
      show details, or just =Right Click= on the ebook.
    - Then in =*calibredb-entry*= buffer, press =o/O/V= to open it.
-    
+
 ** How to add ebooks?
 1. =M-x calibredb-add=, select, mark ebooks (only ivy supports mark/unmark currently -
-   with =ivy-hydra=, in ivy-window, press =m= to mark, =DEL= or =u= to unmark. 
+   with =ivy-hydra=, in ivy-window, press =m= to mark, =DEL= or =u= to unmark.
    Other engines can only select one item) and add to current library.
 
 2. =M-x calibredb-add-dir= and select one directory, all supported formats will be added into current library.
+
+Please notice: Add books may fail! There are some reasons:
+- The book already exists in the database. If you still want to add the duplicated books, you can set ~calibredb-add-duplicate~ to ~Non-Nil~.
+- Not all book formats are supported. If you can not add a specific book, check the logs in **Messages** buffer.
 
 ** How to remove ebooks?
 1. =M-x calibredb=
@@ -321,7 +341,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
    - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
    - Perform remove action as shown in the menu.
 
-PS: If you want to delete in bulk with marked items, use ~calibredb-remove-marked-items~ instead.
+PS: If you want to delete in bulk with marked items, use ~calibredb-remove-marked-items~. ~m~ to mark items, ~D~ to bulk delete.
 
 ** How to switch virtual libraries?
 First, set =calibredb-library-alist= to include the calibre virtual libraries.
@@ -410,20 +430,30 @@ Here is the demo:
 
 ** How to do quick filtering?
 - Click the =calibredb-favorite-icon=, authors, file format, and tags.
-- Press =r= to reset the filtering.
+- Press =r/R= to reset the filtering.
 
   Demo:
- 
+
   [[file:img/quick_filter.gif]]
- 
+
 ** How to interact with org-ref?
 - Setup org-ref
   #+BEGIN_SRC emacs-lisp
   (require 'org-ref)
-  (setq calibredb-ref-default-bibliography (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+  (setq calibredb-ref-default-bibliography "~/Desktop/catalog.bib")
   (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
   (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
   #+END_SRC
+  or
+  #+BEGIN_SRC emacs-lisp
+    (use-package! org-ref
+    :after-call calibredb
+    :config
+    (setq calibredb-ref-default-bibliography "~/Desktop/catalog.bib")
+    (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
+    (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename))
+  #+END_SRC
+
 - In =*calibredb-search*= buffer, =b= =b= to generate the ebook catalogs with a BibTex
   file.
 - The BibTex file is generated under current library path - =calibredb-root-dir=.
@@ -456,7 +486,7 @@ frustrate you when dealing with big libraries:)
    decode the whole database.
 
 ** Can not remember the keybindings?
-Press ~?~, it will show you all actions.
+Press ~?~, it will show you almost all actions.
 
 Demo:
 #+attr_org: :width 600px
@@ -510,7 +540,7 @@ M-x calibredb-toggle-view
 TODO:
     - Multiple dashboard with different libraries.
     - Sorting.
-     
+
 ** calibredb-search-live-filter
 In =*calibredb-search*=,
 perform live filtering:
@@ -679,6 +709,16 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
+** =2020-12-25=
+Merry Christmas! I am happy to release *2.8.0*
+- Add ~calibredb-add-duplicate~, if you want to add the duplicated files, set it to ~Non-Nil~.
+- Add ~calibredb-quick-look~, in macOs, press ~,~ to Quick look the item.
+- Add ~calibredb-yank-dispatch~, you can copy the marked items with pressing ~yy~ as org links now.
+- Add "Fetch and set metadata by identifier", with keys ~sd~: ~calibredb-fetch-and-set-metadata-by-id~. Thanks [[https://github.com/tpeacock19][tpeacock19]]!
+- Minor improvement on ISBN auto detection. Thanks [[https://github.com/dalanicolai][dalanicolai]] tremendous help on auto fetching metadata feature!
+- Fix #23: Choosing the location where the bib file will be stored
+
+
 ** =2020-10-12=
 Version  *2.7.0:*
 - Add feature: Virtual Library
@@ -702,7 +742,7 @@ Version *2.6.0*:
 - Improve live filter: support space-separated multiple keywords.
 - Add configuration: =calibredb-show-results=
 - Add configuration: =calibredb-entry-render-comments=
- 
+
 ** =2020-08-09=
 Version *2.5.0*:
 - Add: =calibredb-fetch-and-set-metadata-by-author-and-title= and =calibredb-fetch-and-set-metadata-by-isbn= (thanks to Daniel Nicolai)
