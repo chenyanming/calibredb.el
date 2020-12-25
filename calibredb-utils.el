@@ -159,13 +159,17 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (find-file-other-frame (calibredb-getattr candidate :file-path)))
 
-(defun calibredb-open-file-with-default-tool (&optional candidate)
+(defun calibredb-open-file-with-default-tool (arg &optional candidate)
   "Open file with the system default tool.
+If the universal prefix argument is used then open the folder
+containing the current file by the default explorer.
 Optional argument CANDIDATE is the selected item."
-  (interactive)
+  (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path)))
+  (if arg
+      (calibredb-open-with-default-tool (file-name-directory (calibredb-getattr candidate :file-path) ))
+    (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path))))
 
 (defun calibredb-quick-look (&optional candidate)
   "Quick the file with the qlmanage, but it only Support macOS.
