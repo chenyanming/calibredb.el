@@ -106,10 +106,7 @@ nil: Prompt delete or not."
 (defcustom calibredb-virtual-library-alist '()
   "Alist for all your calibre virtual libraries.
 1. Left is the virtual library name that shows in the *calibredb-search* header.
-2. Right is the filter keywords - `calibredb-search-filter'.
-Example:
-(setq calibredb-virtual-library-alist '((\"Development\" . \"work pdf rust\")
-                                          (\"Read it later\" . \"Readit epub\")"
+2. Right is the filter keywords - `calibredb-search-filter'. "
   :type 'alist
   :group 'calibredb)
 
