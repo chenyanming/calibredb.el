@@ -872,8 +872,9 @@ With universal ARG \\[universal-argument] use title as initial value."
 
 (defun calibredb-ref-default-bibliography ()
   "Update the path of BibTex file."
-  (setq calibredb-ref-default-bibliography
-        (concat (file-name-as-directory calibredb-root-dir) "catalog.bib"))
+  (unless calibredb-ref-default-bibliography
+    (setq calibredb-ref-default-bibliography
+          (concat (file-name-as-directory calibredb-root-dir) "catalog.bib")))
   (if (boundp 'org-ref-default-bibliography)
       (if (file-exists-p calibredb-ref-default-bibliography)
           (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography))))
