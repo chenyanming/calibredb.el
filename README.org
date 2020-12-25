@@ -309,7 +309,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
 1. =M-x calibredb=
    - In =*calibredb-search*= buffer, move the cursor to the ebook you want to open.
    - Press =RET/o/O/V= to open it.
-   - If you are using macOS, you can also press ~,~ to quick look the ebook.
+   - If you are using macOS, you can also press =,= to quick look the ebook.
 
 2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
    - Select the ebook you want to open in the list
@@ -396,6 +396,7 @@ switch temporarily.
   retrieve metadata from the sources. Subsequently use =C-M-n/C-M-p= to select and
   preview the source to use for adding the metadata to the document. Press =RET=
   to add selected metadata to source.
+- In =*calibredb-search*= buffer, press =s d= to fetch metadata by identifier.
 
 Tips: You can filter the result via ~/~ before setting the metadata.
 
@@ -711,10 +712,10 @@ Search in ebooks.
 * Logs
 ** =2020-12-25=
 Merry Christmas! I am happy to release *2.8.0*
-- Add ~calibredb-add-duplicate~, if you want to add the duplicated files, set it to ~Non-Nil~.
-- Add ~calibredb-quick-look~, in macOs, press ~,~ to Quick look the item.
-- Add ~calibredb-yank-dispatch~, you can copy the marked items with pressing ~yy~ as org links now.
-- Add "Fetch and set metadata by identifier", with keys ~sd~: ~calibredb-fetch-and-set-metadata-by-id~. Thanks [[https://github.com/tpeacock19][tpeacock19]]!
+- Add ~calibredb-add-duplicate~, if you want to add the duplicated files, set it to ~non-Nil~.
+- Add ~calibredb-quick-look~, in macOS, press =,= to Quick look the item.
+- Add ~calibredb-yank-dispatch~, you can copy the marked items with pressing ~y y~ as org links now.
+- Add "Fetch and set metadata by identifier", with keys ~s d~: ~calibredb-fetch-and-set-metadata-by-id~. Thanks [[https://github.com/tpeacock19][tpeacock19]]!
 - Minor improvement on ISBN auto detection. Thanks [[https://github.com/dalanicolai][dalanicolai]] tremendous help on auto fetching metadata feature!
 - Fix #23: Choosing the location where the bib file will be stored
 
