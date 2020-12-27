@@ -481,17 +481,29 @@ Argument INPUT is the metadata contents to be set."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id)))
-        (calibredb-command :command "set_metadata"
-                           :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
-                           :id id
-                           :library (format "--library-path \"%s\"" calibredb-root-dir))))
-    (cond ((equal major-mode 'calibredb-show-mode)
-           (calibredb-show-refresh))
-          ((eq major-mode 'calibredb-search-mode)
-           (calibredb-search-refresh-or-resume))
-          (t nil))))
+    (calibredb-set-metadata--transient-process candidates)))
+
+(defun calibredb-set-metadata--transient-process (cands)
+  "Run sequential processes to set metadata with transient commands.
+Argument CANDS is the list of candiates."
+  (let ((cand (pop cands)))
+    ;; (pp cand)
+    (if cand
+        (set-process-sentinel
+         (let* ((id (calibredb-getattr cand :id)))
+           (calibredb-process :command "set_metadata"
+                              :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
+                              :id id
+                              :library (format "--library-path \"%s\"" calibredb-root-dir)))
+         (lambda (p e)
+           (when (= 0 (process-exit-status p))
+             (calibredb-set-metadata--transient-process cands))))
+      ;; if no candidate left to be processed, refresh *calibredb-search*
+      (cond ((equal major-mode 'calibredb-show-mode)
+             (calibredb-show-refresh))
+            ((eq major-mode 'calibredb-search-mode)
+             (calibredb-search-refresh-or-resume))
+            (t nil)))))
 
 (defun calibredb-find-candidate-at-point ()
   "Find candidate at point and return the list."
