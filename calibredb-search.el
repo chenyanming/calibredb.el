@@ -558,23 +558,7 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id))
-            (tags (calibredb-read-metadatas "tags" cand)))
-        (if (s-contains? calibredb-favorite-keyword tags)
-            (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-favorite-keyword "" tags))
-                               :id id
-                               :library (format "--library-path \"%s\"" calibredb-root-dir))
-          (calibredb-command :command "set_metadata"
-                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-favorite-keyword))
-                             :id id
-                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
-        (cond ((equal major-mode 'calibredb-show-mode)
-               (calibredb-show-refresh))
-              ((eq major-mode 'calibredb-search-mode)
-               (calibredb-search-refresh-or-resume))
-              (t nil))))))
+    (calibredb-toggle-metadata-process candidates calibredb-favorite-keyword)))
 
 ;; highlight
 (defun calibredb-toggle-highlight-at-point (&optional keyword)
@@ -584,23 +568,8 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id))
-            (tags (calibredb-read-metadatas "tags" cand)))
-        (if (s-contains? calibredb-highlight-keyword tags)
-            (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-highlight-keyword "" tags))
-                               :id id
-                               :library (format "--library-path \"%s\"" calibredb-root-dir))
-          (calibredb-command :command "set_metadata"
-                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-highlight-keyword))
-                             :id id
-                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
-        (cond ((equal major-mode 'calibredb-show-mode)
-               (calibredb-show-refresh))
-              ((eq major-mode 'calibredb-search-mode)
-               (calibredb-search-refresh-or-resume))
-              (t nil))))))
+    (calibredb-toggle-metadata-process candidates calibredb-highlight-keyword)))
+
 ;; archive
 (defun calibredb-toggle-archive-at-point (&optional keyword)
   "Toggle archive the current item.
@@ -609,24 +578,36 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id))
-            (tags (calibredb-read-metadatas "tags" cand)))
-        (if (s-contains? calibredb-archive-keyword tags)
-            (calibredb-command :command "set_metadata"
-                               :option (format "--field tags:\"%s\"" (s-replace calibredb-archive-keyword "" tags))
-                               :id id
-                               :library (format "--library-path \"%s\"" calibredb-root-dir))
-          (calibredb-command :command "set_metadata"
-                             :option (format "--field tags:\"%s,%s\"" tags (or keyword calibredb-archive-keyword))
-                             :id id
-                             :library (format "--library-path \"%s\"" calibredb-root-dir)))
-        (cond ((equal major-mode 'calibredb-show-mode)
-               (calibredb-show-refresh))
-              ((eq major-mode 'calibredb-search-mode)
-               (calibredb-search-refresh-or-resume))
-              (t nil))))))
+    (calibredb-toggle-metadata-process candidates calibredb-archive-keyword)))
 
+(defun calibredb-toggle-metadata-process (cands keyword)
+  "Run sequential processes to toggle metadata.
+Argument CANDS is the list of candiates.
+Argument KEYWORD is the metadata keyword to be toggled."
+  (let* ((cand (pop cands))
+         (tags (calibredb-read-metadatas "tags" cand)))
+    ;; (pp cand)
+    (if cand
+        (set-process-sentinel
+         (let* ((id (calibredb-getattr cand :id)))
+           (if (s-contains? keyword tags)
+               (calibredb-process :command "set_metadata"
+                                  :option (format "--field tags:\"%s\"" (s-replace keyword "" tags))
+                                  :id id
+                                  :library (format "--library-path \"%s\"" calibredb-root-dir))
+             (calibredb-process :command "set_metadata"
+                                :option (format "--field tags:\"%s,%s\"" tags keyword)
+                                :id id
+                                :library (format "--library-path \"%s\"" calibredb-root-dir))))
+         (lambda (p e)
+           (when (= 0 (process-exit-status p))
+             (calibredb-toggle-metadata-process cands keyword))))
+      ;; if no candidate left to be processed, refresh *calibredb-search*
+      (cond ((equal major-mode 'calibredb-show-mode)
+             (calibredb-show-refresh))
+            ((eq major-mode 'calibredb-search-mode)
+             (calibredb-search-refresh-or-resume))
+            (t nil)))))
 ;; live filtering
 
 (defun calibredb-search--update-list ()
