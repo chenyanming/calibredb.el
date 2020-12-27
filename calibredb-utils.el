@@ -404,6 +404,10 @@ Argument PROPS are the additional parameters."
       (calibredb-set-metadata-process cands field input))))
 
 (defun calibredb-set-metadata-process (cands field input)
+  "Run sequential processes to set metadata.
+Argument CANDS is the list of candiates.
+Argument FIELD is the metadata field, e.g. tags, author.
+Argument INPUT is the metadata contents to be set."
   (let ((cand (pop cands)))
     ;; (pp cand)
     (if cand
