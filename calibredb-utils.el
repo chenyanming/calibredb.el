@@ -387,32 +387,43 @@ Argument PROPS are the additional parameters."
   (let ((candidates (plist-get props :candidate)))
     (unless candidates
       (setq candidates (or (calibredb-find-marked-candidates) (calibredb-find-candidate-at-point))))
-    (let ((last-input))
-      (dolist (cand (cond ((memq this-command '(ivy-dispatching-done)) (list candidates))
-                          ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
-                                                                                 (helm-marked-candidates) nil))
-                          (t candidates)))
-        (let* ((title (calibredb-getattr cand :book-title))
-               (id (calibredb-getattr cand :id))
-               (prompt (plist-get props :prompt))
-               (field name)
-               (init (calibredb-get-init field cand))
-               (num (length (calibredb-find-marked-candidates)))
-               (input (or last-input (read-string (if (> num 0)
-                                                      (concat "Set " field " for " (number-to-string num) " items: ")
-                                                    (concat prompt id " " title ": ") ) init))))
-          (calibredb-command :command "set_metadata"
-                             :option "--field"
-                             :input (format "%s:\"%s\"" field input)
-                             :id id
-                             :library (format "--library-path \"%s\"" calibredb-root-dir))
-          ;; set the input as last input, so that all items use the same input
-          (setq last-input input)
-          (cond ((equal major-mode 'calibredb-show-mode)
-                 (calibredb-show-refresh))
-                ((eq major-mode 'calibredb-search-mode)
-                 (calibredb-search-refresh-or-resume))
-                (t nil)))))))
+    (let* ((cands (cond ((memq this-command '(ivy-dispatching-done)) (list candidates))
+                        ((memq this-command '(helm-maybe-exit-minibuffer)) (if (fboundp 'helm-marked-candidates)
+                                                                               (helm-marked-candidates) nil))
+                        (t candidates)))
+           (cand (car cands))           ; we use car of cands to get the prompt data
+           (title (calibredb-getattr cand :book-title))
+           (id (calibredb-getattr cand :id))
+           (prompt (plist-get props :prompt))
+           (field name)
+           (init (calibredb-get-init field cand))
+           (num (length cands))
+           (input (read-string (if (> num 0)
+                                   (concat "Set " field " for " (number-to-string num) " items: ")
+                                 (concat prompt id " " title ": ") ) init)))
+      (calibredb-set-metadata-process cands field input))))
+
+(defun calibredb-set-metadata-process (cands field input)
+  (let ((cand (pop cands)))
+    ;; (pp cand)
+    (if cand
+        (set-process-sentinel
+         (let* ((id (calibredb-getattr cand :id)))
+           (calibredb-process :command "set_metadata"
+                              :option "--field"
+                              :input (format "%s:\"%s\"" field input)
+                              :id id
+                              :library (format "--library-path \"%s\"" calibredb-root-dir)))
+         (lambda (p e)
+           (when (= 0 (process-exit-status p))
+             (calibredb-set-metadata-process cands field input))))
+      ;; if no candidate left to be processed, refresh *calibredb-search*
+      (cond ((equal major-mode 'calibredb-show-mode)
+             (calibredb-show-refresh))
+            ((eq major-mode 'calibredb-search-mode)
+             (calibredb-search-refresh-or-resume))
+            (t nil)))))
+
 
 (defun calibredb-set-metadata--tags (&optional candidate)
   "Add tags, divided by comma, on marked CANDIDATEs."

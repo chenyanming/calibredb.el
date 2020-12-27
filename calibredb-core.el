@@ -385,19 +385,28 @@ OR author_sort LIKE '%%%s%%'
                             ,(calibredb-struct-input command-string)
                             ,(calibredb-struct-id command-string)
                             ,(calibredb-struct-library command-string)) " ")))
-    ;; (calibredb-get-action command-string)
-    ;; (add-to-list 'display-buffer-alist (cons "\\*Async Shell Command\\*" (cons #'display-buffer-no-window t)))
-    ;; (let* ((output-buffer (get-buffer-create "*Async Shell Command*"))
-    ;;        (proc (progn
-    ;;                (async-shell-command line output-buffer)
-    ;;                (get-buffer-process output-buffer))))
-    ;;   (if (process-live-p proc)
-    ;;       ;; (set-process-sentinel proc #'do-something)
-    ;;       nil
-    ;;     (message "No process running.")))
     (setq-local inhibit-message t)
     (message "%s" line)
     (message "%s" (shell-command-to-string line))))
+
+(cl-defun calibredb-process (&key command option input id library action)
+  (let* ((command-string (make-calibredb-struct
+                          :command command
+                          :option option
+                          :input input
+                          :id id
+                          :library library
+                          :action action))
+         (line (mapconcat #'identity
+                          `(,calibredb-program
+                            ,(calibredb-struct-command command-string)
+                            ,(calibredb-struct-option command-string)
+                            ,(calibredb-struct-input command-string)
+                            ,(calibredb-struct-id command-string)
+                            ,(calibredb-struct-library command-string)) " ")))
+    (setq-local inhibit-message t)
+    (message "%s" line)
+    (start-process-shell-command "calibredb" "*calibredb*" line)))
 
 (defun calibredb-chomp (s)
   "Argument S is string."
