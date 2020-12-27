@@ -869,6 +869,21 @@ With universal ARG \\[universal-argument] use title as initial value."
                        :id id
                        :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
+;; TODO convert ebooks
+(defun calibredb-convert (&optional candidate)
+  "Convert the slected CANDIDATE."
+  (interactive)
+  (unless candidate
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+  (let ((id (calibredb-getattr candidate :id))
+        (file (calibredb-getattr candidate :file-path)))
+    (calibredb-convert-process
+     :input file
+     :output (format "%s" (calibredb-complete-file-quote "Convert as"))
+     :option (s-join " " (-remove 's-blank? (-flatten (calibredb-convert-arguments)))))))
+
 ;; catalog
 
 (defun calibredb-catalog ()

@@ -120,6 +120,16 @@ nil: Prompt delete or not."
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-convert-program
+  (cond
+   ((eq system-type 'darwin)
+    "/Applications/calibre.app/Contents/MacOS/ebook-convert")
+   (t
+    "ebook-convert"))
+  "Executable used to convert ebooks."
+  :type 'file
+  :group 'calibredb)
+
 (defcustom calibredb-debug-program
   (cond
    ((eq system-type 'darwin)
@@ -362,6 +372,9 @@ OR author_sort LIKE '%%%s%%'
 (cl-defstruct calibredb-struct
   command option input id library action)
 
+(cl-defstruct calibredb-convert-struct
+  input output option)
+
 (defun calibredb-get-action (state)
   "Get the action function from STATE."
   (let ((action (calibredb-struct-action state)))
@@ -407,6 +420,21 @@ OR author_sort LIKE '%%%s%%'
     (setq-local inhibit-message t)
     (message "%s" line)
     (start-process-shell-command "calibredb" "*calibredb*" line)))
+
+;; TODO
+(cl-defun calibredb-convert-process (&key input output option)
+  (let* ((command-string (make-calibredb-convert-struct
+                          :input input
+                          :output output
+                          :option option))
+         (line (mapconcat #'identity
+                          `(,calibredb-convert-program
+                            ,(calibredb-convert-struct-input command-string)
+                            ,(calibredb-convert-struct-output command-string)
+                            ,(calibredb-convert-struct-option command-string)) " ")))
+    (setq-local inhibit-message t)
+    (message "%s" line)
+    (start-process-shell-command "ebook-convert" "*ebook-convert*" line)))
 
 (defun calibredb-chomp (s)
   "Argument S is string."

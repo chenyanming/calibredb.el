@@ -139,6 +139,27 @@
    ("-A" "Export all books in database, ignoring the list of ids" "--all")]
   [["Export"
     ("e" "Export"         calibredb-export)]]
+  ;; [["Convert"
+  ;;   ("E" "Epub"   calibredb-convert-to-epub-dispatch)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-convert-to-epub-dispatch ()
+  "TODO: Dispatch for convert to epub."
+  ["Arguments"
+   ("-a" "Turn off splitting at page breaks."  "--dont-split-on-page-breaks")
+   ("-c" "This option is needed only if you intend to use the EPUB with FBReaderJ."  "--epub-flatten")
+   ("-m" "Insert an inline Table of Contents that will appear as part of the main book content."  "--epub-inline-toc")
+   ("-o" "Put the inserted inline Table of Contents at the end of the book instead of the start." "--epub-toc-at-end")
+   ("-f" "The version of the EPUB file to generate."  "--epub-version")
+   ("-p" "Extract the contents of the generated EPUB file to the specified directory. "  "--extract-to")
+   ("-r" "Split all HTML files larger than this size (in KB). " "--flow-size")
+   ("-s" "This option disables the generation of this cover." "--no-default-epub-cover")
+   ("-t" "Do not use SVG for the book cover."  "--no-svg-cover")
+   ("-d" "When using an SVG cover, this option will cause the cover to scale to cover the available screen area, but still preserve its aspect ratio (ratio of width to height)" "--preserve-cover-aspect-ratio")
+   ("-l" "If specified, the output plugin will try to create output that is as human readable as possible." "--pretty-print")
+   ("-A" "Title for any generated in-line table of contents." "--toc-title")]
+  [["Export"
+    ("e" "Export" calibredb-convert)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-catalog-bib-dispatch ()
@@ -256,6 +277,10 @@ Argument PROMPT prompt to show."
 (defun calibredb-export-arguments ()
   "Return the latest used arguments in the `calibredb-export-dispatch' transient."
   (car (alist-get 'calibredb-export-dispatch transient-history)))
+
+(defun calibredb-convert-arguments ()
+  "Return the latest used arguments in the `calibredb-convert-to-epub-dispatch' transient."
+  (car (alist-get 'calibredb-convert-to-epub-dispatch transient-history)))
 
 (defun calibredb-catalog-bib-arguments ()
   "Return the latest used arguments in the `calibredb-catalog-bib-dispatch' transient."
