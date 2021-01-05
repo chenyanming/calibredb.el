@@ -1,4 +1,4 @@
-#+TITLE:   calibredb.el
+#+TITLE:   [[https://github.com/chenyanming/calibredb.el][calibredb.el]]
 #+DATE:    Aug 9, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
@@ -10,6 +10,7 @@
 #+HTML_HEAD: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/lib/js/jquery.stickytableheaders.min.js"></script>
 #+HTML_HEAD: <script type="text/javascript" src="https://fniessen.github.io/org-html-themes/src/readtheorg_theme/js/readtheorg.js"></script>
+
 [[https://melpa.org/#/calibredb][file:https://melpa.org/packages/calibredb-badge.svg]]
 
 * Table of Contents :TOC_1:noexport:
