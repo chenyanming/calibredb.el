@@ -327,7 +327,7 @@ WITH d AS (
     SELECT *
     FROM books
 )
-SELECT d.book, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, t.tag, d.uncompressed_size, c.text, group_concat(i.type || ':' || i.val) AS ids, p.name AS publisher, s.name AS series, l.lang_code, b.last_modified
+SELECT d.book AS id, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, t.tag, d.uncompressed_size, c.text, group_concat(i.type || ':' || i.val) AS ids, p.name AS publisher, s.name AS series, l.lang_code, b.last_modified
 FROM d
 LEFT JOIN p
 ON d.book = p.book
@@ -560,7 +560,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
-  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE book = %s" calibredb-query-string id)))
+  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
          (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
