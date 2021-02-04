@@ -560,7 +560,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
-  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
+  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE book = %s" calibredb-query-string id)))
          (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list)
