@@ -48,6 +48,7 @@
 (require 'calibredb-annotation)
 (require 'calibredb-transient)
 (require 'calibredb-library)
+(require 'calibredb-org)
 
 ;;;###autoload
 (defun calibredb ()
