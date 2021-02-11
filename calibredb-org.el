@@ -27,7 +27,7 @@
 (declare-function calibredb-find-marked-candidates "calibredb-utils.el")
 (declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
 
-
+;;;###autoload
 (defun calibredb-org-link-setup ()
   "Setup calibredb org links."
   (interactive)
