@@ -36,7 +36,7 @@
 
 (defun calibredb-org-link-view (id _)
   "Follow calibredb org links."
-  (calibredb-show-entry (cdar (calibredb-candidate id)) :switch))
+  (calibredb-show-entry (cdar (calibredb-candidate id))))
 
 (defun calibredb-org-link-copy ()
   "Copy the marked items as calibredb org links."
