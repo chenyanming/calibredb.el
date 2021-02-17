@@ -104,8 +104,11 @@ The result depends on the value of `calibredb-show-unique-buffers'."
   "Quit the *calibredb-entry*."
   (interactive)
   (when (eq major-mode 'calibredb-show-mode)
-    (if (get-buffer "*calibredb-entry*")
-        (kill-buffer "*calibredb-entry*"))))
+    (when (get-buffer "*calibredb-entry*")
+      (pop-to-buffer "*calibredb-entry*")
+      (if (< (length (window-prev-buffers)) 2)
+          (kill-buffer-and-window)
+        (kill-buffer)))))
 
 (provide 'calibredb-show)
 
