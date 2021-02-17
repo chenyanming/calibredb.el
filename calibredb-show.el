@@ -107,8 +107,10 @@ The result depends on the value of `calibredb-show-unique-buffers'."
     (when (get-buffer "*calibredb-entry*")
       (pop-to-buffer "*calibredb-entry*")
       (if (< (length (window-prev-buffers)) 2)
-          (kill-buffer-and-window)
-        (kill-buffer)))))
+        (progn
+          (quit-window)
+          (kill-buffer "*calibredb-entry*"))
+        (kill-buffer "*calibredb-entry*")))))
 
 (provide 'calibredb-show)
 
