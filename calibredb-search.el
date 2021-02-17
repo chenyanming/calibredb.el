@@ -423,6 +423,7 @@ Argument EVENT mouse event."
                (kill-buffer-and-window)
              (kill-buffer)))
           ((get-buffer "*calibredb-search*")
+           (quit-window)
            (kill-buffer "*calibredb-search*")))))
 
 (defun calibredb-mark-at-point ()
