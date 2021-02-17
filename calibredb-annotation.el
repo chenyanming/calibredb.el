@@ -126,7 +126,9 @@ Bound to \\<C-cC-k> in `calibredb-edit-annotation-mode'."
   (interactive)
   (when (eq major-mode 'calibredb-edit-annotation-mode)
     (if (< (length (window-prev-buffers)) 2)
-        (kill-buffer-and-window)
+        (progn
+          (quit-window)
+          (kill-buffer "*calibredb-edit-annatation*"))
       (kill-buffer))))
 
 (provide 'calibredb-annotation)
