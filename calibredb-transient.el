@@ -182,7 +182,8 @@
   "Invoke a Yank operation."
   :man-page "calibredb"
   ["Yank operaion"
-   [("y" "Copy as org links"         calibredb-copy-as-org-link)]]
+   [("y" "Copy as calibredb org links"         calibredb-org-link-copy)
+    ("f" "Copy as file org links"              calibredb-copy-as-org-link)]]
   [("q" "Quit"   transient-quit-one)])
 
 (defun calibredb-transient-read-bib-fields (prompt _initial-input _history)

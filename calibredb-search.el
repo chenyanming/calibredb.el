@@ -903,7 +903,7 @@ ARGUMENT FILTER is the filter string."
          (let ((id (calibredb-getattr cand :id))
                (path (calibredb-getattr cand :file-path))
                (title (calibredb-getattr cand :book-title)))
-           (insert (format "[[%s][%s %s - %s]]\n"
+           (insert (format "[[file:%s][%s %s - %s]]\n"
                            path
                            (cond (calibredb-format-all-the-icons
                                   (if (fboundp 'all-the-icons-icon-for-file)
