@@ -100,18 +100,7 @@ Argument FILEPATH is the file path."
                      "cmd.exe" "/c" (expand-file-name filepath))
     (start-process "shell-process" "*Messages*"
                    (cond ((eq system-type 'gnu/linux)
-                          (calibredb-chomp
-                           (shell-command-to-string
-                            (concat
-                             "grep Exec "
-                             (car
-                              (delq nil (let ((mime-appname (calibredb-chomp (replace-regexp-in-string
-                                                                              "kde4-" "kde4/"
-                                                                              (shell-command-to-string "xdg-mime query default application/pdf")))))
-                                          (mapcar
-                                           (lambda (dir) (let ((outdir (concat dir "/" mime-appname))) (if (file-exists-p outdir) outdir)))
-                                           '("~/.local/share/applications" "/usr/local/share/applications" "/usr/share/applications")))))
-                             "|head -1|awk '{print $1}'|cut -d '=' -f 2"))))
+                          "xdg-open")
                          ((eq system-type 'windows-nt)
                           "start")
                          ((eq system-type 'darwin)
