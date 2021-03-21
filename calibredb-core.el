@@ -706,7 +706,7 @@ Argument BOOK-ALIST ."
      (calibredb-format-column (propertize tag
                                           'face 'calibredb-tag-face
                                           'mouse-face 'calibredb-mouse-face
-                                          'help-echo "Filter with this man"
+                                          'help-echo "Filter with this tag"
                                           'keymap tag-map) (calibredb-tag-width) :left)
      (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)
