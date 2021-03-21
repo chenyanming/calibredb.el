@@ -525,6 +525,16 @@ then in =*calibredb-search*=, =*calibredb-entry*= buffer or under =pdf-view-mode
 M-x calibredb-rga
 #+END_SRC
 
+** How to interact with calibredb files in org files?
+First enable org link with:
+#+begin_src emacs-lisp
+M-x calibredb-org-link-setup
+#+end_src
+
+In ~*calibredb-search*~ buffer,
+- ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.
+- ~y f~ copy as file org link. If you click the link, it will open the file directly.
+
 ** More examples?
 Please check
 #+html: <a href="#keybindings">keybindings</a> .
@@ -719,6 +729,17 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
+** =2021-03-21=
+Version  *2.9.0:*
+- Now, it is able to set metadata asynchronous.
+- Add ~calibredb-org-link-setup~ to support org-link: ~calibredb:~, copy the marked items as org link with ~y y~ or ~y f~.
+- Improve exit functions on *~calibredb-search*~ and *~calibredb-entry*~ buffers.
+- Add universal prefix support for ~calibredb-open-file-with-default-tool~,
+  #+begin_src emacs-lisp
+  C-u M-x calibredb-open-file-with-default-tool
+  #+end_src
+   will open the folder where the file located.
+
 ** =2020-12-25=
 Merry Christmas! I am happy to release *2.8.0*
 - Add ~calibredb-add-duplicate~, if you want to add the duplicated files, set it to ~non-Nil~.

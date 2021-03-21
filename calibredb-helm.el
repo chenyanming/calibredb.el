@@ -28,6 +28,7 @@
 
 (declare-function calibredb-set-metadata--tags "calibredb-utils.el")
 (declare-function calibredb-set-metadata--comments "calibredb-utils.el")
+(declare-function calibredb-open-file-with-default-tool "calibredb-utils.el")
 (declare-function calibredb-show-entry "calibredb-search.el")
 
 (defvar calibredb-helm-map

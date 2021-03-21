@@ -47,6 +47,7 @@
 (declare-function pdf-info-search-string "pdf-info")
 (declare-function pdf-info-gettext "pdf-info")
 (declare-function djvu-find-file "djvu")
+(declare-function djvu-goto-page "djvu")
 (declare-function djvu-next-page "djvu")
 
 (defvar djvu-doc-page)
@@ -418,7 +419,7 @@ Argument INPUT is the metadata contents to be set."
                               :input (format "%s:\"%s\"" field input)
                               :id id
                               :library (format "--library-path \"%s\"" calibredb-root-dir)))
-         (lambda (p e)
+         (lambda (p _e)
            (when (= 0 (process-exit-status p))
              (calibredb-set-metadata-process cands field input))))
       ;; if no candidate left to be processed, refresh *calibredb-search*
@@ -495,7 +496,7 @@ Argument CANDS is the list of candiates."
                               :option (format "--field \"%s\"" (s-join "\" --field \"" (-remove 's-blank? (-flatten (calibredb-set-metadata-arguments)))))
                               :id id
                               :library (format "--library-path \"%s\"" calibredb-root-dir)))
-         (lambda (p e)
+         (lambda (p _e)
            (when (= 0 (process-exit-status p))
              (calibredb-set-metadata--transient-process cands))))
       ;; if no candidate left to be processed, refresh *calibredb-search*
@@ -871,13 +872,13 @@ With universal ARG \\[universal-argument] use title as initial value."
 
 ;; TODO convert ebooks
 (defun calibredb-convert (&optional candidate)
-  "Convert the slected CANDIDATE."
+  "TODO: Convert the slected CANDIDATE."
   (interactive)
   (unless candidate
     (if (eq major-mode 'calibredb-search-mode)
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let ((id (calibredb-getattr candidate :id))
+  (let (;; (id (calibredb-getattr candidate :id))
         (file (calibredb-getattr candidate :file-path)))
     (calibredb-convert-process
      :input file

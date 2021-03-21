@@ -23,20 +23,18 @@
 
 
 (require 'calibredb-core)
+(require 'ol)
+
 (declare-function calibredb-show-entry "calibredb-search.el")
 (declare-function calibredb-find-marked-candidates "calibredb-utils.el")
 (declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
 
-;;;###autoload
-(defun calibredb-org-link-setup ()
-  "Setup calibredb org links."
-  (interactive)
-  (require 'ol)
-  (org-link-set-parameters "calibredb" :follow #'calibredb-org-link-view))
 
 (defun calibredb-org-link-view (id _)
   "Follow calibredb org links."
   (calibredb-show-entry (cdar (calibredb-candidate id))))
+
+(org-link-set-parameters "calibredb" :follow #'calibredb-org-link-view)
 
 (defun calibredb-org-link-copy ()
   "Copy the marked items as calibredb org links."

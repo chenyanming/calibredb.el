@@ -561,7 +561,7 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (calibredb-toggle-metadata-process candidates calibredb-favorite-keyword)))
+    (calibredb-toggle-metadata-process candidates (or keyword calibredb-favorite-keyword ))))
 
 ;; highlight
 (defun calibredb-toggle-highlight-at-point (&optional keyword)
@@ -571,7 +571,7 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (calibredb-toggle-metadata-process candidates calibredb-highlight-keyword)))
+    (calibredb-toggle-metadata-process candidates (or keyword calibredb-highlight-keyword ))))
 
 ;; archive
 (defun calibredb-toggle-archive-at-point (&optional keyword)
@@ -581,7 +581,7 @@ Argument KEYWORD is the tag keyword."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (calibredb-toggle-metadata-process candidates calibredb-archive-keyword)))
+    (calibredb-toggle-metadata-process candidates (or keyword calibredb-archive-keyword ))))
 
 (defun calibredb-toggle-metadata-process (cands keyword)
   "Run sequential processes to toggle metadata.
@@ -602,7 +602,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
                                 :option (format "--field tags:\"%s,%s\"" tags keyword)
                                 :id id
                                 :library (format "--library-path \"%s\"" calibredb-root-dir))))
-         (lambda (p e)
+         (lambda (p _e)
            (when (= 0 (process-exit-status p))
              (calibredb-toggle-metadata-process cands keyword))))
       ;; if no candidate left to be processed, refresh *calibredb-search*
