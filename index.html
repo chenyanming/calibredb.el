@@ -3,12 +3,12 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-01-05 Tue 21:58 -->
+<!-- 2021-03-21 Sun 17:53 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title><a href="https://github.com/chenyanming/calibredb.el">calibredb.el</a></title>
-<meta name="generator" content="Org mode" />
+<title>[[https://github.com/chenyanming/calibredb.el][calibredb.el]]</title>
 <meta name="author" content="Damon Chan" />
+<meta name="generator" content="Org Mode" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
   .title  { text-align: center;
@@ -52,7 +52,7 @@
     padding: 3px;
     border: 1px solid black;
   }
-  pre.src:hover:before { display: inline;}
+  pre.src:hover:before { display: inline; margin-top: 14px;}
   /* Languages per Org manual */
   pre.src-asymptote:before { content: 'Asymptote'; }
   pre.src-awk:before { content: 'Awk'; }
@@ -229,148 +229,151 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org7fae3fa">1. Description</a>
+<li><a href="#orga45ad4b">1. Description</a>
 <ul>
-<li><a href="#org0fcd810">1.1. Related package</a></li>
+<li><a href="#orge6c9e93">1.1. Related package</a></li>
 </ul>
 </li>
-<li><a href="#org0bd283f">2. Installation</a>
+<li><a href="#orgd74c150">2. Installation</a>
 <ul>
-<li><a href="#orgb8c448e">2.1. Install sqlite and calibre</a>
+<li><a href="#org451b11a">2.1. Install sqlite and calibre</a>
 <ul>
-<li><a href="#org6217495">2.1.1. macOS</a></li>
-<li><a href="#org34b95ac">2.1.2. Windows</a></li>
-<li><a href="#org96703a8">2.1.3. Linux</a></li>
+<li><a href="#orge57ae5b">2.1.1. macOS</a></li>
+<li><a href="#org882bb02">2.1.2. Windows</a></li>
+<li><a href="#orge1d89df">2.1.3. Linux</a></li>
 </ul>
 </li>
-<li><a href="#org2957c27">2.2. Install calibredb.el</a></li>
-<li><a href="#org66ce9cb">2.3. Spacemacs Layer</a></li>
+<li><a href="#org4c831fa">2.2. Install calibredb.el</a></li>
+<li><a href="#org5837935">2.3. Spacemacs Layer</a></li>
 </ul>
 </li>
-<li><a href="#orgfa75160">3. Configuration</a>
+<li><a href="#org2bc11f2">3. Configuration</a>
 <ul>
-<li><a href="#orgd7e5df1">3.1. Quick Start</a>
+<li><a href="#orgebed683">3.1. Quick Start</a>
 <ul>
-<li><a href="#orgc781760">3.1.1. require</a></li>
-<li><a href="#orgc62ef42">3.1.2. use-package</a></li>
+<li><a href="#org1bd7792">3.1.1. require</a></li>
+<li><a href="#org62321a8">3.1.2. use-package</a></li>
 </ul>
 </li>
-<li><a href="#org3ebb420">3.2. Virtual Libraries</a></li>
-<li><a href="#org3750236">3.3. Column width</a></li>
-<li><a href="#org70a5488">3.4. Size indicator</a></li>
-<li><a href="#orgf122495">3.5. File format icons</a></li>
-<li><a href="#orgbbf9ac4">3.6. Configure to support org-ref</a></li>
-<li><a href="#orgcd08327">3.7. keybindings</a></li>
+<li><a href="#org835e64f">3.2. Virtual Libraries</a></li>
+<li><a href="#org4ea8fc4">3.3. Column width</a></li>
+<li><a href="#orgcc725bf">3.4. Size indicator</a></li>
+<li><a href="#org4a93ce7">3.5. File format icons</a></li>
+<li><a href="#org87754e1">3.6. Configure to support org-ref</a></li>
+<li><a href="#orgb8483f0">3.7. keybindings</a></li>
 </ul>
 </li>
-<li><a href="#org734d174">4. Workflows</a>
+<li><a href="#orga04c718">4. Workflows</a>
 <ul>
-<li><a href="#orgf0286ec">4.1. Start with <code>calibredb</code></a></li>
-<li><a href="#org63c7ba1">4.2. Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></a></li>
-<li><a href="#org24e5c36">4.3. Start with <code>calibredb-list</code></a></li>
+<li><a href="#orgbe8695e">4.1. Start with <code>calibredb</code></a></li>
+<li><a href="#org2952f49">4.2. Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></a></li>
+<li><a href="#org484aa5d">4.3. Start with <code>calibredb-list</code></a></li>
 </ul>
 </li>
-<li><a href="#org1d6d61b">5. Q&amp;A</a>
+<li><a href="#orgd50347b">5. Q&amp;A</a>
 <ul>
-<li><a href="#orga859fbc">5.1. Transient commands</a></li>
-<li><a href="#org366fec6">5.2. What is my working library?</a></li>
-<li><a href="#org118878e">5.3. How to open an ebook?</a></li>
-<li><a href="#org4c5f6c4">5.4. How to add ebooks?</a></li>
-<li><a href="#org392b10d">5.5. How to remove ebooks?</a></li>
-<li><a href="#org7d2a85c">5.6. How to switch virtual libraries?</a></li>
-<li><a href="#org6014320">5.7. How to switch libraries?</a></li>
-<li><a href="#org7089bd5">5.8. How to set metadata on ebooks?</a>
+<li><a href="#org6bd76bd">5.1. Transient commands</a></li>
+<li><a href="#org93d9f2e">5.2. What is my working library?</a></li>
+<li><a href="#org242de31">5.3. How to open an ebook?</a></li>
+<li><a href="#orgf130ea5">5.4. How to add ebooks?</a></li>
+<li><a href="#orgdc24326">5.5. How to remove ebooks?</a></li>
+<li><a href="#orgfda0f2f">5.6. How to switch virtual libraries?</a></li>
+<li><a href="#orgbaf6172">5.7. How to switch libraries?</a></li>
+<li><a href="#org8815849">5.8. How to set metadata on ebooks?</a>
 <ul>
-<li><a href="#orgbe26a6a">5.8.1. About <code>fetch-ebook-metadata</code></a></li>
+<li><a href="#org221ad79">5.8.1. About <code>fetch-ebook-metadata</code></a></li>
 </ul>
 </li>
-<li><a href="#orgbb23844">5.9. How to mark favorite/highlight/archive on ebooks?</a></li>
-<li><a href="#org0b20e28">5.10. How to do live filtering?</a></li>
-<li><a href="#org0016ab9">5.11. How to do quick filtering?</a></li>
-<li><a href="#org62527c5">5.12. How to interact with org-ref?</a></li>
-<li><a href="#orgcbdbae5">5.13. Why the loading time is so long?</a></li>
-<li><a href="#org7907e2d">5.14. Can not remember the keybindings?</a></li>
-<li><a href="#org218b635">5.15. How to edit annotation with org-mode?</a></li>
-<li><a href="#org920c952">5.16. How to search in ebooks directly?</a></li>
-<li><a href="#orga71de8f">5.17. More examples?</a></li>
+<li><a href="#orgc2fee20">5.9. How to mark favorite/highlight/archive on ebooks?</a></li>
+<li><a href="#org608cd34">5.10. How to do live filtering?</a></li>
+<li><a href="#orgd576782">5.11. How to do quick filtering?</a></li>
+<li><a href="#org1fa2225">5.12. How to interact with org-ref?</a></li>
+<li><a href="#org8a69972">5.13. Why the loading time is so long?</a></li>
+<li><a href="#orgdacc7ad">5.14. Can not remember the keybindings?</a></li>
+<li><a href="#org9f48c8d">5.15. How to edit annotation with org-mode?</a></li>
+<li><a href="#org538c385">5.16. How to search in ebooks directly?</a></li>
+<li><a href="#org72f28a9">5.17. How to interact with calibredb files in org files?</a></li>
+<li><a href="#org77a8584">5.18. More examples?</a></li>
 </ul>
 </li>
-<li><a href="#org8ce4927">6. Supported Features</a>
+<li><a href="#org3993ca2">6. Supported Features</a>
 <ul>
-<li><a href="#org1b9fd11">6.1. calibredb</a></li>
-<li><a href="#org5a5cd4e">6.2. calibredb-search-live-filter</a></li>
-<li><a href="#org95999ea">6.3. calibredb-find-helm</a></li>
-<li><a href="#org9fac947">6.4. calibredb-find-counsel</a></li>
-<li><a href="#orgc6d5bda">6.5. calibredb-list</a></li>
-<li><a href="#org4dfc586">6.6. calibredb-clone</a></li>
-<li><a href="#orga9fddda">6.7. calibredb-library-list</a></li>
-<li><a href="#org8fbd1fd">6.8. calibredb-switch-library</a></li>
-<li><a href="#org7fddd77">6.9. Show details</a></li>
-<li><a href="#orgc0cdfc2">6.10. Dispatch</a>
+<li><a href="#org47d9c63">6.1. calibredb</a></li>
+<li><a href="#org99fe07c">6.2. calibredb-search-live-filter</a></li>
+<li><a href="#orgf760d15">6.3. calibredb-find-helm</a></li>
+<li><a href="#orga598b1b">6.4. calibredb-find-counsel</a></li>
+<li><a href="#orgbc74c4b">6.5. calibredb-list</a></li>
+<li><a href="#org13766dd">6.6. calibredb-clone</a></li>
+<li><a href="#orgdbc756d">6.7. calibredb-library-list</a></li>
+<li><a href="#org4684454">6.8. calibredb-switch-library</a></li>
+<li><a href="#org26581a9">6.9. Show details</a></li>
+<li><a href="#org4d9d281">6.10. Dispatch</a>
 <ul>
-<li><a href="#org1d1d1f4">6.10.1. calibredb-dispatch</a></li>
-<li><a href="#org3fc3868">6.10.2. calibredb-set-metadata-dispatch</a></li>
-<li><a href="#orgf1f642a">6.10.3. calibredb-catalog-bib-dispatch</a></li>
-<li><a href="#org592d8ad">6.10.4. calibredb-export-dispatch</a></li>
+<li><a href="#org5558e36">6.10.1. calibredb-dispatch</a></li>
+<li><a href="#org6225664">6.10.2. calibredb-set-metadata-dispatch</a></li>
+<li><a href="#org4b83f07">6.10.3. calibredb-catalog-bib-dispatch</a></li>
+<li><a href="#org8d53200">6.10.4. calibredb-export-dispatch</a></li>
 </ul>
 </li>
-<li><a href="#orgb6d1eec">6.11. add</a></li>
-<li><a href="#org51f2096">6.12. remove</a></li>
-<li><a href="#org47e4790">6.13. set<sub>metadata</sub></a></li>
-<li><a href="#org1302070">6.14. Export</a></li>
-<li><a href="#org572d928">6.15. Catalog</a>
+<li><a href="#orgb4d4f27">6.11. add</a></li>
+<li><a href="#org1a6ac10">6.12. remove</a></li>
+<li><a href="#orgcba3725">6.13. set<sub>metadata</sub></a></li>
+<li><a href="#org45cf872">6.14. Export</a></li>
+<li><a href="#org1969b4f">6.15. Yank</a></li>
+<li><a href="#org3895a36">6.16. Catalog</a>
 <ul>
-<li><a href="#orgb5b23aa">6.15.1. BibTex</a></li>
+<li><a href="#org1e2e024">6.16.1. BibTex</a></li>
 </ul>
 </li>
-<li><a href="#orgf76f5d4">6.16. calibredb-rga</a></li>
+<li><a href="#orgf4e503a">6.17. calibredb-rga</a></li>
 </ul>
 </li>
-<li><a href="#org84870eb">7. Logs</a>
+<li><a href="#org36ae3dc">7. Logs</a>
 <ul>
-<li><a href="#org4d94d84">7.1. <code>2020-12-25</code></a></li>
-<li><a href="#orga7ee123">7.2. <code>2020-10-12</code></a></li>
-<li><a href="#orgd8466e1">7.3. <code>2020-08-29</code></a></li>
-<li><a href="#org61ff097">7.4. <code>2020-08-09</code></a></li>
-<li><a href="#org839e694">7.5. <code>2020-07-16</code></a></li>
-<li><a href="#org8053f46">7.6. <code>2020-07-01</code></a></li>
-<li><a href="#org115f05c">7.7. <code>2020-06-22</code></a></li>
-<li><a href="#org8ed60c0">7.8. <code>2020-06-21</code></a></li>
-<li><a href="#org0465a50">7.9. <code>2020-06-11</code></a></li>
-<li><a href="#org446205d">7.10. <code>2020-06-07</code></a></li>
-<li><a href="#org12b7539">7.11. <code>2020-06-06</code></a></li>
-<li><a href="#org1e9379b">7.12. <code>2020-06-05</code></a></li>
-<li><a href="#org913a937">7.13. <code>2020-06-05</code></a></li>
-<li><a href="#orge76d094">7.14. <code>2020-06-04</code></a></li>
-<li><a href="#orgd932dc1">7.15. <code>2020-05-31</code></a></li>
-<li><a href="#org4f477f3">7.16. <code>2020-05-30</code></a></li>
-<li><a href="#orge92341a">7.17. <code>2020-05-16</code></a></li>
-<li><a href="#org3a154a6">7.18. <code>2020-05-15</code></a></li>
-<li><a href="#orgb310849">7.19. <code>2020-05-14</code></a></li>
-<li><a href="#orgc552fe3">7.20. <code>2020-05-13</code></a></li>
-<li><a href="#orge95d1bd">7.21. <code>2020-05-10</code></a></li>
-<li><a href="#orgeb00774">7.22. <code>2020-05-09</code></a></li>
+<li><a href="#orgfca8d92">7.1. <code>2021-03-21</code></a></li>
+<li><a href="#org5750451">7.2. <code>2020-12-25</code></a></li>
+<li><a href="#org84bcd08">7.3. <code>2020-10-12</code></a></li>
+<li><a href="#org4a904e6">7.4. <code>2020-08-29</code></a></li>
+<li><a href="#orgc20da3b">7.5. <code>2020-08-09</code></a></li>
+<li><a href="#org0fc4564">7.6. <code>2020-07-16</code></a></li>
+<li><a href="#org779e527">7.7. <code>2020-07-01</code></a></li>
+<li><a href="#org3a663b5">7.8. <code>2020-06-22</code></a></li>
+<li><a href="#org91b4754">7.9. <code>2020-06-21</code></a></li>
+<li><a href="#orgc776b7c">7.10. <code>2020-06-11</code></a></li>
+<li><a href="#org2a5c824">7.11. <code>2020-06-07</code></a></li>
+<li><a href="#org8884ab5">7.12. <code>2020-06-06</code></a></li>
+<li><a href="#orge43576a">7.13. <code>2020-06-05</code></a></li>
+<li><a href="#orgf577511">7.14. <code>2020-06-05</code></a></li>
+<li><a href="#org27389e6">7.15. <code>2020-06-04</code></a></li>
+<li><a href="#org8b6fe21">7.16. <code>2020-05-31</code></a></li>
+<li><a href="#org4424dd5">7.17. <code>2020-05-30</code></a></li>
+<li><a href="#orgdb26658">7.18. <code>2020-05-16</code></a></li>
+<li><a href="#orgc2a1c2d">7.19. <code>2020-05-15</code></a></li>
+<li><a href="#org988475c">7.20. <code>2020-05-14</code></a></li>
+<li><a href="#org6357536">7.21. <code>2020-05-13</code></a></li>
+<li><a href="#orgf0202d0">7.22. <code>2020-05-10</code></a></li>
+<li><a href="#org33d8d12">7.23. <code>2020-05-09</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="org7095be7" class="figure">
+<div id="org3ffa660" class="figure">
 <p><a href="https://melpa.org/#/calibredb"><object type="image/svg+xml" data="https://melpa.org/packages/calibredb-badge.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object></a>
 </p>
 </div>
 
-<div id="outline-container-org7fae3fa" class="outline-2">
-<h2 id="org7fae3fa"><span class="section-number-2">1</span> Description</h2>
+<div id="outline-container-orga45ad4b" class="outline-2">
+<h2 id="orga45ad4b"><span class="section-number-2">1</span> Description</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Yet another <a href="https://calibre-ebook.com/">calibre</a> client for emacs.
 </p>
 
 
-<div id="org49bb709" class="figure">
+<div id="org292e27f" class="figure">
 <p><img src="img/dashboard.jpg" alt="dashboard.jpg" />
 </p>
 </div>
@@ -392,8 +395,8 @@ package for pdf and djvu files respectively)</b></li>
 </ol>
 </div>
 
-<div id="outline-container-org0fcd810" class="outline-3">
-<h3 id="org0fcd810"><span class="section-number-3">1.1</span> Related package</h3>
+<div id="outline-container-orge6c9e93" class="outline-3">
+<h3 id="orge6c9e93"><span class="section-number-3">1.1</span> Related package</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li>toc-mode (easily manage pdf/djvu document&rsquo;s Table Of Contents)</li>
@@ -403,16 +406,16 @@ package for pdf and djvu files respectively)</b></li>
 </div>
 </div>
 
-<div id="outline-container-org0bd283f" class="outline-2">
-<h2 id="org0bd283f"><span class="section-number-2">2</span> Installation</h2>
+<div id="outline-container-orgd74c150" class="outline-2">
+<h2 id="orgd74c150"><span class="section-number-2">2</span> Installation</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgb8c448e" class="outline-3">
-<h3 id="orgb8c448e"><span class="section-number-3">2.1</span> Install sqlite and calibre</h3>
+<div id="outline-container-org451b11a" class="outline-3">
+<h3 id="org451b11a"><span class="section-number-3">2.1</span> Install sqlite and calibre</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-org6217495" class="outline-4">
-<h4 id="org6217495"><span class="section-number-4">2.1.1</span> macOS</h4>
+<div id="outline-container-orge57ae5b" class="outline-4">
+<h4 id="orge57ae5b"><span class="section-number-4">2.1.1</span> macOS</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">brew install sqlite
@@ -425,8 +428,8 @@ Download calibre&rsquo;s DMG file from <a href="https://calibre-ebook.com/downlo
 </div>
 </div>
 
-<div id="outline-container-org34b95ac" class="outline-4">
-<h4 id="org34b95ac"><span class="section-number-4">2.1.2</span> Windows</h4>
+<div id="outline-container-org882bb02" class="outline-4">
+<h4 id="org882bb02"><span class="section-number-4">2.1.2</span> Windows</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 With chocolatey
@@ -438,22 +441,22 @@ With chocolatey
 </div>
 </div>
 
-<div id="outline-container-org96703a8" class="outline-4">
-<h4 id="org96703a8"><span class="section-number-4">2.1.3</span> Linux</h4>
+<div id="outline-container-orge1d89df" class="outline-4">
+<h4 id="orge1d89df"><span class="section-number-4">2.1.3</span> Linux</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 For example, in Ubuntu 18.04:
 </p>
 <div class="org-src-container">
-<pre class="src src-sh"><span style="color: #8FBCBB;">sudo</span> apt install sqlite3 calibre
+<pre class="src src-sh"><span style="color: #9A7500;">sudo</span> apt install sqlite3 calibre
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org2957c27" class="outline-3">
-<h3 id="org2957c27"><span class="section-number-3">2.2</span> Install calibredb.el</h3>
+<div id="outline-container-org4c831fa" class="outline-3">
+<h3 id="org4c831fa"><span class="section-number-3">2.2</span> Install calibredb.el</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 It&rsquo;s available on <a href="https://melpa.org/">Melpa</a> :
@@ -466,8 +469,8 @@ It&rsquo;s available on <a href="https://melpa.org/">Melpa</a> :
 </div>
 </div>
 
-<div id="outline-container-org66ce9cb" class="outline-3">
-<h3 id="org66ce9cb"><span class="section-number-3">2.3</span> Spacemacs Layer</h3>
+<div id="outline-container-org5837935" class="outline-3">
+<h3 id="org5837935"><span class="section-number-3">2.3</span> Spacemacs Layer</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 For Spacemacs <a href="https://github.com/dalanicolai/calibre-layer">this calibre-layer</a> implements calibre.el with evilified keybindings
@@ -476,26 +479,26 @@ For Spacemacs <a href="https://github.com/dalanicolai/calibre-layer">this calibr
 </div>
 </div>
 
-<div id="outline-container-orgfa75160" class="outline-2">
-<h2 id="orgfa75160"><span class="section-number-2">3</span> Configuration</h2>
+<div id="outline-container-org2bc11f2" class="outline-2">
+<h2 id="org2bc11f2"><span class="section-number-2">3</span> Configuration</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgd7e5df1" class="outline-3">
-<h3 id="orgd7e5df1"><span class="section-number-3">3.1</span> Quick Start</h3>
+<div id="outline-container-orgebed683" class="outline-3">
+<h3 id="orgebed683"><span class="section-number-3">3.1</span> Quick Start</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-orgc781760" class="outline-4">
-<h4 id="orgc781760"><span class="section-number-4">3.1.1</span> require</h4>
+<div id="outline-container-org1bd7792" class="outline-4">
+<h4 id="org1bd7792"><span class="section-number-4">3.1.1</span> require</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">require</span> <span style="color: #81A1C1;">'</span><span style="color: #81A1C1;">calibredb</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-root-dir <span style="color: #A3BE8C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-db-dir <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">expand-file-name</span> <span style="color: #A3BE8C;">"metadata.db"</span> calibredb-root-dir<span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-library-alist <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #A3BE8C;">)</span>
-                                <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/Books Library"</span><span style="color: #A3BE8C;">)</span>
-                                <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/HELLO"</span><span style="color: #A3BE8C;">)</span>
-                                <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/Books"</span><span style="color: #A3BE8C;">)</span>
-                                <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/World"</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #97365B;">require</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">calibredb</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-root-dir</span> <span style="color: #4F894C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-db-dir</span> <span style="color: #97365B;">(</span><span style="color: #97365B;">expand-file-name</span> <span style="color: #4F894C;">"metadata.db"</span> <span style="color: #842879;">calibredb-root-dir</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">(</span><span style="color: #4F894C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #4F894C;">)</span>
+                                <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/Books Library"</span><span style="color: #4F894C;">)</span>
+                                <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/HELLO"</span><span style="color: #4F894C;">)</span>
+                                <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/Books"</span><span style="color: #4F894C;">)</span>
+                                <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/World"</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -504,36 +507,36 @@ PS: If <code>sqlite3</code> and <code>calibredb</code> is in not in your system 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> sql-sqlite-program <span style="color: #A3BE8C;">"/usr/bin/sqlite3"</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-program <span style="color: #A3BE8C;">"/Applications/calibre.app/Contents/MacOS/calibredb"</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">sql-sqlite-program</span> <span style="color: #4F894C;">"/usr/bin/sqlite3"</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-program</span> <span style="color: #4F894C;">"/Applications/calibre.app/Contents/MacOS/calibredb"</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgc62ef42" class="outline-4">
-<h4 id="orgc62ef42"><span class="section-number-4">3.1.2</span> use-package</h4>
+<div id="outline-container-org62321a8" class="outline-4">
+<h4 id="org62321a8"><span class="section-number-4">3.1.2</span> use-package</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">use-package</span> calibredb
-  <span style="color: #81A1C1;">:defer</span> t
-  <span style="color: #81A1C1;">:init</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">autoload</span> <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">calibredb</span> <span style="color: #A3BE8C;">"calibredb"</span><span style="color: #B48EAD;">)</span>
-  <span style="color: #81A1C1;">:config</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">setq</span> calibredb-root-dir <span style="color: #A3BE8C;">"~/OneDrive/Org/Doc/Calibre"</span><span style="color: #B48EAD;">)</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">setq</span> calibredb-db-dir <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">expand-file-name</span> <span style="color: #A3BE8C;">"metadata.db"</span> calibredb-root-dir<span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">setq</span> calibredb-library-alist <span style="color: #81A1C1;">'</span><span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">(</span><span style="color: #A3BE8C;">"~/OneDrive/Org/Doc/Calibre"</span><span style="color: #81A1C1;">)</span>
-                                  <span style="color: #81A1C1;">(</span><span style="color: #A3BE8C;">"~/Documents/Books Library"</span><span style="color: #81A1C1;">)</span>
-                                  <span style="color: #81A1C1;">(</span><span style="color: #A3BE8C;">"~/Documents/LIB1"</span><span style="color: #81A1C1;">)</span>
-                                  <span style="color: #81A1C1;">(</span><span style="color: #A3BE8C;">"/Volumes/ShareDrive/Documents/Library/"</span><span style="color: #81A1C1;">)</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">use-package</span> calibredb
+  <span style="color: #29838D;">:defer</span> t
+  <span style="color: #29838D;">:init</span>
+  <span style="color: #97365B;">(</span><span style="color: #97365B;">autoload</span> <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">calibredb</span> <span style="color: #4F894C;">"calibredb"</span><span style="color: #97365B;">)</span>
+  <span style="color: #29838D;">:config</span>
+  <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-root-dir</span> <span style="color: #4F894C;">"~/OneDrive/Org/Doc/Calibre"</span><span style="color: #97365B;">)</span>
+  <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-db-dir</span> <span style="color: #4F894C;">(</span><span style="color: #97365B;">expand-file-name</span> <span style="color: #4F894C;">"metadata.db"</span> <span style="color: #842879;">calibredb-root-dir</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span>
+  <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #4F894C;">(</span><span style="color: #3B6EA8;">(</span><span style="color: #4F894C;">"~/OneDrive/Org/Doc/Calibre"</span><span style="color: #3B6EA8;">)</span>
+                                  <span style="color: #3B6EA8;">(</span><span style="color: #4F894C;">"~/Documents/Books Library"</span><span style="color: #3B6EA8;">)</span>
+                                  <span style="color: #3B6EA8;">(</span><span style="color: #4F894C;">"~/Documents/LIB1"</span><span style="color: #3B6EA8;">)</span>
+                                  <span style="color: #3B6EA8;">(</span><span style="color: #4F894C;">"/Volumes/ShareDrive/Documents/Library/"</span><span style="color: #3B6EA8;">)</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3ebb420" class="outline-3">
-<h3 id="org3ebb420"><span class="section-number-3">3.2</span> Virtual Libraries</h3>
+<div id="outline-container-org835e64f" class="outline-3">
+<h3 id="org835e64f"><span class="section-number-3">3.2</span> Virtual Libraries</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Virtual libraries are some convenient shortcuts for quick filtering the Ebooks
@@ -541,16 +544,16 @@ by setting the <code>calibredb-search-filter</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-virtual-library-alist <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"1. Development - work"</span> . <span style="color: #A3BE8C;">"work </span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">(</span><span style="color: #A3BE8C;">pdf</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">|</span><span style="color: #A3BE8C;">epub</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">)</span><span style="color: #A3BE8C;">"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"2. Read it later"</span> . <span style="color: #A3BE8C;">"Readit epub"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"3. Development - rust"</span> . <span style="color: #A3BE8C;">"rust"</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-virtual-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">(</span><span style="color: #4F894C;">"1. Development - work"</span> . <span style="color: #4F894C;">"work </span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">(</span><span style="color: #4F894C;">pdf</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">|</span><span style="color: #4F894C;">epub</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">)</span><span style="color: #4F894C;">"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"2. Read it later"</span> . <span style="color: #4F894C;">"Readit epub"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"3. Development - rust"</span> . <span style="color: #4F894C;">"rust"</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org3750236" class="outline-3">
-<h3 id="org3750236"><span class="section-number-3">3.3</span> Column width</h3>
+<div id="outline-container-org4ea8fc4" class="outline-3">
+<h3 id="org4ea8fc4"><span class="section-number-3">3.3</span> Column width</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 You can configure the column width:
@@ -560,7 +563,7 @@ You can configure the column width:
 For example:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-id-width <span style="color: #B48EAD; font-weight: bold;">4</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-id-width</span> <span style="color: #97365B; font-weight: bold;">4</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -588,14 +591,14 @@ Then in <code>*calibredb-search*</code> buffer, press <code>r</code> to refresh 
 </div>
 </div>
 
-<div id="outline-container-org70a5488" class="outline-3">
-<h3 id="org70a5488"><span class="section-number-3">3.4</span> Size indicator</h3>
+<div id="outline-container-orgcc725bf" class="outline-3">
+<h3 id="orgcc725bf"><span class="section-number-3">3.4</span> Size indicator</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 Enable size indicator:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-size-show t<span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-size-show</span> t<span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -605,8 +608,8 @@ Then in <code>*calibredb-search*</code> buffer, press <code>r</code> to refresh 
 </div>
 </div>
 
-<div id="outline-container-orgf122495" class="outline-3">
-<h3 id="orgf122495"><span class="section-number-3">3.5</span> File format icons</h3>
+<div id="outline-container-org4a93ce7" class="outline-3">
+<h3 id="org4a93ce7"><span class="section-number-3">3.5</span> File format icons</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
 You can choose <a href="https://github.com/domtronn/all-the-icons.el">all-the-icons</a> or <a href="https://github.com/seagle0128/icons-in-terminal.el">icons-in-terminal</a> to render the icons. You have
@@ -617,7 +620,7 @@ to install the icons packages by yourself, otherwise it would not work.
 To enable all-the-icons:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-format-all-the-icons t<span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-format-all-the-icons</span> t<span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -625,7 +628,7 @@ To enable all-the-icons:
 To enable icons-in-terminal:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-format-icons-in-terminal t<span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-format-icons-in-terminal</span> t<span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -644,98 +647,98 @@ TODO: Auto disable format icons when dealing with big libraries.
 </div>
 </div>
 
-<div id="outline-container-orgbbf9ac4" class="outline-3">
-<h3 id="orgbbf9ac4"><span class="section-number-3">3.6</span> Configure to support org-ref</h3>
+<div id="outline-container-org87754e1" class="outline-3">
+<h3 id="org87754e1"><span class="section-number-3">3.6</span> Configure to support org-ref</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 You can output a BibTex file which can be used in org-ref.
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">require</span> <span style="color: #81A1C1;">'</span><span style="color: #81A1C1;">org-ref</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-ref-default-bibliography <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">concat</span> <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">file-name-as-directory</span> calibredb-root-dir<span style="color: #A3BE8C;">)</span> <span style="color: #A3BE8C;">"catalog.bib"</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">add-to-list</span> <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-default-bibliography</span> calibredb-ref-default-bibliography<span style="color: #81A1C1;">)</span>
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> org-ref-get-pdf-filename-function <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-get-mendeley-filename</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #97365B;">require</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">org-ref</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span> <span style="color: #97365B;">(</span><span style="color: #97365B;">concat</span> <span style="color: #4F894C;">(</span><span style="color: #97365B;">file-name-as-directory</span> <span style="color: #842879;">calibredb-root-dir</span><span style="color: #4F894C;">)</span> <span style="color: #4F894C;">"catalog.bib"</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #29838D;">add-to-list</span> <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-default-bibliography</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span><span style="color: #3B6EA8;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> org-ref-get-pdf-filename-function <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-get-mendeley-filename</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgcd08327" class="outline-3">
-<h3 id="orgcd08327"><span class="section-number-3">3.7</span> keybindings</h3>
+<div id="outline-container-orgb8483f0" class="outline-3">
+<h3 id="orgb8483f0"><span class="section-number-3">3.7</span> keybindings</h3>
 <div class="outline-text-3" id="text-3-7">
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">defvar</span> <span style="color: #D8DEE9;">calibredb-show-mode-map</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">let</span> <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">map</span> <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">make-sparse-keymap</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"?"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-entry-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"o"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-find-file</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"O"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-find-file-other-frame</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"V"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-open-file-with-default-tool</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"s"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"e"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-export-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"q"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-entry-quit</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"y"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-yank-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">","</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-quick-look</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"."</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-open-dired</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-/"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-rga</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-t"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--tags</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-a"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--author_sort</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-A"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--authors</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-T"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--title</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-c"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--comments</span><span style="color: #A3BE8C;">)</span>
-    map<span style="color: #B48EAD;">)</span>
-  <span style="color: #78808f;">"Keymap for `</span><span style="color: #81A1C1;">calibredb-show-mode</span><span style="color: #78808f;">'."</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">defvar</span> <span style="color: #842879;">calibredb-show-mode-map</span>
+  <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">let</span> <span style="color: #4F894C;">(</span><span style="color: #3B6EA8;">(</span><span style="color: #29838D;">map</span> <span style="color: #97365B;">(</span><span style="color: #97365B;">make-sparse-keymap</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"?"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-entry-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"o"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-find-file</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"O"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-find-file-other-frame</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"V"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-open-file-with-default-tool</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"s"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"e"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-export-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"q"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-entry-quit</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"y"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-yank-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">","</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-quick-look</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"."</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-open-dired</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-/"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-rga</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-t"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--tags</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-a"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--author_sort</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-A"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--authors</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-T"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--title</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-c"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--comments</span><span style="color: #4F894C;">)</span>
+    map<span style="color: #97365B;">)</span>
+  <span style="color: #828b9b;">"Keymap for `</span><span style="color: #97365B;">calibredb-show-mode</span><span style="color: #828b9b;">'."</span><span style="color: #3B6EA8;">)</span>
 
-<span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">defvar</span> <span style="color: #D8DEE9;">calibredb-search-mode-map</span>
-  <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">let</span> <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">map</span> <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">make-sparse-keymap</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #81A1C1;">[</span>mouse-3<span style="color: #81A1C1;">]</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-mouse</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">kbd</span> <span style="color: #A3BE8C;">"&lt;RET&gt;"</span><span style="color: #81A1C1;">)</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-find-file</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"?"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"a"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-add</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"A"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-add-dir</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"c"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-clone</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"d"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-remove</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"D"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-remove-marked-items</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"j"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-next-entry</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"k"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-previous-entry</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"l"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-list</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"L"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-list</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"n"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-next</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"N"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-next</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"p"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-previous</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"P"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-previous</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"s"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"S"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-switch-library</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"o"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-find-file</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"O"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-find-file-other-frame</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"v"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-view</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"V"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-open-file-with-default-tool</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">","</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-quick-look</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"."</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-open-dired</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"y"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-yank-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"b"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-catalog-bib-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"e"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-export-dispatch</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"r"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-refresh-and-clear-filter</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"R"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-clear-filter</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"q"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-quit</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"m"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-mark-and-forward</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"f"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-toggle-favorite-at-point</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"x"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-toggle-archive-at-point</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"h"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-toggle-highlight-at-point</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"u"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-unmark-and-forward</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"i"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-edit-annotation</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">kbd</span> <span style="color: #A3BE8C;">"&lt;DEL&gt;"</span><span style="color: #81A1C1;">)</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-unmark-and-backward</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">kbd</span> <span style="color: #A3BE8C;">"&lt;backtab&gt;"</span><span style="color: #81A1C1;">)</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-toggle-view</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">kbd</span> <span style="color: #A3BE8C;">"TAB"</span><span style="color: #81A1C1;">)</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-toggle-view-at-point</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-n"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-show-next-entry</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-p"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-show-previous-entry</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"/"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-live-filter</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-t"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--tags</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-a"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--author_sort</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-A"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--authors</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-T"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--title</span><span style="color: #A3BE8C;">)</span>
-    <span style="color: #A3BE8C;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"\M-c"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-set-metadata--comments</span><span style="color: #A3BE8C;">)</span>
-    map<span style="color: #B48EAD;">)</span>
-  <span style="color: #78808f;">"Keymap for `</span><span style="color: #81A1C1;">calibredb-search-mode</span><span style="color: #78808f;">'."</span><span style="color: #81A1C1;">)</span>
+<span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">defvar</span> <span style="color: #842879;">calibredb-search-mode-map</span>
+  <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">let</span> <span style="color: #4F894C;">(</span><span style="color: #3B6EA8;">(</span><span style="color: #29838D;">map</span> <span style="color: #97365B;">(</span><span style="color: #97365B;">make-sparse-keymap</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #3B6EA8;">[</span>mouse-3<span style="color: #3B6EA8;">]</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-mouse</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #3B6EA8;">(</span><span style="color: #29838D;">kbd</span> <span style="color: #4F894C;">"&lt;RET&gt;"</span><span style="color: #3B6EA8;">)</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-find-file</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"?"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"a"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-add</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"A"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-add-dir</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"c"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-clone</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"d"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-remove</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"D"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-remove-marked-items</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"j"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-next-entry</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"k"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-previous-entry</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"l"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-list</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"L"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-list</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"n"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-next</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"N"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-next</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"p"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-previous</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"P"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-previous</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"s"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"S"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-switch-library</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"o"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-find-file</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"O"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-find-file-other-frame</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"v"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-view</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"V"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-open-file-with-default-tool</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">","</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-quick-look</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"."</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-open-dired</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"y"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-yank-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"b"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-catalog-bib-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"e"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-export-dispatch</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"r"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-refresh-and-clear-filter</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"R"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-clear-filter</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"q"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-quit</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"m"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-mark-and-forward</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"f"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-toggle-favorite-at-point</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"x"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-toggle-archive-at-point</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"h"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-toggle-highlight-at-point</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"u"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-unmark-and-forward</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"i"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-edit-annotation</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #3B6EA8;">(</span><span style="color: #29838D;">kbd</span> <span style="color: #4F894C;">"&lt;DEL&gt;"</span><span style="color: #3B6EA8;">)</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-unmark-and-backward</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #3B6EA8;">(</span><span style="color: #29838D;">kbd</span> <span style="color: #4F894C;">"&lt;backtab&gt;"</span><span style="color: #3B6EA8;">)</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-toggle-view</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #3B6EA8;">(</span><span style="color: #29838D;">kbd</span> <span style="color: #4F894C;">"TAB"</span><span style="color: #3B6EA8;">)</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-toggle-view-at-point</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-n"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-show-next-entry</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-p"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-show-previous-entry</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"/"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-live-filter</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-t"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--tags</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-a"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--author_sort</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-A"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--authors</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-T"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--title</span><span style="color: #4F894C;">)</span>
+    <span style="color: #4F894C;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"\M-c"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-set-metadata--comments</span><span style="color: #4F894C;">)</span>
+    map<span style="color: #97365B;">)</span>
+  <span style="color: #828b9b;">"Keymap for `</span><span style="color: #97365B;">calibredb-search-mode</span><span style="color: #828b9b;">'."</span><span style="color: #3B6EA8;">)</span>
 
 </pre>
 </div>
@@ -747,15 +750,15 @@ PS: Keybindings might be changed in future versions.
 </div>
 </div>
 
-<div id="outline-container-org734d174" class="outline-2">
-<h2 id="org734d174"><span class="section-number-2">4</span> Workflows</h2>
+<div id="outline-container-orga04c718" class="outline-2">
+<h2 id="orga04c718"><span class="section-number-2">4</span> Workflows</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 There are three ways to manage your ebooks:
 </p>
 </div>
-<div id="outline-container-orgf0286ec" class="outline-3">
-<h3 id="orgf0286ec"><span class="section-number-3">4.1</span> Start with <code>calibredb</code></h3>
+<div id="outline-container-orgbe8695e" class="outline-3">
+<h3 id="orgbe8695e"><span class="section-number-3">4.1</span> Start with <code>calibredb</code></h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 First,  <code>M-x calibredb</code> to enter ebook dashboard.
@@ -776,8 +779,8 @@ You can perform the following actions:
 </div>
 </div>
 
-<div id="outline-container-org63c7ba1" class="outline-3">
-<h3 id="org63c7ba1"><span class="section-number-3">4.2</span> Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></h3>
+<div id="outline-container-org2952f49" class="outline-3">
+<h3 id="org2952f49"><span class="section-number-3">4.2</span> Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></h3>
 <div class="outline-text-3" id="text-4-2">
 <ul class="org-ul">
 <li><code>M-x calibredb-find-helm</code> or <code>calibredb-find-counsel</code> to enter the ebook list</li>
@@ -785,8 +788,8 @@ You can perform the following actions:
 </ul>
 </div>
 </div>
-<div id="outline-container-org24e5c36" class="outline-3">
-<h3 id="org24e5c36"><span class="section-number-3">4.3</span> Start with <code>calibredb-list</code></h3>
+<div id="outline-container-org484aa5d" class="outline-3">
+<h3 id="org484aa5d"><span class="section-number-3">4.3</span> Start with <code>calibredb-list</code></h3>
 <div class="outline-text-3" id="text-4-3">
 <ul class="org-ul">
 <li><code>M-x calibredb-list</code> to enter ebook dashboard (buffer <code>*calibredb-list*</code>)</li>
@@ -807,8 +810,8 @@ yourself. For example, with cloud services.
 </div>
 </div>
 
-<div id="outline-container-org1d6d61b" class="outline-2">
-<h2 id="org1d6d61b"><span class="section-number-2">5</span> Q&amp;A</h2>
+<div id="outline-container-orgd50347b" class="outline-2">
+<h2 id="orgd50347b"><span class="section-number-2">5</span> Q&amp;A</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 The keybindings mentioned below are referenced from
@@ -816,8 +819,8 @@ The keybindings mentioned below are referenced from
 <a href="#keybindings">keybindings</a>.
 </div>
 
-<div id="outline-container-orga859fbc" class="outline-3">
-<h3 id="orga859fbc"><span class="section-number-3">5.1</span> Transient commands</h3>
+<div id="outline-container-org6bd76bd" class="outline-3">
+<h3 id="org6bd76bd"><span class="section-number-3">5.1</span> Transient commands</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 <code>calibredb</code> supports <code>Transient commands</code> just like <code>magit</code>. Most of the features are binded in <code>Transient commands</code>. You can press <code>?</code> to checkout.
@@ -834,8 +837,8 @@ The keybindings mentioned below are referenced from
 </div>
 </div>
 
-<div id="outline-container-org366fec6" class="outline-3">
-<h3 id="org366fec6"><span class="section-number-3">5.2</span> What is my working library?</h3>
+<div id="outline-container-org93d9f2e" class="outline-3">
+<h3 id="org93d9f2e"><span class="section-number-3">5.2</span> What is my working library?</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 <code>M-x calibredb</code>, your current library path shows in the header in buffer <code>*calibredb-search*</code>
@@ -844,8 +847,8 @@ Besides, variable <code>calibredb-root-dir</code> also saves the current library
 </div>
 </div>
 
-<div id="outline-container-org118878e" class="outline-3">
-<h3 id="org118878e"><span class="section-number-3">5.3</span> How to open an ebook?</h3>
+<div id="outline-container-org242de31" class="outline-3">
+<h3 id="org242de31"><span class="section-number-3">5.3</span> How to open an ebook?</h3>
 <div class="outline-text-3" id="text-5-3">
 <ol class="org-ol">
 <li><code>M-x calibredb</code>
@@ -871,8 +874,8 @@ show details, or just <code>Right Click</code> on the ebook.</li>
 </div>
 </div>
 
-<div id="outline-container-org4c5f6c4" class="outline-3">
-<h3 id="org4c5f6c4"><span class="section-number-3">5.4</span> How to add ebooks?</h3>
+<div id="outline-container-orgf130ea5" class="outline-3">
+<h3 id="orgf130ea5"><span class="section-number-3">5.4</span> How to add ebooks?</h3>
 <div class="outline-text-3" id="text-5-4">
 <ol class="org-ol">
 <li><code>M-x calibredb-add</code>, select, mark ebooks (only ivy supports mark/unmark currently -
@@ -892,8 +895,8 @@ Please notice: Add books may fail! There are some reasons:
 </div>
 </div>
 
-<div id="outline-container-org392b10d" class="outline-3">
-<h3 id="org392b10d"><span class="section-number-3">5.5</span> How to remove ebooks?</h3>
+<div id="outline-container-orgdc24326" class="outline-3">
+<h3 id="orgdc24326"><span class="section-number-3">5.5</span> How to remove ebooks?</h3>
 <div class="outline-text-3" id="text-5-5">
 <ol class="org-ol">
 <li><code>M-x calibredb</code>
@@ -916,16 +919,16 @@ PS: If you want to delete in bulk with marked items, use <code>calibredb-remove-
 </div>
 </div>
 
-<div id="outline-container-org7d2a85c" class="outline-3">
-<h3 id="org7d2a85c"><span class="section-number-3">5.6</span> How to switch virtual libraries?</h3>
+<div id="outline-container-orgfda0f2f" class="outline-3">
+<h3 id="orgfda0f2f"><span class="section-number-3">5.6</span> How to switch virtual libraries?</h3>
 <div class="outline-text-3" id="text-5-6">
 <p>
 First, set <code>calibredb-library-alist</code> to include the calibre virtual libraries.
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-virtual-library-alist <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"1. Development - work"</span> . <span style="color: #A3BE8C;">"work </span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">(</span><span style="color: #A3BE8C;">pdf</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">|</span><span style="color: #A3BE8C;">epub</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">)</span><span style="color: #A3BE8C;">"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"2. Read it later"</span> . <span style="color: #A3BE8C;">"Readit epub"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"3. Development - rust"</span> . <span style="color: #A3BE8C;">"rust"</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-virtual-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">(</span><span style="color: #4F894C;">"1. Development - work"</span> . <span style="color: #4F894C;">"work </span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">(</span><span style="color: #4F894C;">pdf</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">|</span><span style="color: #4F894C;">epub</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">)</span><span style="color: #4F894C;">"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"2. Read it later"</span> . <span style="color: #4F894C;">"Readit epub"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"3. Development - rust"</span> . <span style="color: #4F894C;">"rust"</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 <p>
@@ -943,8 +946,8 @@ the library.
 </div>
 </div>
 
-<div id="outline-container-org6014320" class="outline-3">
-<h3 id="org6014320"><span class="section-number-3">5.7</span> How to switch libraries?</h3>
+<div id="outline-container-orgbaf6172" class="outline-3">
+<h3 id="orgbaf6172"><span class="section-number-3">5.7</span> How to switch libraries?</h3>
 <div class="outline-text-3" id="text-5-7">
 <p>
 Set <code>calibredb-library-alist</code> to include the calibre libraries.
@@ -957,11 +960,11 @@ it in <code>calibredb-library-alist</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-library-alist <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #A3BE8C;">)</span>
-                                  <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/Books Library"</span><span style="color: #A3BE8C;">)</span>
-                                  <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/HELLO"</span><span style="color: #A3BE8C;">)</span>
-                                  <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/Books"</span><span style="color: #A3BE8C;">)</span>
-                                  <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"/Users/damonchan/Documents/World"</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">(</span><span style="color: #4F894C;">"~/OneDrive/Doc/Calibre"</span><span style="color: #4F894C;">)</span>
+                                  <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/Books Library"</span><span style="color: #4F894C;">)</span>
+                                  <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/HELLO"</span><span style="color: #4F894C;">)</span>
+                                  <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/Books"</span><span style="color: #4F894C;">)</span>
+                                  <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"/Users/damonchan/Documents/World"</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 <p>
@@ -985,8 +988,8 @@ switch temporarily.
 </div>
 </div>
 
-<div id="outline-container-org7089bd5" class="outline-3">
-<h3 id="org7089bd5"><span class="section-number-3">5.8</span> How to set metadata on ebooks?</h3>
+<div id="outline-container-org8815849" class="outline-3">
+<h3 id="org8815849"><span class="section-number-3">5.8</span> How to set metadata on ebooks?</h3>
 <div class="outline-text-3" id="text-5-8">
 <ul class="org-ul">
 <li>In <code>*calibredb-search*</code> buffer, <code>m/DEL/u</code> to mark/unmark backward/unmark forward items, and <code>s</code> to set metadata
@@ -1010,8 +1013,8 @@ Tips: You can filter the result via <code>/</code> before setting the metadata.
 </p>
 </div>
 
-<div id="outline-container-orgbe26a6a" class="outline-4">
-<h4 id="orgbe26a6a"><span class="section-number-4">5.8.1</span> About <code>fetch-ebook-metadata</code></h4>
+<div id="outline-container-org221ad79" class="outline-4">
+<h4 id="org221ad79"><span class="section-number-4">5.8.1</span> About <code>fetch-ebook-metadata</code></h4>
 <div class="outline-text-4" id="text-5-8-1">
 <p>
 We are using <code>fetch-ebook-metadata</code> cli tool to fetch the metadata. However,
@@ -1031,15 +1034,15 @@ configurations. Since the settings on calibre GUI would affect the
 <li>Specify the list of metadata download plugins to use, this should be the same as the calibre GUI configuration.</li>
 </ol>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-fetch-metadata-source-list <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">"Google"</span> <span style="color: #A3BE8C;">"Amazon.com"</span> <span style="color: #A3BE8C;">"Douban Books"</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-fetch-metadata-source-list</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">"Google"</span> <span style="color: #4F894C;">"Amazon.com"</span> <span style="color: #4F894C;">"Douban Books"</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 </div>
 </div>
 </div>
 
-<div id="outline-container-orgbb23844" class="outline-3">
-<h3 id="orgbb23844"><span class="section-number-3">5.9</span> How to mark favorite/highlight/archive on ebooks?</h3>
+<div id="outline-container-orgc2fee20" class="outline-3">
+<h3 id="orgc2fee20"><span class="section-number-3">5.9</span> How to mark favorite/highlight/archive on ebooks?</h3>
 <div class="outline-text-3" id="text-5-9">
 <ul class="org-ul">
 <li><p>
@@ -1052,14 +1055,14 @@ Demo:
 </p></li>
 </ul>
 
-<div id="org337ea91" class="figure">
+<div id="org6080ede" class="figure">
 <p><img src="img/favorite_highlight_archive.png" alt="favorite_highlight_archive.png" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org0b20e28" class="outline-3">
-<h3 id="org0b20e28"><span class="section-number-3">5.10</span> How to do live filtering?</h3>
+<div id="outline-container-org608cd34" class="outline-3">
+<h3 id="org608cd34"><span class="section-number-3">5.10</span> How to do live filtering?</h3>
 <div class="outline-text-3" id="text-5-10">
 <ul class="org-ul">
 <li>Press <code>/</code> to start live filtering.</li>
@@ -1072,8 +1075,8 @@ Here is the demo:
 </div>
 </div>
 
-<div id="outline-container-org0016ab9" class="outline-3">
-<h3 id="org0016ab9"><span class="section-number-3">5.11</span> How to do quick filtering?</h3>
+<div id="outline-container-orgd576782" class="outline-3">
+<h3 id="orgd576782"><span class="section-number-3">5.11</span> How to do quick filtering?</h3>
 <div class="outline-text-3" id="text-5-11">
 <ul class="org-ul">
 <li>Click the <code>calibredb-favorite-icon</code>, authors, file format, and tags.</li>
@@ -1086,7 +1089,7 @@ Demo:
 </p>
 
 
-<div id="orgb4f1678" class="figure">
+<div id="orgd6df4fa" class="figure">
 <p><img src="img/quick_filter.gif" alt="quick_filter.gif" />
 </p>
 </div></li>
@@ -1094,30 +1097,30 @@ Demo:
 </div>
 </div>
 
-<div id="outline-container-org62527c5" class="outline-3">
-<h3 id="org62527c5"><span class="section-number-3">5.12</span> How to interact with org-ref?</h3>
+<div id="outline-container-org1fa2225" class="outline-3">
+<h3 id="org1fa2225"><span class="section-number-3">5.12</span> How to interact with org-ref?</h3>
 <div class="outline-text-3" id="text-5-12">
 <ul class="org-ul">
 <li><p>
 Setup org-ref
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">  <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">require</span> <span style="color: #81A1C1;">'</span><span style="color: #81A1C1;">org-ref</span><span style="color: #81A1C1;">)</span>
-  <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-ref-default-bibliography <span style="color: #A3BE8C;">"~/Desktop/catalog.bib"</span><span style="color: #81A1C1;">)</span>
-  <span style="color: #81A1C1;">(</span><span style="color: #8FBCBB;">add-to-list</span> <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-default-bibliography</span> calibredb-ref-default-bibliography<span style="color: #81A1C1;">)</span>
-  <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> org-ref-get-pdf-filename-function <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-get-mendeley-filename</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp">  <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">require</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">org-ref</span><span style="color: #3B6EA8;">)</span>
+  <span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span> <span style="color: #4F894C;">"~/Desktop/catalog.bib"</span><span style="color: #3B6EA8;">)</span>
+  <span style="color: #3B6EA8;">(</span><span style="color: #29838D;">add-to-list</span> <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-default-bibliography</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span><span style="color: #3B6EA8;">)</span>
+  <span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> org-ref-get-pdf-filename-function <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-get-mendeley-filename</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 <p>
 or
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">use-package!</span> org-ref
-    <span style="color: #81A1C1;">:after-call</span> calibredb
-    <span style="color: #81A1C1;">:config</span>
-    <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">setq</span> calibredb-ref-default-bibliography <span style="color: #A3BE8C;">"~/Desktop/catalog.bib"</span><span style="color: #B48EAD;">)</span>
-    <span style="color: #B48EAD;">(</span><span style="color: #8FBCBB;">add-to-list</span> <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-default-bibliography</span> calibredb-ref-default-bibliography<span style="color: #B48EAD;">)</span>
-    <span style="color: #B48EAD;">(</span><span style="color: #81A1C1;">setq</span> org-ref-get-pdf-filename-function <span style="color: #81A1C1;">'</span><span style="color: #8FBCBB;">org-ref-get-mendeley-filename</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp">    <span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">use-package!</span> org-ref
+    <span style="color: #29838D;">:after-call</span> calibredb
+    <span style="color: #29838D;">:config</span>
+    <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span> <span style="color: #4F894C;">"~/Desktop/catalog.bib"</span><span style="color: #97365B;">)</span>
+    <span style="color: #97365B;">(</span><span style="color: #29838D;">add-to-list</span> <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-default-bibliography</span> <span style="color: #842879;">calibredb-ref-default-bibliography</span><span style="color: #97365B;">)</span>
+    <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> org-ref-get-pdf-filename-function <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">org-ref-get-mendeley-filename</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div></li>
 
@@ -1139,8 +1142,8 @@ Demo:
 </div>
 
 
-<div id="outline-container-orgcbdbae5" class="outline-3">
-<h3 id="orgcbdbae5"><span class="section-number-3">5.13</span> Why the loading time is so long?</h3>
+<div id="outline-container-org8a69972" class="outline-3">
+<h3 id="org8a69972"><span class="section-number-3">5.13</span> Why the loading time is so long?</h3>
 <div class="outline-text-3" id="text-5-13">
 <p>
 For some big libraries, such as the libraries that has 10000+ books, the package
@@ -1169,8 +1172,8 @@ decode the whole database.</li>
 </div>
 </div>
 
-<div id="outline-container-org7907e2d" class="outline-3">
-<h3 id="org7907e2d"><span class="section-number-3">5.14</span> Can not remember the keybindings?</h3>
+<div id="outline-container-orgdacc7ad" class="outline-3">
+<h3 id="orgdacc7ad"><span class="section-number-3">5.14</span> Can not remember the keybindings?</h3>
 <div class="outline-text-3" id="text-5-14">
 <p>
 Press <code>?</code>, it will show you almost all actions.
@@ -1180,15 +1183,15 @@ Press <code>?</code>, it will show you almost all actions.
 Demo:
 </p>
 
-<div id="orgefd10cf" class="figure">
+<div id="org42bdca7" class="figure">
 <p><img src="img/details.gif" alt="details.gif" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org218b635" class="outline-3">
-<h3 id="org218b635"><span class="section-number-3">5.15</span> How to edit annotation with org-mode?</h3>
+<div id="outline-container-org9f48c8d" class="outline-3">
+<h3 id="org9f48c8d"><span class="section-number-3">5.15</span> How to edit annotation with org-mode?</h3>
 <div class="outline-text-3" id="text-5-15">
 <p>
 In <code>*calibredb-search*</code> buffer,
@@ -1206,7 +1209,7 @@ By default, the annotation would be saved to <code>comments</code> field. If you
 change to other filed, please set with the following statement:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-annotation-field <span style="color: #A3BE8C;">"comments"</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-annotation-field</span> <span style="color: #4F894C;">"comments"</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -1216,8 +1219,8 @@ Please notice: Due to the limitation of <b>calibredb</b>, the blank new lines wi
 </div>
 </div>
 
-<div id="outline-container-org920c952" class="outline-3">
-<h3 id="org920c952"><span class="section-number-3">5.16</span> How to search in ebooks directly?</h3>
+<div id="outline-container-org538c385" class="outline-3">
+<h3 id="org538c385"><span class="section-number-3">5.16</span> How to search in ebooks directly?</h3>
 <div class="outline-text-3" id="text-5-16">
 <p>
 We wrap <code>counsel-ag</code> in <code>calibredb-rga</code>, using the power of <a href="https://github.com/phiresky/ripgrep-all">ripgrep-all</a>.
@@ -1231,9 +1234,22 @@ then in <code>*calibredb-search*</code>, <code>*calibredb-entry*</code> buffer o
 </div>
 </div>
 
-<div id="outline-container-orga71de8f" class="outline-3">
-<h3 id="orga71de8f"><span class="section-number-3">5.17</span> More examples?</h3>
+<div id="outline-container-org72f28a9" class="outline-3">
+<h3 id="org72f28a9"><span class="section-number-3">5.17</span> How to interact with calibredb files in org files?</h3>
 <div class="outline-text-3" id="text-5-17">
+<p>
+In <code>*calibredb-search*</code> buffer,
+</p>
+<ul class="org-ul">
+<li><code>y y</code> copy as calibredb link. If you click the link, it will open the corresponding <code>*calibredb-entry*</code> buffer.</li>
+<li><code>y f</code> copy as file org link. If you click the link, it will open the file directly.</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org77a8584" class="outline-3">
+<h3 id="org77a8584"><span class="section-number-3">5.18</span> More examples?</h3>
+<div class="outline-text-3" id="text-5-18">
 <p>
 Please check
 </p>
@@ -1245,8 +1261,8 @@ All are self documented.
 </div>
 </div>
 
-<div id="outline-container-org8ce4927" class="outline-2">
-<h2 id="org8ce4927"><span class="section-number-2">6</span> Supported Features</h2>
+<div id="outline-container-org3993ca2" class="outline-2">
+<h2 id="org3993ca2"><span class="section-number-2">6</span> Supported Features</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 For more details on the actions, check the official calibre documents:
@@ -1254,8 +1270,8 @@ For more details on the actions, check the official calibre documents:
 </p>
 </div>
 
-<div id="outline-container-org1b9fd11" class="outline-3">
-<h3 id="org1b9fd11"><span class="section-number-3">6.1</span> calibredb</h3>
+<div id="outline-container-org47d9c63" class="outline-3">
+<h3 id="org47d9c63"><span class="section-number-3">6.1</span> calibredb</h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 Enter calibre emacs client, a new buffer called <code>*calibredb-search*</code> with <code>calibredb-search-mode</code>
@@ -1286,8 +1302,8 @@ TODO:
 </div>
 </div>
 
-<div id="outline-container-org5a5cd4e" class="outline-3">
-<h3 id="org5a5cd4e"><span class="section-number-3">6.2</span> calibredb-search-live-filter</h3>
+<div id="outline-container-org99fe07c" class="outline-3">
+<h3 id="org99fe07c"><span class="section-number-3">6.2</span> calibredb-search-live-filter</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
 In <code>*calibredb-search*</code>,
@@ -1334,9 +1350,9 @@ If you set the filter keywords in <code>calibredb-virtual-library-alist</code>, 
 (Notice the double backslashes):
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp"><span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">setq</span> calibredb-virtual-library-alist <span style="color: #81A1C1;">'</span><span style="color: #B48EAD;">(</span><span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"1. Development - work"</span> . <span style="color: #A3BE8C;">"work </span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">(</span><span style="color: #A3BE8C;">pdf</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">|</span><span style="color: #A3BE8C;">epub</span><span style="color: #81A1C1; font-weight: bold;">\\</span><span style="color: #81A1C1; font-weight: bold;">)</span><span style="color: #A3BE8C;">"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"2. Read it later"</span> . <span style="color: #A3BE8C;">"Readit epub"</span><span style="color: #A3BE8C;">)</span>
-                                        <span style="color: #A3BE8C;">(</span><span style="color: #A3BE8C;">"3. Development - rust"</span> . <span style="color: #A3BE8C;">"rust"</span><span style="color: #A3BE8C;">)</span><span style="color: #B48EAD;">)</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-virtual-library-alist</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">(</span><span style="color: #4F894C;">(</span><span style="color: #4F894C;">"1. Development - work"</span> . <span style="color: #4F894C;">"work </span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">(</span><span style="color: #4F894C;">pdf</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">|</span><span style="color: #4F894C;">epub</span><span style="color: #3B6EA8; font-weight: bold;">\\</span><span style="color: #3B6EA8; font-weight: bold;">)</span><span style="color: #4F894C;">"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"2. Read it later"</span> . <span style="color: #4F894C;">"Readit epub"</span><span style="color: #4F894C;">)</span>
+                                        <span style="color: #4F894C;">(</span><span style="color: #4F894C;">"3. Development - rust"</span> . <span style="color: #4F894C;">"rust"</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div>
 
@@ -1353,8 +1369,8 @@ second-level filter with <code>calibredb-find-counsel</code>, and <code>calibred
 </div>
 </div>
 
-<div id="outline-container-org95999ea" class="outline-3">
-<h3 id="org95999ea"><span class="section-number-3">6.3</span> calibredb-find-helm</h3>
+<div id="outline-container-orgf760d15" class="outline-3">
+<h3 id="orgf760d15"><span class="section-number-3">6.3</span> calibredb-find-helm</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 Use helm to list all ebooks
@@ -1366,8 +1382,8 @@ Use helm to list all ebooks
 </div>
 </div>
 
-<div id="outline-container-org9fac947" class="outline-3">
-<h3 id="org9fac947"><span class="section-number-3">6.4</span> calibredb-find-counsel</h3>
+<div id="outline-container-orga598b1b" class="outline-3">
+<h3 id="orga598b1b"><span class="section-number-3">6.4</span> calibredb-find-counsel</h3>
 <div class="outline-text-3" id="text-6-4">
 <p>
 Use counsel to list all ebooks
@@ -1379,8 +1395,8 @@ Use counsel to list all ebooks
 </div>
 </div>
 
-<div id="outline-container-orgc6d5bda" class="outline-3">
-<h3 id="orgc6d5bda"><span class="section-number-3">6.5</span> calibredb-list</h3>
+<div id="outline-container-orgbc74c4b" class="outline-3">
+<h3 id="orgbc74c4b"><span class="section-number-3">6.5</span> calibredb-list</h3>
 <div class="outline-text-3" id="text-6-5">
 <p>
 Generate an org buffer which contains all files&rsquo; cover images, titles and the file links.
@@ -1392,8 +1408,8 @@ Generate an org buffer which contains all files&rsquo; cover images, titles and 
 </div>
 </div>
 
-<div id="outline-container-org4dfc586" class="outline-3">
-<h3 id="org4dfc586"><span class="section-number-3">6.6</span> calibredb-clone</h3>
+<div id="outline-container-org13766dd" class="outline-3">
+<h3 id="org13766dd"><span class="section-number-3">6.6</span> calibredb-clone</h3>
 <div class="outline-text-3" id="text-6-6">
 <p>
 Create a clone of the current library. This creates a new, empty library that
@@ -1413,8 +1429,8 @@ lecture notes, one for research references etc.
 </div>
 </div>
 
-<div id="outline-container-orga9fddda" class="outline-3">
-<h3 id="orga9fddda"><span class="section-number-3">6.7</span> calibredb-library-list</h3>
+<div id="outline-container-orgdbc756d" class="outline-3">
+<h3 id="orgdbc756d"><span class="section-number-3">6.7</span> calibredb-library-list</h3>
 <div class="outline-text-3" id="text-6-7">
 <p>
 Switch library from library list defined in <code>calibredb-library-alist</code>.
@@ -1429,8 +1445,8 @@ selecting the new item.
 </div>
 </div>
 
-<div id="outline-container-org8fbd1fd" class="outline-3">
-<h3 id="org8fbd1fd"><span class="section-number-3">6.8</span> calibredb-switch-library</h3>
+<div id="outline-container-org4684454" class="outline-3">
+<h3 id="org4684454"><span class="section-number-3">6.8</span> calibredb-switch-library</h3>
 <div class="outline-text-3" id="text-6-8">
 <p>
 Switch a library temporary by selecting a path.
@@ -1443,8 +1459,8 @@ Switch a library temporary by selecting a path.
 </div>
 </div>
 
-<div id="outline-container-org7fddd77" class="outline-3">
-<h3 id="org7fddd77"><span class="section-number-3">6.9</span> Show details</h3>
+<div id="outline-container-org26581a9" class="outline-3">
+<h3 id="org26581a9"><span class="section-number-3">6.9</span> Show details</h3>
 <div class="outline-text-3" id="text-6-9">
 <p>
 This action will get you to the book details buffer called <code>*calibredb-entry*</code>
@@ -1452,12 +1468,12 @@ This action will get you to the book details buffer called <code>*calibredb-entr
 </div>
 </div>
 
-<div id="outline-container-orgc0cdfc2" class="outline-3">
-<h3 id="orgc0cdfc2"><span class="section-number-3">6.10</span> Dispatch</h3>
+<div id="outline-container-org4d9d281" class="outline-3">
+<h3 id="org4d9d281"><span class="section-number-3">6.10</span> Dispatch</h3>
 <div class="outline-text-3" id="text-6-10">
 </div>
-<div id="outline-container-org1d1d1f4" class="outline-4">
-<h4 id="org1d1d1f4"><span class="section-number-4">6.10.1</span> calibredb-dispatch</h4>
+<div id="outline-container-org5558e36" class="outline-4">
+<h4 id="org5558e36"><span class="section-number-4">6.10.1</span> calibredb-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-1">
 <p>
 Under <code>*calilbredb-search*</code> or <code>*calilbredb-entry*</code> buffer, you can make actions on
@@ -1474,8 +1490,8 @@ Or fire with keybinding <code>?</code>
 </div>
 </div>
 
-<div id="outline-container-org3fc3868" class="outline-4">
-<h4 id="org3fc3868"><span class="section-number-4">6.10.2</span> calibredb-set-metadata-dispatch</h4>
+<div id="outline-container-org6225664" class="outline-4">
+<h4 id="org6225664"><span class="section-number-4">6.10.2</span> calibredb-set-metadata-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-2">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-set-metadata-dispatch
@@ -1487,8 +1503,8 @@ Or fire with keybinding <code>s</code>
 </div>
 </div>
 
-<div id="outline-container-orgf1f642a" class="outline-4">
-<h4 id="orgf1f642a"><span class="section-number-4">6.10.3</span> calibredb-catalog-bib-dispatch</h4>
+<div id="outline-container-org4b83f07" class="outline-4">
+<h4 id="org4b83f07"><span class="section-number-4">6.10.3</span> calibredb-catalog-bib-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-3">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-catalog-bib-dispatch
@@ -1500,8 +1516,8 @@ Or fire with keybinding <code>b</code>
 </div>
 </div>
 
-<div id="outline-container-org592d8ad" class="outline-4">
-<h4 id="org592d8ad"><span class="section-number-4">6.10.4</span> calibredb-export-dispatch</h4>
+<div id="outline-container-org8d53200" class="outline-4">
+<h4 id="org8d53200"><span class="section-number-4">6.10.4</span> calibredb-export-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-4">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-export-dispatch
@@ -1515,8 +1531,8 @@ Or fire with keybinding <code>e</code>
 </div>
 
 
-<div id="outline-container-orgb6d1eec" class="outline-3">
-<h3 id="orgb6d1eec"><span class="section-number-3">6.11</span> add</h3>
+<div id="outline-container-orgb4d4f27" class="outline-3">
+<h3 id="orgb4d4f27"><span class="section-number-3">6.11</span> add</h3>
 <div class="outline-text-3" id="text-6-11">
 <p>
 To add a file into calibre, call
@@ -1536,8 +1552,8 @@ To add a directory into calibre, call
 </div>
 </div>
 
-<div id="outline-container-org51f2096" class="outline-3">
-<h3 id="org51f2096"><span class="section-number-3">6.12</span> remove</h3>
+<div id="outline-container-org1a6ac10" class="outline-3">
+<h3 id="org1a6ac10"><span class="section-number-3">6.12</span> remove</h3>
 <div class="outline-text-3" id="text-6-12">
 <p>
 To remove an item, call
@@ -1557,8 +1573,8 @@ To remove the marked items, call
 </div>
 </div>
 
-<div id="outline-container-org47e4790" class="outline-3">
-<h3 id="org47e4790"><span class="section-number-3">6.13</span> set<sub>metadata</sub></h3>
+<div id="outline-container-orgcba3725" class="outline-3">
+<h3 id="orgcba3725"><span class="section-number-3">6.13</span> set<sub>metadata</sub></h3>
 <div class="outline-text-3" id="text-6-13">
 <p>
 To set metadata,
@@ -1570,8 +1586,8 @@ To set metadata,
 </div>
 </div>
 
-<div id="outline-container-org1302070" class="outline-3">
-<h3 id="org1302070"><span class="section-number-3">6.14</span> Export</h3>
+<div id="outline-container-org45cf872" class="outline-3">
+<h3 id="org45cf872"><span class="section-number-3">6.14</span> Export</h3>
 <div class="outline-text-3" id="text-6-14">
 <p>
 To export the ebook,
@@ -1583,13 +1599,26 @@ To export the ebook,
 </div>
 </div>
 
-<div id="outline-container-org572d928" class="outline-3">
-<h3 id="org572d928"><span class="section-number-3">6.15</span> Catalog</h3>
+<div id="outline-container-org1969b4f" class="outline-3">
+<h3 id="org1969b4f"><span class="section-number-3">6.15</span> Yank</h3>
 <div class="outline-text-3" id="text-6-15">
+<p>
+To yank the ebook as org links,
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">M-x calibredb-yank-dispatch
+</pre>
 </div>
-<div id="outline-container-orgb5b23aa" class="outline-4">
-<h4 id="orgb5b23aa"><span class="section-number-4">6.15.1</span> BibTex</h4>
-<div class="outline-text-4" id="text-6-15-1">
+</div>
+</div>
+
+<div id="outline-container-org3895a36" class="outline-3">
+<h3 id="org3895a36"><span class="section-number-3">6.16</span> Catalog</h3>
+<div class="outline-text-3" id="text-6-16">
+</div>
+<div id="outline-container-org1e2e024" class="outline-4">
+<h4 id="org1e2e024"><span class="section-number-4">6.16.1</span> BibTex</h4>
+<div class="outline-text-4" id="text-6-16-1">
 <p>
 Export the ebook catalogs to a BibTex file.
 </p>
@@ -1604,9 +1633,9 @@ PS: Document can be found in <a href="https://github.com/kovidgoyal/calibre/blob
 </div>
 </div>
 
-<div id="outline-container-orgf76f5d4" class="outline-3">
-<h3 id="orgf76f5d4"><span class="section-number-3">6.16</span> calibredb-rga</h3>
-<div class="outline-text-3" id="text-6-16">
+<div id="outline-container-orgf4e503a" class="outline-3">
+<h3 id="orgf4e503a"><span class="section-number-3">6.17</span> calibredb-rga</h3>
+<div class="outline-text-3" id="text-6-17">
 <p>
 Search in ebooks.
 </p>
@@ -1614,13 +1643,37 @@ Search in ebooks.
 </div>
 </div>
 
-<div id="outline-container-org84870eb" class="outline-2">
-<h2 id="org84870eb"><span class="section-number-2">7</span> Logs</h2>
+<div id="outline-container-org36ae3dc" class="outline-2">
+<h2 id="org36ae3dc"><span class="section-number-2">7</span> Logs</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-org4d94d84" class="outline-3">
-<h3 id="org4d94d84"><span class="section-number-3">7.1</span> <code>2020-12-25</code></h3>
+<div id="outline-container-orgfca8d92" class="outline-3">
+<h3 id="orgfca8d92"><span class="section-number-3">7.1</span> <code>2021-03-21</code></h3>
 <div class="outline-text-3" id="text-7-1">
+<p>
+Version  <b>2.9.0:</b>
+</p>
+<ul class="org-ul">
+<li>Now, it is able to set metadata asynchronous.</li>
+<li>Add <code>calibredb-org-link-setup</code> to support org-link: <code>calibredb:</code>, copy the marked items as org link with <code>y y</code> or <code>y f</code>.</li>
+<li>Improve exit functions on *~calibredb-search*~ and *~calibredb-entry*~ buffers.</li>
+<li><p>
+Add universal prefix support for <code>calibredb-open-file-with-default-tool</code>,
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp">  C-u M-x calibredb-open-file-with-default-tool
+</pre>
+</div>
+<p>
+will open the folder where the file located.
+</p></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5750451" class="outline-3">
+<h3 id="org5750451"><span class="section-number-3">7.2</span> <code>2020-12-25</code></h3>
+<div class="outline-text-3" id="text-7-2">
 <p>
 Merry Christmas! I am happy to release <b>2.8.0</b>
 </p>
@@ -1636,9 +1689,9 @@ Merry Christmas! I am happy to release <b>2.8.0</b>
 </div>
 
 
-<div id="outline-container-orga7ee123" class="outline-3">
-<h3 id="orga7ee123"><span class="section-number-3">7.2</span> <code>2020-10-12</code></h3>
-<div class="outline-text-3" id="text-7-2">
+<div id="outline-container-org84bcd08" class="outline-3">
+<h3 id="org84bcd08"><span class="section-number-3">7.3</span> <code>2020-10-12</code></h3>
+<div class="outline-text-3" id="text-7-3">
 <p>
 Version  <b>2.7.0:</b>
 </p>
@@ -1649,22 +1702,22 @@ Version  <b>2.7.0:</b>
 Adjust keybindings:
 </p>
 <div class="org-src-container">
-<pre class="src src-emacs-lisp">    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"l"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-list</span><span style="color: #81A1C1;">)</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"L"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-list</span><span style="color: #81A1C1;">)</span> <span style="color: #6f7787;">; </span><span style="color: #6f7787;">previous l</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"n"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-next</span><span style="color: #81A1C1;">)</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"N"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-next</span><span style="color: #81A1C1;">)</span> <span style="color: #6f7787;">; </span><span style="color: #6f7787;">previous n</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"p"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-virtual-library-previous</span><span style="color: #81A1C1;">)</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"P"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-library-previous</span><span style="color: #81A1C1;">)</span> <span style="color: #6f7787;">; </span><span style="color: #6f7787;">previous p</span>
-    <span style="color: #81A1C1;">(</span><span style="color: #81A1C1;">define-key</span> map <span style="color: #A3BE8C;">"R"</span> <span style="color: #81A1C1;">#'</span><span style="color: #8FBCBB;">calibredb-search-clear-filter</span><span style="color: #81A1C1;">)</span>
+<pre class="src src-emacs-lisp">    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"l"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-list</span><span style="color: #3B6EA8;">)</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"L"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-list</span><span style="color: #3B6EA8;">)</span> <span style="color: #8b94a5;">; </span><span style="color: #8b94a5;">previous l</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"n"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-next</span><span style="color: #3B6EA8;">)</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"N"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-next</span><span style="color: #3B6EA8;">)</span> <span style="color: #8b94a5;">; </span><span style="color: #8b94a5;">previous n</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"p"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-virtual-library-previous</span><span style="color: #3B6EA8;">)</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"P"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-library-previous</span><span style="color: #3B6EA8;">)</span> <span style="color: #8b94a5;">; </span><span style="color: #8b94a5;">previous p</span>
+    <span style="color: #3B6EA8;">(</span><span style="color: #97365B;">define-key</span> map <span style="color: #4F894C;">"R"</span> <span style="color: #3B6EA8;">#'</span><span style="color: #9A7500;">calibredb-search-clear-filter</span><span style="color: #3B6EA8;">)</span>
 </pre>
 </div></li>
 </ul>
 </div>
 </div>
 
-<div id="outline-container-orgd8466e1" class="outline-3">
-<h3 id="orgd8466e1"><span class="section-number-3">7.3</span> <code>2020-08-29</code></h3>
-<div class="outline-text-3" id="text-7-3">
+<div id="outline-container-org4a904e6" class="outline-3">
+<h3 id="org4a904e6"><span class="section-number-3">7.4</span> <code>2020-08-29</code></h3>
+<div class="outline-text-3" id="text-7-4">
 <p>
 Version <b>2.6.0</b>:
 </p>
@@ -1679,9 +1732,9 @@ Version <b>2.6.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org61ff097" class="outline-3">
-<h3 id="org61ff097"><span class="section-number-3">7.4</span> <code>2020-08-09</code></h3>
-<div class="outline-text-3" id="text-7-4">
+<div id="outline-container-orgc20da3b" class="outline-3">
+<h3 id="orgc20da3b"><span class="section-number-3">7.5</span> <code>2020-08-09</code></h3>
+<div class="outline-text-3" id="text-7-5">
 <p>
 Version <b>2.5.0</b>:
 </p>
@@ -1691,9 +1744,9 @@ Version <b>2.5.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org839e694" class="outline-3">
-<h3 id="org839e694"><span class="section-number-3">7.5</span> <code>2020-07-16</code></h3>
-<div class="outline-text-3" id="text-7-5">
+<div id="outline-container-org0fc4564" class="outline-3">
+<h3 id="org0fc4564"><span class="section-number-3">7.6</span> <code>2020-07-16</code></h3>
+<div class="outline-text-3" id="text-7-6">
 <p>
 Version <b>2.4.1</b>:
 </p>
@@ -1703,9 +1756,9 @@ Version <b>2.4.1</b>:
 </div>
 </div>
 
-<div id="outline-container-org8053f46" class="outline-3">
-<h3 id="org8053f46"><span class="section-number-3">7.6</span> <code>2020-07-01</code></h3>
-<div class="outline-text-3" id="text-7-6">
+<div id="outline-container-org779e527" class="outline-3">
+<h3 id="org779e527"><span class="section-number-3">7.7</span> <code>2020-07-01</code></h3>
+<div class="outline-text-3" id="text-7-7">
 <p>
 Version <b>2.4.0</b>:
 </p>
@@ -1716,9 +1769,9 @@ Version <b>2.4.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org115f05c" class="outline-3">
-<h3 id="org115f05c"><span class="section-number-3">7.7</span> <code>2020-06-22</code></h3>
-<div class="outline-text-3" id="text-7-7">
+<div id="outline-container-org3a663b5" class="outline-3">
+<h3 id="org3a663b5"><span class="section-number-3">7.8</span> <code>2020-06-22</code></h3>
+<div class="outline-text-3" id="text-7-8">
 <p>
 Version <b>2.3.2</b>:
 </p>
@@ -1730,9 +1783,9 @@ Version <b>2.3.2</b>:
 </div>
 </div>
 
-<div id="outline-container-org8ed60c0" class="outline-3">
-<h3 id="org8ed60c0"><span class="section-number-3">7.8</span> <code>2020-06-21</code></h3>
-<div class="outline-text-3" id="text-7-8">
+<div id="outline-container-org91b4754" class="outline-3">
+<h3 id="org91b4754"><span class="section-number-3">7.9</span> <code>2020-06-21</code></h3>
+<div class="outline-text-3" id="text-7-9">
 <p>
 Version <b>2.3.1</b>:
 </p>
@@ -1743,9 +1796,9 @@ Version <b>2.3.1</b>:
 </div>
 </div>
 
-<div id="outline-container-org0465a50" class="outline-3">
-<h3 id="org0465a50"><span class="section-number-3">7.9</span> <code>2020-06-11</code></h3>
-<div class="outline-text-3" id="text-7-9">
+<div id="outline-container-orgc776b7c" class="outline-3">
+<h3 id="orgc776b7c"><span class="section-number-3">7.10</span> <code>2020-06-11</code></h3>
+<div class="outline-text-3" id="text-7-10">
 <p>
 Version <b>2.3.0</b>:
 </p>
@@ -1755,9 +1808,9 @@ Version <b>2.3.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org446205d" class="outline-3">
-<h3 id="org446205d"><span class="section-number-3">7.10</span> <code>2020-06-07</code></h3>
-<div class="outline-text-3" id="text-7-10">
+<div id="outline-container-org2a5c824" class="outline-3">
+<h3 id="org2a5c824"><span class="section-number-3">7.11</span> <code>2020-06-07</code></h3>
+<div class="outline-text-3" id="text-7-11">
 <p>
 Version <b>2.2.0</b>:
 </p>
@@ -1768,9 +1821,9 @@ Version <b>2.2.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org12b7539" class="outline-3">
-<h3 id="org12b7539"><span class="section-number-3">7.11</span> <code>2020-06-06</code></h3>
-<div class="outline-text-3" id="text-7-11">
+<div id="outline-container-org8884ab5" class="outline-3">
+<h3 id="org8884ab5"><span class="section-number-3">7.12</span> <code>2020-06-06</code></h3>
+<div class="outline-text-3" id="text-7-12">
 <p>
 Version 2.1.0:
 </p>
@@ -1780,9 +1833,9 @@ Version 2.1.0:
 </div>
 </div>
 
-<div id="outline-container-org1e9379b" class="outline-3">
-<h3 id="org1e9379b"><span class="section-number-3">7.12</span> <code>2020-06-05</code></h3>
-<div class="outline-text-3" id="text-7-12">
+<div id="outline-container-orge43576a" class="outline-3">
+<h3 id="orge43576a"><span class="section-number-3">7.13</span> <code>2020-06-05</code></h3>
+<div class="outline-text-3" id="text-7-13">
 <p>
 Version <b>2.0.0</b>:
 </p>
@@ -1795,9 +1848,9 @@ Version <b>2.0.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org913a937" class="outline-3">
-<h3 id="org913a937"><span class="section-number-3">7.13</span> <code>2020-06-05</code></h3>
-<div class="outline-text-3" id="text-7-13">
+<div id="outline-container-orgf577511" class="outline-3">
+<h3 id="orgf577511"><span class="section-number-3">7.14</span> <code>2020-06-05</code></h3>
+<div class="outline-text-3" id="text-7-14">
 <p>
 Version <b>1.9.0</b>:
 </p>
@@ -1807,9 +1860,9 @@ Version <b>1.9.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orge76d094" class="outline-3">
-<h3 id="orge76d094"><span class="section-number-3">7.14</span> <code>2020-06-04</code></h3>
-<div class="outline-text-3" id="text-7-14">
+<div id="outline-container-org27389e6" class="outline-3">
+<h3 id="org27389e6"><span class="section-number-3">7.15</span> <code>2020-06-04</code></h3>
+<div class="outline-text-3" id="text-7-15">
 <p>
 Version <b>1.8.0</b>:
 </p>
@@ -1821,9 +1874,9 @@ Version <b>1.8.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgd932dc1" class="outline-3">
-<h3 id="orgd932dc1"><span class="section-number-3">7.15</span> <code>2020-05-31</code></h3>
-<div class="outline-text-3" id="text-7-15">
+<div id="outline-container-org8b6fe21" class="outline-3">
+<h3 id="org8b6fe21"><span class="section-number-3">7.16</span> <code>2020-05-31</code></h3>
+<div class="outline-text-3" id="text-7-16">
 <p>
 Version <b>1.7.0</b>:
 </p>
@@ -1833,9 +1886,9 @@ Version <b>1.7.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org4f477f3" class="outline-3">
-<h3 id="org4f477f3"><span class="section-number-3">7.16</span> <code>2020-05-30</code></h3>
-<div class="outline-text-3" id="text-7-16">
+<div id="outline-container-org4424dd5" class="outline-3">
+<h3 id="org4424dd5"><span class="section-number-3">7.17</span> <code>2020-05-30</code></h3>
+<div class="outline-text-3" id="text-7-17">
 <p>
 Version <b>1.6.0</b>:
 </p>
@@ -1848,9 +1901,9 @@ Version <b>1.6.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orge92341a" class="outline-3">
-<h3 id="orge92341a"><span class="section-number-3">7.17</span> <code>2020-05-16</code></h3>
-<div class="outline-text-3" id="text-7-17">
+<div id="outline-container-orgdb26658" class="outline-3">
+<h3 id="orgdb26658"><span class="section-number-3">7.18</span> <code>2020-05-16</code></h3>
+<div class="outline-text-3" id="text-7-18">
 <p>
 Version <b>1.5.0</b>:
 </p>
@@ -1860,9 +1913,9 @@ Version <b>1.5.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org3a154a6" class="outline-3">
-<h3 id="org3a154a6"><span class="section-number-3">7.18</span> <code>2020-05-15</code></h3>
-<div class="outline-text-3" id="text-7-18">
+<div id="outline-container-orgc2a1c2d" class="outline-3">
+<h3 id="orgc2a1c2d"><span class="section-number-3">7.19</span> <code>2020-05-15</code></h3>
+<div class="outline-text-3" id="text-7-19">
 <p>
 Version <b>1.4.0</b>:
 </p>
@@ -1872,9 +1925,9 @@ Version <b>1.4.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgb310849" class="outline-3">
-<h3 id="orgb310849"><span class="section-number-3">7.19</span> <code>2020-05-14</code></h3>
-<div class="outline-text-3" id="text-7-19">
+<div id="outline-container-org988475c" class="outline-3">
+<h3 id="org988475c"><span class="section-number-3">7.20</span> <code>2020-05-14</code></h3>
+<div class="outline-text-3" id="text-7-20">
 <p>
 Version <b>1.3.0</b>:
 </p>
@@ -1886,9 +1939,9 @@ Version <b>1.3.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgc552fe3" class="outline-3">
-<h3 id="orgc552fe3"><span class="section-number-3">7.20</span> <code>2020-05-13</code></h3>
-<div class="outline-text-3" id="text-7-20">
+<div id="outline-container-org6357536" class="outline-3">
+<h3 id="org6357536"><span class="section-number-3">7.21</span> <code>2020-05-13</code></h3>
+<div class="outline-text-3" id="text-7-21">
 <p>
 Version <b>1.2.0</b>:
 </p>
@@ -1899,9 +1952,9 @@ Version <b>1.2.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orge95d1bd" class="outline-3">
-<h3 id="orge95d1bd"><span class="section-number-3">7.21</span> <code>2020-05-10</code></h3>
-<div class="outline-text-3" id="text-7-21">
+<div id="outline-container-orgf0202d0" class="outline-3">
+<h3 id="orgf0202d0"><span class="section-number-3">7.22</span> <code>2020-05-10</code></h3>
+<div class="outline-text-3" id="text-7-22">
 <p>
 Version <b>1.1.0</b>:
 </p>
@@ -1911,9 +1964,9 @@ Version <b>1.1.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgeb00774" class="outline-3">
-<h3 id="orgeb00774"><span class="section-number-3">7.22</span> <code>2020-05-09</code></h3>
-<div class="outline-text-3" id="text-7-22">
+<div id="outline-container-org33d8d12" class="outline-3">
+<h3 id="org33d8d12"><span class="section-number-3">7.23</span> <code>2020-05-09</code></h3>
+<div class="outline-text-3" id="text-7-23">
 <p>
 Version <b>1.0.0</b>:
 </p>
@@ -1929,7 +1982,7 @@ Version <b>1.0.0</b>:
 <div id="postamble" class="status">
 <p class="date">Date: Aug 9, 2020</p>
 <p class="author">Author: Damon Chan</p>
-<p class="date">Created: 2021-01-05 Tue 21:58</p>
+<p class="date">Created: 2021-03-21 Sun 17:53</p>
 </div>
 </body>
 </html>
