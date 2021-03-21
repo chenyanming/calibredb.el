@@ -527,9 +527,6 @@ M-x calibredb-rga
 
 ** How to interact with calibredb files in org files?
 First enable org link with:
-#+begin_src emacs-lisp
-M-x calibredb-org-link-setup
-#+end_src
 
 In ~*calibredb-search*~ buffer,
 - ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.
@@ -715,6 +712,12 @@ M-x calibredb-set-metadata-dispatch
 To export the ebook,
 #+BEGIN_SRC emacs-lisp
 M-x calibredb-export-dispatch
+#+END_SRC
+
+** Yank
+To yank the ebook as org links,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-yank-dispatch
 #+END_SRC
 
 ** Catalog
