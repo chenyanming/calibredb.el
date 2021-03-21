@@ -674,7 +674,7 @@ Argument BOOK-ALIST ."
                         (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path) :v-adjust 0 :height 1) "")
                     " "))
            (t ""))
-     (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face)) calibredb-id-width :left)
+     (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face 'id id)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
                                       (if (s-contains? calibredb-favorite-keyword tag)
                                           (format "%s " (propertize calibredb-favorite-icon
@@ -706,7 +706,7 @@ Argument BOOK-ALIST ."
      (calibredb-format-column (propertize tag
                                           'face 'calibredb-tag-face
                                           'mouse-face 'calibredb-mouse-face
-                                          'help-echo "Filter with this tag"
+                                          'help-echo "Filter with this man"
                                           'keymap tag-map) (calibredb-tag-width) :left)
      (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)

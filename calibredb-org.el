@@ -29,12 +29,34 @@
 (declare-function calibredb-find-marked-candidates "calibredb-utils.el")
 (declare-function calibredb-find-candidate-at-point "calibredb-utils.el")
 
-
+;;;###autoload
 (defun calibredb-org-link-view (id _)
   "Follow calibredb org links."
   (calibredb-show-entry (cdar (calibredb-candidate id))))
 
-(org-link-set-parameters "calibredb" :follow #'calibredb-org-link-view)
+;;;###autoload
+(defun calibredb-org-complete-link (&optional prefix)
+  "Define completion for Org \"calibredb:\" links.
+The optional PREFIX argument is ignored.
+Please notice: `calibredb-id-width' must >= the real id lenth."
+  (ignore prefix)
+  (let* ((cands (if calibredb-search-entries
+                   calibredb-search-entries
+                 (progn
+                   (setq calibredb-search-entries (calibredb-candidates))
+                   (setq calibredb-full-entries calibredb-search-entries)))))
+    (if cands
+        (let* ((cand (completing-read "Insert: " cands))
+               (id-point (text-property-not-all 0 (length cand) 'id nil cand))
+               (id (get-text-property id-point 'id cand)))
+          (concat (format "calibredb:%s" id)))
+      "calibredb:")))
+
+;; TODO: The description can not be set.
+(org-link-set-parameters
+ "calibredb"
+ :follow #'calibredb-org-link-view
+ :complete #'calibredb-org-complete-link)
 
 (defun calibredb-org-link-copy ()
   "Copy the marked items as calibredb org links."
