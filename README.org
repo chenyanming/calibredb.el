@@ -526,8 +526,6 @@ M-x calibredb-rga
 #+END_SRC
 
 ** How to interact with calibredb files in org files?
-First enable org link with:
-
 In ~*calibredb-search*~ buffer,
 - ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.
 - ~y f~ copy as file org link. If you click the link, it will open the file directly.
