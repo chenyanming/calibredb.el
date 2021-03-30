@@ -304,7 +304,7 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (let ((id (calibredb-getattr candidate :id))
         (title (calibredb-getattr candidate :book-title)))
-    (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
+    (if (yes-or-no-p (concat "Are you sure to move: " id " - " title " to recycle bin?"))
         (calibredb-command :command "remove"
                            :id id
                            :library (format "--library-path %s" (calibredb-root-dir-quote))))
@@ -321,20 +321,18 @@ If prefix ARG is non-nil, delete the files without prompt."
   (let ((candidates (calibredb-find-marked-candidates)))
     (unless candidates
       (setq candidates (calibredb-find-candidate-at-point)))
-    (dolist (cand candidates)
-      (let ((id (calibredb-getattr cand :id))
-            (title (calibredb-getattr cand :book-title)))
-        ;; If with prefix, delete without prompt
-        (if arg
-            (progn
-              (calibredb-command :command "remove"
-                                 :id id
-                                 :library (format "--library-path %s" (calibredb-root-dir-quote)))
-              (message (format "Deleted %s - %s" id title)))
-          (if (yes-or-no-p (concat "Confirm Delete: " id " - " title))
-              (calibredb-command :command "remove"
-                                 :id id
-                                 :library (format "--library-path %s" (calibredb-root-dir-quote)))))))
+    (let ((ids (mapconcat (lambda (cand) (calibredb-getattr cand :id))  candidates "," )))
+      ;; If with prefix, delete without prompt
+      (if arg
+          (progn
+            (calibredb-command :command "remove"
+                               :id ids
+                               :library (format "--library-path %s" (calibredb-root-dir-quote)))
+            (message (format "Deleted %s - %s" ids)))
+        (if (yes-or-no-p (concat "Are you sure to move: " ids " to recycle bin?"))
+            (calibredb-command :command "remove"
+                               :id ids
+                               :library (format "--library-path %s" (calibredb-root-dir-quote))))))
     (if (eq major-mode 'calibredb-search-mode)
         (calibredb-search-refresh-or-resume))))
 
