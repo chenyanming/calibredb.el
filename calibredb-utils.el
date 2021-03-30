@@ -297,8 +297,8 @@ Optional argument REST is the rest."
 ;; remove
 
 (defun calibredb-remove (&optional candidate)
-  "Remove the slected item.
-Optional argument CANDIDATE is the selected item."
+  "Remove the item at point.
+Optional argument CANDIDATE is the item at point."
   (interactive)
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
