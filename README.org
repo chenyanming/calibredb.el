@@ -105,8 +105,6 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
 #+BEGIN_SRC emacs-lisp
 (use-package calibredb
   :defer t
-  :init
-  (autoload 'calibredb "calibredb")
   :config
   (setq calibredb-root-dir "~/OneDrive/Org/Doc/Calibre")
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
