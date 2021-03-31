@@ -730,7 +730,7 @@ Search in ebooks.
 * Logs
 ** =2021-03-21=
 Version  *2.9.0:*
-- Now, it is able to set metadata asynchronous.
+- Now, it is able to set metadata asynchronously.
 - Add ~calibredb-org-link-setup~ to support org-link: ~calibredb:~, copy the marked items as org link with ~y y~ or ~y f~.
 - Improve exit functions on *~calibredb-search*~ and *~calibredb-entry*~ buffers.
 - Add universal prefix support for ~calibredb-open-file-with-default-tool~,
