@@ -96,17 +96,15 @@
 (defun calibredb-open-with-default-tool (filepath)
   "TODO: consolidate default-opener with dispatcher.
 Argument FILEPATH is the file path."
-  (if (eq system-type 'windows-nt)
-      (start-process "shell-process" "*Messages*"
-                     "cmd.exe" "/c" (expand-file-name filepath))
-    (start-process "shell-process" "*Messages*"
-                   (cond ((eq system-type 'gnu/linux)
-                          "xdg-open")
-                         ((eq system-type 'windows-nt)
-                          "start")
-                         ((eq system-type 'darwin)
-                          "open")
-                         (t (message "unknown system!?"))) (expand-file-name filepath))))
+  (cond ((eq system-type 'gnu/linux)
+         (call-process "xdg-open" nil 0 nil (expand-file-name filepath)))
+        ((eq system-type 'windows-nt)
+         (start-process "shell-process" "*Messages*"
+                        "cmd.exe" "/c" (expand-file-name filepath)))
+        ((eq system-type 'darwin)
+         (start-process "shell-process" "*Messages*"
+                        "open" (expand-file-name filepath)))
+        (t (message "unknown system!?"))))
 
 
 (defun calibredb-insert-image (path alt width height)
