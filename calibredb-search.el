@@ -80,6 +80,12 @@ When live editing the filter, it is bound to :live.")
 (defvar calibredb-search-print-entry-function #'calibredb-search-print-entry--default
   "Function to print entries into the *calibredb-search* buffer.")
 
+(defvar calibredb-tag-filterp nil)
+(defvar calibredb-favorite-filterp nil)
+(defvar calibredb-author-filterp nil)
+(defvar calibredb-date-filterp nil)
+(defvar calibredb-format-filterp nil)
+
 (defvar calibredb-search-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map [mouse-3] #'calibredb-search-mouse)
@@ -327,7 +333,15 @@ Indicating the library you use."
                                (if (equal calibredb-search-entries '(""))
                                    "0   "
                                  (concat (number-to-string (length calibredb-search-entries)) "   "))) 'face font-lock-warning-face)
-           (propertize (format "%s" (if (equal calibredb-search-filter "")
+           (propertize (format "%s%s"
+                               (cond
+                                (calibredb-tag-filterp "Tag: ")
+                                (calibredb-favorite-filterp "Favorite: ")
+                                (calibredb-author-filterp "Author: ")
+                                (calibredb-date-filterp "Date: ")
+                                (calibredb-format-filterp "Format: ")
+                                (t ""))
+                               (if (equal calibredb-search-filter "")
                                         ""
                                       (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
            (propertize (let ((len (length (calibredb-find-marked-candidates))))
@@ -406,11 +420,21 @@ Argument EVENT mouse event."
   "Refresh calibredb and clear the fitler keyword."
   (interactive)
   (calibredb-search-refresh)
+  (setq calibredb-tag-filterp nil)
+  (setq calibredb-favorite-filterp nil)
+  (setq calibredb-author-filterp nil)
+  (setq calibredb-date-filterp nil)
+  (setq calibredb-format-filterp nil)
   (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-clear-filter ()
   "Clear the fitler keyword."
   (interactive)
+  (setq calibredb-tag-filterp nil)
+  (setq calibredb-favorite-filterp nil)
+  (setq calibredb-author-filterp nil)
+  (setq calibredb-date-filterp nil)
+  (setq calibredb-format-filterp nil)
   (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-quit ()
@@ -480,6 +504,11 @@ Argument EVENT mouse event."
         (error "No favorite chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filterp nil)
+      (setq calibredb-favorite-filterp t)
+      (setq calibredb-author-filterp nil)
+      (setq calibredb-date-filterp nil)
+      (setq calibredb-format-filterp nil)
       (calibredb-search-keyword-filter calibredb-favorite-keyword))))
 
 (defun calibredb-tag-mouse-1 (event)
@@ -492,6 +521,11 @@ Argument EVENT mouse event."
         (error "No tag chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filterp t)
+      (setq calibredb-favorite-filterp nil)
+      (setq calibredb-author-filterp nil)
+      (setq calibredb-date-filterp nil)
+      (setq calibredb-format-filterp nil)
       (calibredb-search-keyword-filter (word-at-point t)))))
 
 (defun calibredb-author-mouse-1 (event)
@@ -504,6 +538,11 @@ Argument EVENT mouse event."
         (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filterp nil)
+      (setq calibredb-favorite-filterp nil)
+      (setq calibredb-author-filterp t)
+      (setq calibredb-date-filterp nil)
+      (setq calibredb-format-filterp nil)
       (calibredb-search-keyword-filter (word-at-point t)))))
 
 (defun calibredb-format-mouse-1 (event)
@@ -516,6 +555,11 @@ Argument EVENT mouse event."
         (error "No format chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filterp nil)
+      (setq calibredb-favorite-filterp nil)
+      (setq calibredb-author-filterp nil)
+      (setq calibredb-date-filterp nil)
+      (setq calibredb-format-filterp t)
       (calibredb-search-keyword-filter (word-at-point t)))))
 
 (defun calibredb-date-mouse-1 (event)
@@ -528,6 +572,11 @@ Argument EVENT mouse event."
         (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filterp nil)
+      (setq calibredb-favorite-filterp nil)
+      (setq calibredb-author-filterp nil)
+      (setq calibredb-date-filterp t)
+      (setq calibredb-format-filterp nil)
       (calibredb-search-keyword-filter (thing-at-point 'symbol t)))))
 
 (defun calibredb-file-mouse-1 (event)
@@ -727,7 +776,27 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 ARGUMENT FILTER is the filter string."
   (let ((matches (plist-get filter :matches))
         res-list)
-    (cl-loop for line in calibredb-full-entries do
+    (cond (calibredb-tag-filterp
+           (cl-loop for line in calibredb-full-entries do
+             (if (eval `(and ,@(cl-loop for regex in matches collect
+                                        (unless (equal (calibredb-tag-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :tag))))))
+                 (push line res-list))))
+          (calibredb-format-filterp
+           (cl-loop for line in calibredb-full-entries do
+                    (if (eval `(and ,@(cl-loop for regex in matches collect
+                                               (unless (equal (calibredb-format-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-format))))))
+                        (push line res-list))))
+          (calibredb-author-filterp
+           (cl-loop for line in calibredb-full-entries do
+                    (if (eval `(and ,@(cl-loop for regex in matches collect
+                                               (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort))))))
+                        (push line res-list))))
+          (calibredb-date-filterp
+           (cl-loop for line in calibredb-full-entries do
+                    (if (eval `(and ,@(cl-loop for regex in matches collect
+                                               (unless (equal (calibredb-date-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :last_modified))))))
+                        (push line res-list))))
+          (t (cl-loop for line in calibredb-full-entries do
              (if (eval `(and ,@(cl-loop for regex in matches collect
                                         (or
                                          (unless (equal calibredb-id-width 0) (string-match-p regex (calibredb-getattr (cdr line) :id)))
@@ -742,7 +811,7 @@ ARGUMENT FILTER is the filter string."
                                          (unless (equal (calibredb-comment-width) 0) (string-match-p regex (let ((c (calibredb-getattr (cdr line) :comment))
                                                                                                                  (w calibredb-comment-width))
                                                                                                              (if (> w 0) (s-truncate w c) c))))))))
-                 (push line res-list)))
+                 (push line res-list)))))
     (nreverse res-list)))
 
 ;;; detail view
