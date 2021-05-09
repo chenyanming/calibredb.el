@@ -98,6 +98,11 @@ selecting the new item."
 (defun calibredb-virtual-library-filter (keyword)
   "Filter the virtual library based on keyword."
   (setq calibredb-virtual-library-name keyword) ; set calibredb-virtual-library-name
+  (setq calibredb-tag-filter-p nil)
+  (setq calibredb-favorite-filter-p nil)
+  (setq calibredb-author-filter-p nil)
+  (setq calibredb-date-filter-p nil)
+  (setq calibredb-format-filter-p nil)
   (calibredb-search-keyword-filter
    (cdr (assoc keyword calibredb-virtual-library-alist)))
   (calibredb-search-header))
