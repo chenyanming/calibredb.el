@@ -526,7 +526,7 @@ Argument EVENT mouse event."
       (setq calibredb-author-filterp nil)
       (setq calibredb-date-filterp nil)
       (setq calibredb-format-filterp nil)
-      (calibredb-search-keyword-filter (word-at-point t)))))
+      (calibredb-search-keyword-filter (get-text-property (point) 'tag nil)))))
 
 (defun calibredb-author-mouse-1 (event)
   "Visit the location click on.
@@ -543,7 +543,7 @@ Argument EVENT mouse event."
       (setq calibredb-author-filterp t)
       (setq calibredb-date-filterp nil)
       (setq calibredb-format-filterp nil)
-      (calibredb-search-keyword-filter (word-at-point t)))))
+      (calibredb-search-keyword-filter (get-text-property (point) 'author nil)))))
 
 (defun calibredb-format-mouse-1 (event)
   "Visit the location click on.

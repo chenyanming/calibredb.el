@@ -698,16 +698,24 @@ Argument BOOK-ALIST ."
                                           'mouse-face 'calibredb-mouse-face
                                           'help-echo "Filter with this date"
                                           'keymap date-map) (calibredb-date-width) :left)
-     (calibredb-format-column (propertize author
-                                          'face 'calibredb-author-face
-                                          'mouse-face 'calibredb-mouse-face
-                                          'help-echo "Filter with this author"
-                                          'keymap author-map) (calibredb-author-width) :left)
-     (calibredb-format-column (propertize tag
-                                          'face 'calibredb-tag-face
-                                          'mouse-face 'calibredb-mouse-face
-                                          'help-echo "Filter with this tag"
-                                          'keymap tag-map) (calibredb-tag-width) :left)
+     (calibredb-format-column (mapconcat
+                               (lambda (author)
+                                 (propertize author
+                                             'author author
+                                             'face 'calibredb-author-face
+                                             'mouse-face 'calibredb-mouse-face
+                                             'help-echo (format "Filter with this author: %s" author)
+                                             'keymap author-map))
+                               (split-string author ",") ",") (calibredb-author-width) :left)
+     (calibredb-format-column (mapconcat
+                               (lambda (tag)
+                                 (propertize tag
+                                             'tag tag
+                                             'face 'calibredb-tag-face
+                                             'mouse-face 'calibredb-mouse-face
+                                             'help-echo (format "Filter with this tag: %s" tag)
+                                             'keymap tag-map))
+                               (split-string tag ",") ",") (calibredb-tag-width) :left)
      (calibredb-format-column (propertize ids 'face 'calibredb-ids-face) (calibredb-ids-width) :left)
      (if (stringp comment)
          (propertize
