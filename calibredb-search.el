@@ -727,7 +727,14 @@ ebook record will be shown.
   (unwind-protect
       (let ((calibredb-search-filter-active :live))
         (setq calibredb-search-filter
-              (read-from-minibuffer "Filter: " calibredb-search-filter))
+              (read-from-minibuffer (format "Filter %s: "
+                                            (cond
+                                             (calibredb-tag-filter-p "(tag)")
+                                             (calibredb-favorite-filter-p "(favorite)")
+                                             (calibredb-author-filter-p "(author)")
+                                             (calibredb-date-filter-p "(date)")
+                                             (calibredb-format-filter-p "(format)")
+                                             (t "(live)"))) calibredb-search-filter))
         (message calibredb-search-filter))
     (calibredb-search-update :force)))
 
