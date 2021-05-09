@@ -786,7 +786,10 @@ Optional argument ARG."
                                       :id id
                                       :library (format "--library-path \"%s\"" calibredb-root-dir)))
                  metadata)
-           (switch-to-buffer-other-window "*calibredb-search*")
+           (let ((window (get-buffer-window "*calibredb-search*")))
+             (if window
+                 (select-window window)
+               (switch-to-buffer-other-window "*calibredb-search*")))
            (calibredb-search-refresh-or-resume)
            (if calibredb-show-results (calibredb-show-results metadata t))
            (message (format "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors)))
