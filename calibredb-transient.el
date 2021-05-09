@@ -112,8 +112,10 @@
     ("T" "title"         calibredb-set-metadata--title)
     ("a" "author_sort"         calibredb-set-metadata--author_sort)
     ("c" "comments"         calibredb-set-metadata--comments)]
-   ["List fields"
-    ("l" "list fileds"         calibredb-set-metadata--list-fields)]
+   ["Toggle field"
+    ("*" "favorite" calibredb-toggle-favorite-at-point)
+    ("x" "archive" calibredb-toggle-archive-at-point)
+    ("h" "highlight" calibredb-toggle-highlight-at-point)]
    ["Set metadata"
     ("s" "Set metadata With Arguments"         calibredb-set-metadata--transient)
     ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
