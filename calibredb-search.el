@@ -780,22 +780,22 @@ ARGUMENT FILTER is the filter string."
     (cond (calibredb-tag-filter-p
            (cl-loop for line in calibredb-full-entries do
              (if (eval `(and ,@(cl-loop for regex in matches collect
-                                        (unless (equal (calibredb-tag-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :tag))))))
+                                        (unless (equal (calibredb-tag-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :tag))))))
                  (push line res-list))))
           (calibredb-format-filter-p
            (cl-loop for line in calibredb-full-entries do
                     (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-format-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-format))))))
+                                               (unless (equal (calibredb-format-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :book-format))))))
                         (push line res-list))))
           (calibredb-author-filter-p
            (cl-loop for line in calibredb-full-entries do
                     (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort))))))
+                                               (unless (equal (calibredb-author-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :author-sort))))))
                         (push line res-list))))
           (calibredb-date-filter-p
            (cl-loop for line in calibredb-full-entries do
                     (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-date-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :last_modified))))))
+                                               (unless (equal (calibredb-date-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :last_modified))))))
                         (push line res-list))))
           (t (cl-loop for line in calibredb-full-entries do
              (if (eval `(and ,@(cl-loop for regex in matches collect
