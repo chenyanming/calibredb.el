@@ -505,7 +505,11 @@ Argument EVENT mouse event."
         (error "No favorite chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filter-p nil)
       (setq calibredb-favorite-filter-p t)
+      (setq calibredb-author-filter-p nil)
+      (setq calibredb-date-filter-p nil)
+      (setq calibredb-format-filter-p nil)
       (calibredb-search-keyword-filter calibredb-favorite-keyword))))
 
 (defun calibredb-tag-mouse-1 (event)
@@ -519,6 +523,10 @@ Argument EVENT mouse event."
     (with-current-buffer (window-buffer window)
       (goto-char pos)
       (setq calibredb-tag-filter-p t)
+      (setq calibredb-favorite-filter-p nil)
+      (setq calibredb-author-filter-p nil)
+      (setq calibredb-date-filter-p nil)
+      (setq calibredb-format-filter-p nil)
       (calibredb-search-keyword-filter (get-text-property (point) 'tag nil)))))
 
 (defun calibredb-author-mouse-1 (event)
@@ -531,7 +539,11 @@ Argument EVENT mouse event."
         (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filter-p nil)
+      (setq calibredb-favorite-filter-p nil)
       (setq calibredb-author-filter-p t)
+      (setq calibredb-date-filter-p nil)
+      (setq calibredb-format-filter-p nil)
       (calibredb-search-keyword-filter (get-text-property (point) 'author nil)))))
 
 (defun calibredb-format-mouse-1 (event)
@@ -544,6 +556,10 @@ Argument EVENT mouse event."
         (error "No format chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filter-p nil)
+      (setq calibredb-favorite-filter-p nil)
+      (setq calibredb-author-filter-p nil)
+      (setq calibredb-date-filter-p nil)
       (setq calibredb-format-filter-p t)
       (calibredb-search-keyword-filter (word-at-point t)))))
 
@@ -557,7 +573,11 @@ Argument EVENT mouse event."
         (error "No author chosen"))
     (with-current-buffer (window-buffer window)
       (goto-char pos)
+      (setq calibredb-tag-filter-p nil)
+      (setq calibredb-favorite-filter-p nil)
+      (setq calibredb-author-filter-p nil)
       (setq calibredb-date-filter-p t)
+      (setq calibredb-format-filter-p nil)
       (calibredb-search-keyword-filter (thing-at-point 'symbol t)))))
 
 (defun calibredb-file-mouse-1 (event)
@@ -714,31 +734,6 @@ ebook record will be shown.
 (defun calibredb-search-keyword-filter (keyword)
   "Filter the calibredb-search buffer with KEYWORD."
   (setq calibredb-search-filter keyword)
-  (cond (calibredb-tag-filter-p
-         (setq calibredb-favorite-filter-p nil)
-         (setq calibredb-author-filter-p nil)
-         (setq calibredb-date-filter-p nil)
-         (setq calibredb-format-filter-p nil))
-        (calibredb-favorite-filter-p
-         (setq calibredb-tag-filter-p nil)
-         (setq calibredb-author-filter-p nil)
-         (setq calibredb-date-filter-p nil)
-         (setq calibredb-format-filter-p nil))
-        (calibredb-author-filter-p
-         (setq calibredb-tag-filter-p nil)
-         (setq calibredb-favorite-filter-p nil)
-         (setq calibredb-date-filter-p nil)
-         (setq calibredb-format-filter-p nil))
-        (calibredb-date-filter-p
-         (setq calibredb-tag-filter-p nil)
-         (setq calibredb-favorite-filter-p nil)
-         (setq calibredb-author-filter-p nil)
-         (setq calibredb-format-filter-p nil))
-        (calibredb-format-filter-p
-         (setq calibredb-tag-filter-p nil)
-         (setq calibredb-favorite-filter-p nil)
-         (setq calibredb-author-filter-p nil)
-         (setq calibredb-date-filter-p  nil)))
   (calibredb-search-update :force))
 
 (defun calibredb-search-update (&optional force)

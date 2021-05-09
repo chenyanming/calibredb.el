@@ -942,20 +942,32 @@ With universal ARG \\[universal-argument] use title as initial value."
   (interactive)
   (let ((tag (completing-read "Select tag: " (calibredb-all-tag))))
     (setq calibredb-tag-filter-p t)
+    (setq calibredb-favorite-filter-p nil)
+    (setq calibredb-author-filter-p nil)
+    (setq calibredb-date-filter-p nil)
+    (setq calibredb-format-filter-p nil)
     (calibredb-search-keyword-filter tag)))
 
 (defun calibredb-filter-by-author-sort ()
   "Filter results by author-sort."
   (interactive)
   (let ((author (completing-read "Select author: " (calibredb-all-author-sort))))
+    (setq calibredb-tag-filter-p nil)
+    (setq calibredb-favorite-filter-p nil)
     (setq calibredb-author-filter-p t)
+    (setq calibredb-date-filter-p nil)
+    (setq calibredb-format-filter-p nil)
     (calibredb-search-keyword-filter author)))
 
 (defun calibredb-filter-by-last_modified ()
   "Filter results by last_modified date."
   (interactive)
   (let ((date (completing-read "Select date: " (seq-uniq (mapcar (lambda (date) (s-left 10 date)) (calibredb-all-last_modified))))))
+    (setq calibredb-tag-filter-p nil)
+    (setq calibredb-favorite-filter-p nil)
+    (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p t)
+    (setq calibredb-format-filter-p nil)
     (calibredb-search-keyword-filter date)))
 
 
@@ -963,6 +975,10 @@ With universal ARG \\[universal-argument] use title as initial value."
   "Filter results by book format."
   (interactive)
   (let ((format (completing-read "Select format: " (calibredb-all-book-format))))
+    (setq calibredb-tag-filter-p nil)
+    (setq calibredb-favorite-filter-p nil)
+    (setq calibredb-author-filter-p nil)
+    (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p t)
     (calibredb-search-keyword-filter format)))
 
