@@ -911,6 +911,61 @@ With universal ARG \\[universal-argument] use title as initial value."
       ;; (message "No cover")
       )))
 
+(defmacro calibredb-all (field)
+  `(defun ,(intern (format "calibredb-all-%s" field)) ()
+     ,(format "Get all %s and return as a list." field)
+     (seq-uniq
+      (let (l)
+        (cl-loop for entry in calibredb-full-entries do
+                 (setq l (append (split-string (calibredb-getattr (cdr entry) ,(intern (format ":%s" field))) ",") l))) l))))
+
+(calibredb-all "tag")
+(calibredb-all "id")
+(calibredb-all "author-sort")
+(calibredb-all "book-dir")
+(calibredb-all "book-name")
+(calibredb-all "book-format")
+(calibredb-all "book-pubdate")
+(calibredb-all "book-title")
+(calibredb-all "file-path")
+(calibredb-all "tag")
+(calibredb-all "size")
+(calibredb-all "comment")
+(calibredb-all "ids")
+(calibredb-all "publisher")
+(calibredb-all "series")
+(calibredb-all "lang_code")
+(calibredb-all "last_modified")
+
+(defun calibredb-filter-by-tag ()
+  "Filter results by tag."
+  (interactive)
+  (let ((tag (completing-read "Select tag: " (calibredb-all-tag))))
+    (setq calibredb-tag-filter-p t)
+    (calibredb-search-keyword-filter tag)))
+
+(defun calibredb-filter-by-author-sort ()
+  "Filter results by author-sort."
+  (interactive)
+  (let ((author (completing-read "Select author: " (calibredb-all-author-sort))))
+    (setq calibredb-author-filter-p t)
+    (calibredb-search-keyword-filter author)))
+
+(defun calibredb-filter-by-last_modified ()
+  "Filter results by last_modified date."
+  (interactive)
+  (let ((date (completing-read "Select date: " (seq-uniq (mapcar (lambda (date) (s-left 10 date)) (calibredb-all-last_modified))))))
+    (setq calibredb-date-filter-p t)
+    (calibredb-search-keyword-filter date)))
+
+
+(defun calibredb-filter-by-book-format ()
+  "Filter results by book format."
+  (interactive)
+  (let ((format (completing-read "Select format: " (calibredb-all-book-format))))
+    (setq calibredb-format-filter-p t)
+    (calibredb-search-keyword-filter format)))
+
 (provide 'calibredb-utils)
 
 ;;; calibredb-utils.el ends here

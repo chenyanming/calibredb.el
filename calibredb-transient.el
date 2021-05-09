@@ -40,7 +40,8 @@
     ("A" "Add a directory"   calibredb-add-dir)
     ("d" "Remove a file"   calibredb-remove)
     ("e" "Export" calibredb-export-dispatch)
-    ("s" "set_metadata"   calibredb-set-metadata-dispatch)]
+    ("s" "set_metadata"   calibredb-set-metadata-dispatch)
+    ("f" "filter"   calibredb-filter-dispatch)]
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("v" "View details"  calibredb-view)
@@ -50,7 +51,7 @@
    [("m" "Mark" calibredb-mark-and-forward)
     ("u" "Unmark and forward" calibredb-unmark-and-forward)
     ("DEL" "Unmark and backward" calibredb-unmark-and-backward)
-    ("f" "Favorite" calibredb-toggle-favorite-at-point)
+    ("*" "Favorite" calibredb-toggle-favorite-at-point)
     ("h" "Highlight" calibredb-toggle-highlight-at-point)
     ("x" "Archive" calibredb-toggle-archive-at-point)]]
   ["Library operation"
@@ -121,6 +122,17 @@
     ("f" "Fetch and set metadata by author and title"  calibredb-fetch-and-set-metadata-by-author-and-title)
     ("i" "Fetch and set metadata by ISBN"  calibredb-fetch-and-set-metadata-by-isbn)
     ("d" "Fetch and set metadata by identifier"  calibredb-fetch-and-set-metadata-by-id)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-filter-dispatch ()
+  "Dispatch for filtering the results."
+  [["Filter by..."
+    ("t" "tag"         calibredb-filter-by-tag)
+    ("f" "format"         calibredb-filter-by-book-format)
+    ("a" "author"         calibredb-filter-by-author-sort)
+    ("d" "date"         calibredb-filter-by-last_modified)
+    ("l" "library"      calibredb-virtual-library-list)
+    ("L" "Library"      calibredb-library-list)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-export-dispatch ()
