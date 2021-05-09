@@ -128,11 +128,12 @@
   "Dispatch for filtering the results."
   [["Filter by..."
     ("t" "tag"         calibredb-filter-by-tag)
-    ("f" "format"         calibredb-filter-by-book-format)
+    ("b" "book format"         calibredb-filter-by-book-format)
     ("a" "author"         calibredb-filter-by-author-sort)
     ("d" "date"         calibredb-filter-by-last_modified)
-    ("l" "library"      calibredb-virtual-library-list)
-    ("L" "Library"      calibredb-library-list)]]
+    ("l" "library (virtual)"      calibredb-virtual-library-list)
+    ("L" "Library"      calibredb-library-list)
+    ("r" "reset" calibredb-search-clear-filter)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-export-dispatch ()
