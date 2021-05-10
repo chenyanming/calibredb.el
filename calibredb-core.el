@@ -588,7 +588,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
-  (let* ((query-result (calibredb-query (cond ((eq calibredb-order 'asc)
+  (let* ((query-result (calibredb-query (cond ((eq calibredb-order 'desc)
                                                (cond ((eq calibredb-sort-by 'id)
                                                       (concat calibredb-query-string " ORDER BY id DESC"))
                                                      ((eq calibredb-sort-by 'title)
@@ -609,7 +609,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                                                       (concat calibredb-query-string " ORDER BY lang_code DESC"))
                                                      (t
                                                       (concat calibredb-query-string " ORDER BY id DESC"))))
-                                              ((eq calibredb-order 'desc)
+                                              ((eq calibredb-order 'asc)
                                                (cond ((eq calibredb-sort-by 'id)
                                                       (concat calibredb-query-string " ORDER BY id"))
                                                      ((eq calibredb-sort-by 'title)
@@ -650,7 +650,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                         (setq res-list (remove item res-list))
                         (setq h-list (cons item h-list)))))
                ;; merge archive/highlight/favorite/rest items
-               (setq res-list (nconc f-list h-list res-list a-list))
+               (setq res-list (nconc a-list res-list h-list f-list))
                (calibredb-getbooklist res-list))))))
 
 (defun calibredb-candidate(id)

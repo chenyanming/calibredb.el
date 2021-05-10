@@ -845,7 +845,7 @@ ARGUMENT FILTER is the filter string."
                                                                                                                  (w calibredb-comment-width))
                                                                                                              (if (> w 0) (s-truncate w c) c))))))))
                  (push line res-list)))))
-    res-list))
+    (nreverse res-list)))
 
 ;;; detail view
 
