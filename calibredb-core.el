@@ -283,6 +283,27 @@ Set negative to keep original length."
   :type 'boolean
   :group 'calibredb)
 
+(defcustom calibredb-sort-by 'id
+  "Sort the results by metadata."
+  :type '(choice
+          (const id)
+          (const title)
+          (const format)
+          (const author)
+          (const date)
+          (const pubdate)
+          (const tag)
+          (const size)
+          (const language))
+  :group 'calibredb)
+
+(defcustom calibredb-order 'desc
+  "Sort the results by order."
+  :type '(choice
+          (const asc)
+          (const desc))
+  :group 'calibredb)
+
 (defvar calibredb-query-string-old "
 SELECT id, author_sort, path, name, format, pubdate, title, group_concat(DISTINCT tag) AS tag, uncompressed_size, text, last_modified
 FROM
@@ -567,7 +588,48 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
 
 (defun calibredb-candidates()
   "Generate ebooks candidates alist."
-  (let* ((query-result (calibredb-query calibredb-query-string))
+  (let* ((query-result (calibredb-query (cond ((eq calibredb-order 'asc)
+                                               (cond ((eq calibredb-sort-by 'id)
+                                                      (concat calibredb-query-string " ORDER BY id DESC"))
+                                                     ((eq calibredb-sort-by 'title)
+                                                      (concat calibredb-query-string " ORDER BY title DESC"))
+                                                     ((eq calibredb-sort-by 'author)
+                                                      (concat calibredb-query-string " ORDER BY author_sort DESC"))
+                                                     ((eq calibredb-sort-by 'format)
+                                                      (concat calibredb-query-string " ORDER BY format DESC"))
+                                                     ((eq calibredb-sort-by 'date)
+                                                      (concat calibredb-query-string " ORDER BY last_modified DESC"))
+                                                     ((eq calibredb-sort-by 'pubdate)
+                                                      (concat calibredb-query-string " ORDER BY pubdate DESC"))
+                                                     ((eq calibredb-sort-by 'tag)
+                                                      (concat calibredb-query-string " ORDER BY tag DESC"))
+                                                     ((eq calibredb-sort-by 'size)
+                                                      (concat calibredb-query-string " ORDER BY uncompressed_size DESC"))
+                                                     ((eq calibredb-sort-by 'language)
+                                                      (concat calibredb-query-string " ORDER BY lang_code DESC"))
+                                                     (t
+                                                      (concat calibredb-query-string " ORDER BY id DESC"))))
+                                              ((eq calibredb-order 'desc)
+                                               (cond ((eq calibredb-sort-by 'id)
+                                                      (concat calibredb-query-string " ORDER BY id"))
+                                                     ((eq calibredb-sort-by 'title)
+                                                      (concat calibredb-query-string " ORDER BY title"))
+                                                     ((eq calibredb-sort-by 'author)
+                                                      (concat calibredb-query-string " ORDER BY author_sort"))
+                                                     ((eq calibredb-sort-by 'format)
+                                                      (concat calibredb-query-string " ORDER BY format"))
+                                                     ((eq calibredb-sort-by 'date)
+                                                      (concat calibredb-query-string " ORDER BY last_modified"))
+                                                     ((eq calibredb-sort-by 'pubdate)
+                                                      (concat calibredb-query-string " ORDER BY pubdate"))
+                                                     ((eq calibredb-sort-by 'tag)
+                                                      (concat calibredb-query-string " ORDER BY tag"))
+                                                     ((eq calibredb-sort-by 'size)
+                                                      (concat calibredb-query-string " ORDER BY uncompressed_size"))
+                                                     ((eq calibredb-sort-by 'language)
+                                                      (concat calibredb-query-string " ORDER BY lang_code"))
+                                                     (t
+                                                      (concat calibredb-query-string " ORDER BY id")))))))
          (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list h-list f-list a-list)
@@ -589,7 +651,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                         (setq h-list (cons item h-list)))))
                ;; merge archive/highlight/favorite/rest items
                (setq res-list (nconc f-list h-list res-list a-list))
-               (calibredb-getbooklist (nreverse res-list)))))))
+               (calibredb-getbooklist res-list))))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
@@ -606,7 +668,7 @@ ARGUMENT ID is the id of the ebook in string."
                    ;; concat the invalid format strings into last line
                    ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
                    ))
-               (calibredb-getbooklist (nreverse res-list))) ))))
+               (calibredb-getbooklist res-list)) ))))
 
 (defun calibredb-candidate-query-filter (filter)
   "DEPRECATED Generate ebook candidate alist.
@@ -623,7 +685,7 @@ ARGUMENT FILTER is the filter string."
                    ;; concat the invalid format strings into last line
                    ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
                    ))
-               (calibredb-getbooklist (nreverse res-list))) ))))
+               (calibredb-getbooklist res-list)) ))))
 
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.

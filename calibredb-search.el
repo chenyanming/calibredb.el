@@ -107,7 +107,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "s" #'calibredb-set-metadata-dispatch)
     (define-key map "S" #'calibredb-switch-library)
     (define-key map "f" #'calibredb-filter-dispatch)
-    (define-key map "o" #'calibredb-find-file)
+    (define-key map "o" #'calibredb-sort-dispatch)
     (define-key map "O" #'calibredb-find-file-other-frame)
     (define-key map "v" #'calibredb-view)
     (define-key map "V" #'calibredb-open-file-with-default-tool)
@@ -333,7 +333,32 @@ Indicating the library you use."
            (propertize (format "Total: %s"
                                (if (equal calibredb-search-entries '(""))
                                    "0   "
-                                 (concat (number-to-string (length calibredb-search-entries)) "   "))) 'face font-lock-warning-face)
+                                 (concat (number-to-string (length calibredb-search-entries)) "  "))) 'face font-lock-warning-face)
+           (cond ((eq calibredb-sort-by 'id)
+                  "Sort: id ")
+                 ((eq calibredb-sort-by 'title)
+                  "Sort: title ")
+                 ((eq calibredb-sort-by 'author)
+                  "Sort: author ")
+                 ((eq calibredb-sort-by 'format)
+                  "Sort: format ")
+                 ((eq calibredb-sort-by 'date)
+                  "Sort: date ")
+                 ((eq calibredb-sort-by 'pubdate)
+                  "Sort: pubdate ")
+                 ((eq calibredb-sort-by 'tag)
+                  "Sort: tag ")
+                 ((eq calibredb-sort-by 'size)
+                  "Sort: size ")
+                 ((eq calibredb-sort-by 'language)
+                  "Sort: language ")
+                 (t
+                  "Sort: id "))
+           (cond ((eq calibredb-order 'desc)
+                  "↓  ")
+                 ((eq calibredb-order 'asc)
+                  "↑  ")
+                 (t "↓  "))
            (propertize (format "%s%s"
                                (cond
                                 (calibredb-tag-filter-p "Tag: ")
@@ -343,8 +368,8 @@ Indicating the library you use."
                                 (calibredb-format-filter-p "Format: ")
                                 (t ""))
                                (if (equal calibredb-search-filter "")
-                                        ""
-                                      (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
+                                   ""
+                                 (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
            (propertize (let ((len (length (calibredb-find-marked-candidates))))
                          (if (> len 0)
                              (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))))
@@ -820,7 +845,7 @@ ARGUMENT FILTER is the filter string."
                                                                                                                  (w calibredb-comment-width))
                                                                                                              (if (> w 0) (s-truncate w c) c))))))))
                  (push line res-list)))))
-    (nreverse res-list)))
+    res-list))
 
 ;;; detail view
 
@@ -999,6 +1024,32 @@ ARGUMENT FILTER is the filter string."
            (inhibit-read-only t))
       (remove-overlays beg end)
       (remove-text-properties beg end '(calibredb-mark nil)))))
+
+(defmacro calibredb-sort-by (field)
+  `(defun ,(intern (format "calibredb-sort-by-%s" field)) ()
+     (interactive)
+     ,(format "Sort by %s, refresh *calibredb-search*, and clear filter." field)
+     (setq calibredb-sort-by (quote ,(intern field)))
+     (calibredb-search-refresh-and-clear-filter)))
+
+(calibredb-sort-by "id")
+(calibredb-sort-by "title")
+(calibredb-sort-by "format")
+(calibredb-sort-by "author")
+(calibredb-sort-by "date")
+(calibredb-sort-by "pubdate")
+(calibredb-sort-by "tag")
+(calibredb-sort-by "size")
+(calibredb-sort-by "language")
+
+(defun calibredb-toggle-order ()
+  "Toggle the order between descending or ascending."
+  (interactive)
+  (if (eq calibredb-order 'desc)
+      (setq calibredb-order 'asc)
+    (setq calibredb-order 'desc))
+  (calibredb-search-refresh-and-clear-filter))
+
 
 (provide 'calibredb-search)
 

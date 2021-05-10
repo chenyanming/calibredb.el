@@ -41,8 +41,9 @@
     ("d" "Remove a file"   calibredb-remove)
     ("e" "Export" calibredb-export-dispatch)
     ("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ("f" "filter"   calibredb-filter-dispatch)]
-   [("o" "Open file"         calibredb-find-file)
+    ("f" "filter"   calibredb-filter-dispatch)
+    ("o" "sort"   calibredb-sort-dispatch)]
+   [("RET" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("v" "View details"  calibredb-view)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
@@ -77,7 +78,7 @@
 (transient-define-prefix calibredb-entry-dispatch ()
   "Invoke a calibredb command from a list of available commands in *calibredb-entry*."
   :man-page "calibredb"
-  ["File operaion"
+  ["File operation"
    [("o" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
     ("V" "Open file with default tool"  calibredb-open-file-with-default-tool)
@@ -126,14 +127,29 @@
 
 (transient-define-prefix calibredb-filter-dispatch ()
   "Dispatch for filtering the results."
-  [["Filter by..."
+  [["Filter by"
     ("t" "tag"         calibredb-filter-by-tag)
-    ("b" "book format"         calibredb-filter-by-book-format)
+    ("f" "format"         calibredb-filter-by-book-format)
     ("a" "author"         calibredb-filter-by-author-sort)
     ("d" "date"         calibredb-filter-by-last_modified)
     ("l" "library (virtual)"      calibredb-virtual-library-list)
     ("L" "Library"      calibredb-library-list)
     ("r" "reset" calibredb-search-clear-filter)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-sort-dispatch ()
+  "Dispatch for sorting the results."
+  [["Sort by"
+    ("o" "order (toggle)"         calibredb-toggle-order)
+    ("i" "id"         calibredb-sort-by-id)
+    ("t" "title"      calibredb-sort-by-title)
+    ("f" "format"         calibredb-sort-by-format)
+    ("a" "author"         calibredb-sort-by-author)
+    ("d" "date"      calibredb-sort-by-date)
+    ("p" "pubdate"         calibredb-sort-by-pubdate)
+    ("T" "Tag"      calibredb-sort-by-tag)
+    ("s" "size"      calibredb-sort-by-size)
+    ("l" "language"      calibredb-sort-by-language)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-export-dispatch ()
