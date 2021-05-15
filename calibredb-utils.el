@@ -982,6 +982,20 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-format-filter-p t)
     (calibredb-search-keyword-filter format)))
 
+(defun calibredb-attach-icon-for (path)
+  "Return the icon based on PATH."
+  (char-to-string
+   (pcase (downcase (file-name-extension path))
+     ((or "jpg" "jpeg" "png" "gif") ?)
+     ("pdf" ?)
+     ((or "ppt" "pptx") ?)
+     ((or "xls" "xlsx") ?)
+     ((or "doc" "docx") ?)
+     ((or "ogg" "mp3" "wav" "aiff" "flac") ?)
+     ((or "mp4" "mov" "avi") ?)
+     ((or "zip" "gz" "tar" "7z" "rar") ?)
+     (_ ?))))
+
 (provide 'calibredb-utils)
 
 ;;; calibredb-utils.el ends here

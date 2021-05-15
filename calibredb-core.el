@@ -31,6 +31,7 @@
 (require 'sendmail)
 (require 'dired)
 (require 'thingatpt)
+(require 'pcase)
 (ignore-errors
   (require 'helm)
   (require 'ivy)
@@ -236,6 +237,11 @@ Set negative to keep original length."
 
 (defcustom calibredb-format-icons-in-terminal nil
   "Set Non-nil to show file format icons with icons-in-terminal."
+  :group 'calibredb
+  :type 'boolean)
+
+(defcustom calibredb-format-character-icons nil
+  "Set Non-nil to show file format icons with built-in character icons."
   :group 'calibredb
   :type 'boolean)
 
@@ -735,6 +741,8 @@ Argument BOOK-ALIST ."
             (concat (if (fboundp 'icons-in-terminal-icon-for-file)
                         (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path) :v-adjust 0 :height 1) "")
                     " "))
+           (calibredb-format-character-icons
+            (concat (calibredb-attach-icon-for (calibredb-getattr (list book-alist) :file-path)) " "))
            (t ""))
      (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face 'id id)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
