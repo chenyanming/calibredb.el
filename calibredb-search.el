@@ -426,7 +426,8 @@ Argument EVENT mouse event."
           (calibredb-search-update :force))
       (calibredb-search-refresh))
     (set-window-start (selected-window) pos)
-    (goto-char beg)))
+    (goto-char beg)
+    (hl-line-mode 1)))
 
 (defun calibredb-search-toggle-view-refresh ()
   "TODO Refresh calibredb when toggle view goto the the same id ebook."
