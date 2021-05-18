@@ -505,8 +505,8 @@ Argument EVENT mouse event."
 (defun calibredb-unmark-and-backward ()
   "Unmark the current line and backward."
   (interactive)
-  (calibredb-unmark-at-point)
-  (calibredb-previous-entry))
+  (calibredb-previous-entry)
+  (calibredb-unmark-at-point))
 
 (defun calibredb-unmark-at-point ()
   "Unmark the current line."
