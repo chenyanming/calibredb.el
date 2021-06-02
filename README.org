@@ -155,7 +155,7 @@ Enable size indicator:
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
 ** File format icons
-You can choose [[https://github.com/domtronn/all-the-icons.el][all-the-icons]] or [[https://github.com/seagle0128/icons-in-terminal.el][icons-in-terminal]] to render the icons. You have
+You can choose [[https://github.com/domtronn/all-the-icons.el][all-the-icons]], [[https://github.com/seagle0128/icons-in-terminal.el][icons-in-terminal]], unicode icons to render the icons. You have
 to install the icons packages by yourself, otherwise it would not work.
 
 To enable all-the-icons:
@@ -166,6 +166,11 @@ To enable all-the-icons:
 To enable icons-in-terminal:
 #+BEGIN_SRC emacs-lisp
 (setq calibredb-format-icons-in-terminal t)
+#+END_SRC
+
+To use unicode icons, 
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-format-character-icons t)
 #+END_SRC
 
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
@@ -443,6 +448,29 @@ Here is the demo:
   Demo:
 
   [[file:img/quick_filter.gif]]
+
+** How to do group filtering?
+Press ~f~, then press
+- t: fitler by tag
+- f: filter by format
+- a: filter by author
+- d: filter by date
+- l: filter by virutal library
+- L: filter by library
+- r: reset (clearing the search filter)
+
+** How to do sorting?
+Press ~o~, then press
+- o: toggle the order (desc or asc)
+- i: sort by id
+- t: sort by title
+- f: sort by format
+- a: sort by author
+- d: sort by date
+- p: sort by pubdate
+- T: sort by Tag
+- s: sort by size
+- l: sort by language
 
 ** How to interact with org-ref?
 - Setup org-ref
@@ -728,6 +756,19 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
+** =2021-06-02=
+Version *2.10.0*:
+- Change keybind for ~calibredb-toggle-favorite-at-point~ to ~*~ (original ~f~)
+- Add ~calibredb-filter-dispatch~, bind to ~f~
+- Add ~calibredb-sort-dispatch~, bind to ~o~
+- Mouse click on format/tags/author is enabled for group filtering
+- Improve the following functions:
+  + ~calibredb-unmark-and-backward~
+  + ~calibredb-add~
+  + ~calibredb-remove~
+  + ~calibredb-open-with-default-tool~
+- Add ~calibredb-format-character-icons~
+
 ** =2021-03-21=
 Version  *2.9.0:*
 - Now, it is able to set metadata asynchronously.
