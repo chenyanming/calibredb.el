@@ -3,11 +3,11 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2021-03-21 Sun 17:53 -->
+<!-- 2021-06-03 Thu 10:38 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>[[https://github.com/chenyanming/calibredb.el][calibredb.el]]</title>
-<meta name="author" content="Damon Chan" />
+<meta name="author" content="CHANDAMON" />
 <meta name="generator" content="Org Mode" />
 <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
@@ -229,151 +229,154 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#orga45ad4b">1. Description</a>
+<li><a href="#orgebfa8e8">1. Description</a>
 <ul>
-<li><a href="#orge6c9e93">1.1. Related package</a></li>
+<li><a href="#org43da653">1.1. Related package</a></li>
 </ul>
 </li>
-<li><a href="#orgd74c150">2. Installation</a>
+<li><a href="#orgdd4fc7b">2. Installation</a>
 <ul>
-<li><a href="#org451b11a">2.1. Install sqlite and calibre</a>
+<li><a href="#orga6126f8">2.1. Install sqlite and calibre</a>
 <ul>
-<li><a href="#orge57ae5b">2.1.1. macOS</a></li>
-<li><a href="#org882bb02">2.1.2. Windows</a></li>
-<li><a href="#orge1d89df">2.1.3. Linux</a></li>
+<li><a href="#org290a880">2.1.1. macOS</a></li>
+<li><a href="#org7221376">2.1.2. Windows</a></li>
+<li><a href="#orgd633b54">2.1.3. Linux</a></li>
 </ul>
 </li>
-<li><a href="#org4c831fa">2.2. Install calibredb.el</a></li>
-<li><a href="#org5837935">2.3. Spacemacs Layer</a></li>
+<li><a href="#org12d7277">2.2. Install calibredb.el</a></li>
+<li><a href="#org29811dc">2.3. Spacemacs Layer</a></li>
 </ul>
 </li>
-<li><a href="#org2bc11f2">3. Configuration</a>
+<li><a href="#org8bec487">3. Configuration</a>
 <ul>
-<li><a href="#orgebed683">3.1. Quick Start</a>
+<li><a href="#orgd4e4b33">3.1. Quick Start</a>
 <ul>
-<li><a href="#org1bd7792">3.1.1. require</a></li>
-<li><a href="#org62321a8">3.1.2. use-package</a></li>
+<li><a href="#org1d7756d">3.1.1. require</a></li>
+<li><a href="#org170f933">3.1.2. use-package</a></li>
 </ul>
 </li>
-<li><a href="#org835e64f">3.2. Virtual Libraries</a></li>
-<li><a href="#org4ea8fc4">3.3. Column width</a></li>
-<li><a href="#orgcc725bf">3.4. Size indicator</a></li>
-<li><a href="#org4a93ce7">3.5. File format icons</a></li>
-<li><a href="#org87754e1">3.6. Configure to support org-ref</a></li>
-<li><a href="#orgb8483f0">3.7. keybindings</a></li>
+<li><a href="#org7f53958">3.2. Virtual Libraries</a></li>
+<li><a href="#org300e76f">3.3. Column width</a></li>
+<li><a href="#org4940505">3.4. Size indicator</a></li>
+<li><a href="#orgdaf0db3">3.5. File format icons</a></li>
+<li><a href="#org9b1d03f">3.6. Configure to support org-ref</a></li>
+<li><a href="#orgc76df95">3.7. keybindings</a></li>
 </ul>
 </li>
-<li><a href="#orga04c718">4. Workflows</a>
+<li><a href="#orgd198e25">4. Workflows</a>
 <ul>
-<li><a href="#orgbe8695e">4.1. Start with <code>calibredb</code></a></li>
-<li><a href="#org2952f49">4.2. Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></a></li>
-<li><a href="#org484aa5d">4.3. Start with <code>calibredb-list</code></a></li>
+<li><a href="#orgaee57fb">4.1. Start with <code>calibredb</code></a></li>
+<li><a href="#org8bb259f">4.2. Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></a></li>
+<li><a href="#org6ae5081">4.3. Start with <code>calibredb-list</code></a></li>
 </ul>
 </li>
-<li><a href="#orgd50347b">5. Q&amp;A</a>
+<li><a href="#org5b1a6d5">5. Q&amp;A</a>
 <ul>
-<li><a href="#org6bd76bd">5.1. Transient commands</a></li>
-<li><a href="#org93d9f2e">5.2. What is my working library?</a></li>
-<li><a href="#org242de31">5.3. How to open an ebook?</a></li>
-<li><a href="#orgf130ea5">5.4. How to add ebooks?</a></li>
-<li><a href="#orgdc24326">5.5. How to remove ebooks?</a></li>
-<li><a href="#orgfda0f2f">5.6. How to switch virtual libraries?</a></li>
-<li><a href="#orgbaf6172">5.7. How to switch libraries?</a></li>
-<li><a href="#org8815849">5.8. How to set metadata on ebooks?</a>
+<li><a href="#org0d7878d">5.1. Transient commands</a></li>
+<li><a href="#orgca1d5e8">5.2. What is my working library?</a></li>
+<li><a href="#org0cce95a">5.3. How to open an ebook?</a></li>
+<li><a href="#org8d679d9">5.4. How to add ebooks?</a></li>
+<li><a href="#org9d28128">5.5. How to remove ebooks?</a></li>
+<li><a href="#orgbf9225c">5.6. How to switch virtual libraries?</a></li>
+<li><a href="#org17d19a3">5.7. How to switch libraries?</a></li>
+<li><a href="#org7a3124b">5.8. How to set metadata on ebooks?</a>
 <ul>
-<li><a href="#org221ad79">5.8.1. About <code>fetch-ebook-metadata</code></a></li>
+<li><a href="#orgf655f00">5.8.1. About <code>fetch-ebook-metadata</code></a></li>
 </ul>
 </li>
-<li><a href="#orgc2fee20">5.9. How to mark favorite/highlight/archive on ebooks?</a></li>
-<li><a href="#org608cd34">5.10. How to do live filtering?</a></li>
-<li><a href="#orgd576782">5.11. How to do quick filtering?</a></li>
-<li><a href="#org1fa2225">5.12. How to interact with org-ref?</a></li>
-<li><a href="#org8a69972">5.13. Why the loading time is so long?</a></li>
-<li><a href="#orgdacc7ad">5.14. Can not remember the keybindings?</a></li>
-<li><a href="#org9f48c8d">5.15. How to edit annotation with org-mode?</a></li>
-<li><a href="#org538c385">5.16. How to search in ebooks directly?</a></li>
-<li><a href="#org72f28a9">5.17. How to interact with calibredb files in org files?</a></li>
-<li><a href="#org77a8584">5.18. More examples?</a></li>
+<li><a href="#org8314d8e">5.9. How to mark favorite/highlight/archive on ebooks?</a></li>
+<li><a href="#orga96bad8">5.10. How to do live filtering?</a></li>
+<li><a href="#orgcfa6dca">5.11. How to do quick filtering?</a></li>
+<li><a href="#org0ae84b8">5.12. How to do group filtering?</a></li>
+<li><a href="#orgc3dd88f">5.13. How to do sorting?</a></li>
+<li><a href="#org20604a6">5.14. How to interact with org-ref?</a></li>
+<li><a href="#org54a32a7">5.15. Why the loading time is so long?</a></li>
+<li><a href="#orgbeae151">5.16. Can not remember the keybindings?</a></li>
+<li><a href="#org14beae4">5.17. How to edit annotation with org-mode?</a></li>
+<li><a href="#org07de654">5.18. How to search in ebooks directly?</a></li>
+<li><a href="#org0e68359">5.19. How to interact with calibredb files in org files?</a></li>
+<li><a href="#org368fb70">5.20. More examples?</a></li>
 </ul>
 </li>
-<li><a href="#org3993ca2">6. Supported Features</a>
+<li><a href="#org608b392">6. Supported Features</a>
 <ul>
-<li><a href="#org47d9c63">6.1. calibredb</a></li>
-<li><a href="#org99fe07c">6.2. calibredb-search-live-filter</a></li>
-<li><a href="#orgf760d15">6.3. calibredb-find-helm</a></li>
-<li><a href="#orga598b1b">6.4. calibredb-find-counsel</a></li>
-<li><a href="#orgbc74c4b">6.5. calibredb-list</a></li>
-<li><a href="#org13766dd">6.6. calibredb-clone</a></li>
-<li><a href="#orgdbc756d">6.7. calibredb-library-list</a></li>
-<li><a href="#org4684454">6.8. calibredb-switch-library</a></li>
-<li><a href="#org26581a9">6.9. Show details</a></li>
-<li><a href="#org4d9d281">6.10. Dispatch</a>
+<li><a href="#org8449b96">6.1. calibredb</a></li>
+<li><a href="#orgc0cd01b">6.2. calibredb-search-live-filter</a></li>
+<li><a href="#org51e1de9">6.3. calibredb-find-helm</a></li>
+<li><a href="#org010c656">6.4. calibredb-find-counsel</a></li>
+<li><a href="#org64699e1">6.5. calibredb-list</a></li>
+<li><a href="#org2d7a622">6.6. calibredb-clone</a></li>
+<li><a href="#org7c8d20a">6.7. calibredb-library-list</a></li>
+<li><a href="#orgcc30fc1">6.8. calibredb-switch-library</a></li>
+<li><a href="#org796d851">6.9. Show details</a></li>
+<li><a href="#org8f7d8f9">6.10. Dispatch</a>
 <ul>
-<li><a href="#org5558e36">6.10.1. calibredb-dispatch</a></li>
-<li><a href="#org6225664">6.10.2. calibredb-set-metadata-dispatch</a></li>
-<li><a href="#org4b83f07">6.10.3. calibredb-catalog-bib-dispatch</a></li>
-<li><a href="#org8d53200">6.10.4. calibredb-export-dispatch</a></li>
+<li><a href="#org2bdbca2">6.10.1. calibredb-dispatch</a></li>
+<li><a href="#org76358d3">6.10.2. calibredb-set-metadata-dispatch</a></li>
+<li><a href="#orgb2c0db7">6.10.3. calibredb-catalog-bib-dispatch</a></li>
+<li><a href="#orgb77f15b">6.10.4. calibredb-export-dispatch</a></li>
 </ul>
 </li>
-<li><a href="#orgb4d4f27">6.11. add</a></li>
-<li><a href="#org1a6ac10">6.12. remove</a></li>
-<li><a href="#orgcba3725">6.13. set<sub>metadata</sub></a></li>
-<li><a href="#org45cf872">6.14. Export</a></li>
-<li><a href="#org1969b4f">6.15. Yank</a></li>
-<li><a href="#org3895a36">6.16. Catalog</a>
+<li><a href="#org9788ca2">6.11. add</a></li>
+<li><a href="#orgcc04869">6.12. remove</a></li>
+<li><a href="#org9b8db43">6.13. set<sub>metadata</sub></a></li>
+<li><a href="#org05e76cf">6.14. Export</a></li>
+<li><a href="#orgb2cb458">6.15. Yank</a></li>
+<li><a href="#orgb65117c">6.16. Catalog</a>
 <ul>
-<li><a href="#org1e2e024">6.16.1. BibTex</a></li>
+<li><a href="#orgf45d84e">6.16.1. BibTex</a></li>
 </ul>
 </li>
-<li><a href="#orgf4e503a">6.17. calibredb-rga</a></li>
+<li><a href="#orge19def9">6.17. calibredb-rga</a></li>
 </ul>
 </li>
-<li><a href="#org36ae3dc">7. Logs</a>
+<li><a href="#org6a8e1cb">7. Logs</a>
 <ul>
-<li><a href="#orgfca8d92">7.1. <code>2021-03-21</code></a></li>
-<li><a href="#org5750451">7.2. <code>2020-12-25</code></a></li>
-<li><a href="#org84bcd08">7.3. <code>2020-10-12</code></a></li>
-<li><a href="#org4a904e6">7.4. <code>2020-08-29</code></a></li>
-<li><a href="#orgc20da3b">7.5. <code>2020-08-09</code></a></li>
-<li><a href="#org0fc4564">7.6. <code>2020-07-16</code></a></li>
-<li><a href="#org779e527">7.7. <code>2020-07-01</code></a></li>
-<li><a href="#org3a663b5">7.8. <code>2020-06-22</code></a></li>
-<li><a href="#org91b4754">7.9. <code>2020-06-21</code></a></li>
-<li><a href="#orgc776b7c">7.10. <code>2020-06-11</code></a></li>
-<li><a href="#org2a5c824">7.11. <code>2020-06-07</code></a></li>
-<li><a href="#org8884ab5">7.12. <code>2020-06-06</code></a></li>
-<li><a href="#orge43576a">7.13. <code>2020-06-05</code></a></li>
-<li><a href="#orgf577511">7.14. <code>2020-06-05</code></a></li>
-<li><a href="#org27389e6">7.15. <code>2020-06-04</code></a></li>
-<li><a href="#org8b6fe21">7.16. <code>2020-05-31</code></a></li>
-<li><a href="#org4424dd5">7.17. <code>2020-05-30</code></a></li>
-<li><a href="#orgdb26658">7.18. <code>2020-05-16</code></a></li>
-<li><a href="#orgc2a1c2d">7.19. <code>2020-05-15</code></a></li>
-<li><a href="#org988475c">7.20. <code>2020-05-14</code></a></li>
-<li><a href="#org6357536">7.21. <code>2020-05-13</code></a></li>
-<li><a href="#orgf0202d0">7.22. <code>2020-05-10</code></a></li>
-<li><a href="#org33d8d12">7.23. <code>2020-05-09</code></a></li>
+<li><a href="#orge7cd25c">7.1. <code>2021-06-02</code></a></li>
+<li><a href="#org226bf7b">7.2. <code>2021-03-21</code></a></li>
+<li><a href="#org3965b56">7.3. <code>2020-12-25</code></a></li>
+<li><a href="#orgb8445f0">7.4. <code>2020-10-12</code></a></li>
+<li><a href="#org1903bfa">7.5. <code>2020-08-29</code></a></li>
+<li><a href="#org510202a">7.6. <code>2020-08-09</code></a></li>
+<li><a href="#org90e2512">7.7. <code>2020-07-16</code></a></li>
+<li><a href="#org1db28b5">7.8. <code>2020-07-01</code></a></li>
+<li><a href="#org7e49036">7.9. <code>2020-06-22</code></a></li>
+<li><a href="#org4901ec0">7.10. <code>2020-06-21</code></a></li>
+<li><a href="#orgd6379cd">7.11. <code>2020-06-11</code></a></li>
+<li><a href="#orgb00e98d">7.12. <code>2020-06-07</code></a></li>
+<li><a href="#orgb1139e4">7.13. <code>2020-06-06</code></a></li>
+<li><a href="#orgf7781ed">7.14. <code>2020-06-05</code></a></li>
+<li><a href="#org670d408">7.15. <code>2020-06-05</code></a></li>
+<li><a href="#orga261d1a">7.16. <code>2020-06-04</code></a></li>
+<li><a href="#orgd1e363c">7.17. <code>2020-05-31</code></a></li>
+<li><a href="#orgb0308fc">7.18. <code>2020-05-30</code></a></li>
+<li><a href="#org33cfe47">7.19. <code>2020-05-16</code></a></li>
+<li><a href="#org240174d">7.20. <code>2020-05-15</code></a></li>
+<li><a href="#org5fdc9b7">7.21. <code>2020-05-14</code></a></li>
+<li><a href="#org046ed74">7.22. <code>2020-05-13</code></a></li>
+<li><a href="#org72fbfca">7.23. <code>2020-05-10</code></a></li>
+<li><a href="#org7648682">7.24. <code>2020-05-09</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
 
-<div id="org3ffa660" class="figure">
+<div id="org5d220ac" class="figure">
 <p><a href="https://melpa.org/#/calibredb"><object type="image/svg+xml" data="https://melpa.org/packages/calibredb-badge.svg" class="org-svg">
 Sorry, your browser does not support SVG.</object></a>
 </p>
 </div>
 
-<div id="outline-container-orga45ad4b" class="outline-2">
-<h2 id="orga45ad4b"><span class="section-number-2">1</span> Description</h2>
+<div id="outline-container-orgebfa8e8" class="outline-2">
+<h2 id="orgebfa8e8"><span class="section-number-2">1</span> Description</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 Yet another <a href="https://calibre-ebook.com/">calibre</a> client for emacs.
 </p>
 
 
-<div id="org292e27f" class="figure">
+<div id="org51e70fa" class="figure">
 <p><img src="img/dashboard.jpg" alt="dashboard.jpg" />
 </p>
 </div>
@@ -395,8 +398,8 @@ package for pdf and djvu files respectively)</b></li>
 </ol>
 </div>
 
-<div id="outline-container-orge6c9e93" class="outline-3">
-<h3 id="orge6c9e93"><span class="section-number-3">1.1</span> Related package</h3>
+<div id="outline-container-org43da653" class="outline-3">
+<h3 id="org43da653"><span class="section-number-3">1.1</span> Related package</h3>
 <div class="outline-text-3" id="text-1-1">
 <ul class="org-ul">
 <li>toc-mode (easily manage pdf/djvu document&rsquo;s Table Of Contents)</li>
@@ -406,16 +409,16 @@ package for pdf and djvu files respectively)</b></li>
 </div>
 </div>
 
-<div id="outline-container-orgd74c150" class="outline-2">
-<h2 id="orgd74c150"><span class="section-number-2">2</span> Installation</h2>
+<div id="outline-container-orgdd4fc7b" class="outline-2">
+<h2 id="orgdd4fc7b"><span class="section-number-2">2</span> Installation</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org451b11a" class="outline-3">
-<h3 id="org451b11a"><span class="section-number-3">2.1</span> Install sqlite and calibre</h3>
+<div id="outline-container-orga6126f8" class="outline-3">
+<h3 id="orga6126f8"><span class="section-number-3">2.1</span> Install sqlite and calibre</h3>
 <div class="outline-text-3" id="text-2-1">
 </div>
-<div id="outline-container-orge57ae5b" class="outline-4">
-<h4 id="orge57ae5b"><span class="section-number-4">2.1.1</span> macOS</h4>
+<div id="outline-container-org290a880" class="outline-4">
+<h4 id="org290a880"><span class="section-number-4">2.1.1</span> macOS</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <div class="org-src-container">
 <pre class="src src-sh">brew install sqlite
@@ -428,8 +431,8 @@ Download calibre&rsquo;s DMG file from <a href="https://calibre-ebook.com/downlo
 </div>
 </div>
 
-<div id="outline-container-org882bb02" class="outline-4">
-<h4 id="org882bb02"><span class="section-number-4">2.1.2</span> Windows</h4>
+<div id="outline-container-org7221376" class="outline-4">
+<h4 id="org7221376"><span class="section-number-4">2.1.2</span> Windows</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <p>
 With chocolatey
@@ -441,8 +444,8 @@ With chocolatey
 </div>
 </div>
 
-<div id="outline-container-orge1d89df" class="outline-4">
-<h4 id="orge1d89df"><span class="section-number-4">2.1.3</span> Linux</h4>
+<div id="outline-container-orgd633b54" class="outline-4">
+<h4 id="orgd633b54"><span class="section-number-4">2.1.3</span> Linux</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <p>
 For example, in Ubuntu 18.04:
@@ -455,8 +458,8 @@ For example, in Ubuntu 18.04:
 </div>
 </div>
 
-<div id="outline-container-org4c831fa" class="outline-3">
-<h3 id="org4c831fa"><span class="section-number-3">2.2</span> Install calibredb.el</h3>
+<div id="outline-container-org12d7277" class="outline-3">
+<h3 id="org12d7277"><span class="section-number-3">2.2</span> Install calibredb.el</h3>
 <div class="outline-text-3" id="text-2-2">
 <p>
 It&rsquo;s available on <a href="https://melpa.org/">Melpa</a> :
@@ -469,8 +472,8 @@ It&rsquo;s available on <a href="https://melpa.org/">Melpa</a> :
 </div>
 </div>
 
-<div id="outline-container-org5837935" class="outline-3">
-<h3 id="org5837935"><span class="section-number-3">2.3</span> Spacemacs Layer</h3>
+<div id="outline-container-org29811dc" class="outline-3">
+<h3 id="org29811dc"><span class="section-number-3">2.3</span> Spacemacs Layer</h3>
 <div class="outline-text-3" id="text-2-3">
 <p>
 For Spacemacs <a href="https://github.com/dalanicolai/calibre-layer">this calibre-layer</a> implements calibre.el with evilified keybindings
@@ -479,16 +482,16 @@ For Spacemacs <a href="https://github.com/dalanicolai/calibre-layer">this calibr
 </div>
 </div>
 
-<div id="outline-container-org2bc11f2" class="outline-2">
-<h2 id="org2bc11f2"><span class="section-number-2">3</span> Configuration</h2>
+<div id="outline-container-org8bec487" class="outline-2">
+<h2 id="org8bec487"><span class="section-number-2">3</span> Configuration</h2>
 <div class="outline-text-2" id="text-3">
 </div>
-<div id="outline-container-orgebed683" class="outline-3">
-<h3 id="orgebed683"><span class="section-number-3">3.1</span> Quick Start</h3>
+<div id="outline-container-orgd4e4b33" class="outline-3">
+<h3 id="orgd4e4b33"><span class="section-number-3">3.1</span> Quick Start</h3>
 <div class="outline-text-3" id="text-3-1">
 </div>
-<div id="outline-container-org1bd7792" class="outline-4">
-<h4 id="org1bd7792"><span class="section-number-4">3.1.1</span> require</h4>
+<div id="outline-container-org1d7756d" class="outline-4">
+<h4 id="org1d7756d"><span class="section-number-4">3.1.1</span> require</h4>
 <div class="outline-text-4" id="text-3-1-1">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #97365B;">require</span> <span style="color: #3B6EA8;">'</span><span style="color: #97365B;">calibredb</span><span style="color: #3B6EA8;">)</span>
@@ -514,14 +517,12 @@ PS: If <code>sqlite3</code> and <code>calibredb</code> is in not in your system 
 </div>
 </div>
 
-<div id="outline-container-org62321a8" class="outline-4">
-<h4 id="org62321a8"><span class="section-number-4">3.1.2</span> use-package</h4>
+<div id="outline-container-org170f933" class="outline-4">
+<h4 id="org170f933"><span class="section-number-4">3.1.2</span> use-package</h4>
 <div class="outline-text-4" id="text-3-1-2">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">use-package</span> calibredb
   <span style="color: #29838D;">:defer</span> t
-  <span style="color: #29838D;">:init</span>
-  <span style="color: #97365B;">(</span><span style="color: #97365B;">autoload</span> <span style="color: #3B6EA8;">'</span><span style="color: #9A7500;">calibredb</span> <span style="color: #4F894C;">"calibredb"</span><span style="color: #97365B;">)</span>
   <span style="color: #29838D;">:config</span>
   <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-root-dir</span> <span style="color: #4F894C;">"~/OneDrive/Org/Doc/Calibre"</span><span style="color: #97365B;">)</span>
   <span style="color: #97365B;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-db-dir</span> <span style="color: #4F894C;">(</span><span style="color: #97365B;">expand-file-name</span> <span style="color: #4F894C;">"metadata.db"</span> <span style="color: #842879;">calibredb-root-dir</span><span style="color: #4F894C;">)</span><span style="color: #97365B;">)</span>
@@ -535,8 +536,8 @@ PS: If <code>sqlite3</code> and <code>calibredb</code> is in not in your system 
 </div>
 </div>
 
-<div id="outline-container-org835e64f" class="outline-3">
-<h3 id="org835e64f"><span class="section-number-3">3.2</span> Virtual Libraries</h3>
+<div id="outline-container-org7f53958" class="outline-3">
+<h3 id="org7f53958"><span class="section-number-3">3.2</span> Virtual Libraries</h3>
 <div class="outline-text-3" id="text-3-2">
 <p>
 Virtual libraries are some convenient shortcuts for quick filtering the Ebooks
@@ -552,8 +553,8 @@ by setting the <code>calibredb-search-filter</code>.
 </div>
 </div>
 
-<div id="outline-container-org4ea8fc4" class="outline-3">
-<h3 id="org4ea8fc4"><span class="section-number-3">3.3</span> Column width</h3>
+<div id="outline-container-org300e76f" class="outline-3">
+<h3 id="org300e76f"><span class="section-number-3">3.3</span> Column width</h3>
 <div class="outline-text-3" id="text-3-3">
 <p>
 You can configure the column width:
@@ -591,8 +592,8 @@ Then in <code>*calibredb-search*</code> buffer, press <code>r</code> to refresh 
 </div>
 </div>
 
-<div id="outline-container-orgcc725bf" class="outline-3">
-<h3 id="orgcc725bf"><span class="section-number-3">3.4</span> Size indicator</h3>
+<div id="outline-container-org4940505" class="outline-3">
+<h3 id="org4940505"><span class="section-number-3">3.4</span> Size indicator</h3>
 <div class="outline-text-3" id="text-3-4">
 <p>
 Enable size indicator:
@@ -608,11 +609,11 @@ Then in <code>*calibredb-search*</code> buffer, press <code>r</code> to refresh 
 </div>
 </div>
 
-<div id="outline-container-org4a93ce7" class="outline-3">
-<h3 id="org4a93ce7"><span class="section-number-3">3.5</span> File format icons</h3>
+<div id="outline-container-orgdaf0db3" class="outline-3">
+<h3 id="orgdaf0db3"><span class="section-number-3">3.5</span> File format icons</h3>
 <div class="outline-text-3" id="text-3-5">
 <p>
-You can choose <a href="https://github.com/domtronn/all-the-icons.el">all-the-icons</a> or <a href="https://github.com/seagle0128/icons-in-terminal.el">icons-in-terminal</a> to render the icons. You have
+You can choose <a href="https://github.com/domtronn/all-the-icons.el">all-the-icons</a>, <a href="https://github.com/seagle0128/icons-in-terminal.el">icons-in-terminal</a>, unicode icons to render the icons. You have
 to install the icons packages by yourself, otherwise it would not work.
 </p>
 
@@ -633,6 +634,14 @@ To enable icons-in-terminal:
 </div>
 
 <p>
+To use unicode icons,
+</p>
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">setq</span> <span style="color: #842879;">calibredb-format-character-icons</span> t<span style="color: #3B6EA8;">)</span>
+</pre>
+</div>
+
+<p>
 Then in <code>*calibredb-search*</code> buffer, press <code>r</code> to refresh the library.
 </p>
 
@@ -647,8 +656,8 @@ TODO: Auto disable format icons when dealing with big libraries.
 </div>
 </div>
 
-<div id="outline-container-org87754e1" class="outline-3">
-<h3 id="org87754e1"><span class="section-number-3">3.6</span> Configure to support org-ref</h3>
+<div id="outline-container-org9b1d03f" class="outline-3">
+<h3 id="org9b1d03f"><span class="section-number-3">3.6</span> Configure to support org-ref</h3>
 <div class="outline-text-3" id="text-3-6">
 <p>
 You can output a BibTex file which can be used in org-ref.
@@ -663,8 +672,8 @@ You can output a BibTex file which can be used in org-ref.
 </div>
 </div>
 
-<div id="outline-container-orgb8483f0" class="outline-3">
-<h3 id="orgb8483f0"><span class="section-number-3">3.7</span> keybindings</h3>
+<div id="outline-container-orgc76df95" class="outline-3">
+<h3 id="orgc76df95"><span class="section-number-3">3.7</span> keybindings</h3>
 <div class="outline-text-3" id="text-3-7">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp"><span style="color: #3B6EA8;">(</span><span style="color: #3B6EA8;">defvar</span> <span style="color: #842879;">calibredb-show-mode-map</span>
@@ -750,15 +759,15 @@ PS: Keybindings might be changed in future versions.
 </div>
 </div>
 
-<div id="outline-container-orga04c718" class="outline-2">
-<h2 id="orga04c718"><span class="section-number-2">4</span> Workflows</h2>
+<div id="outline-container-orgd198e25" class="outline-2">
+<h2 id="orgd198e25"><span class="section-number-2">4</span> Workflows</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 There are three ways to manage your ebooks:
 </p>
 </div>
-<div id="outline-container-orgbe8695e" class="outline-3">
-<h3 id="orgbe8695e"><span class="section-number-3">4.1</span> Start with <code>calibredb</code></h3>
+<div id="outline-container-orgaee57fb" class="outline-3">
+<h3 id="orgaee57fb"><span class="section-number-3">4.1</span> Start with <code>calibredb</code></h3>
 <div class="outline-text-3" id="text-4-1">
 <p>
 First,  <code>M-x calibredb</code> to enter ebook dashboard.
@@ -779,8 +788,8 @@ You can perform the following actions:
 </div>
 </div>
 
-<div id="outline-container-org2952f49" class="outline-3">
-<h3 id="org2952f49"><span class="section-number-3">4.2</span> Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></h3>
+<div id="outline-container-org8bb259f" class="outline-3">
+<h3 id="org8bb259f"><span class="section-number-3">4.2</span> Start with <code>calibredb-find-helm</code> or <code>calibredb-find-counsel</code></h3>
 <div class="outline-text-3" id="text-4-2">
 <ul class="org-ul">
 <li><code>M-x calibredb-find-helm</code> or <code>calibredb-find-counsel</code> to enter the ebook list</li>
@@ -788,8 +797,8 @@ You can perform the following actions:
 </ul>
 </div>
 </div>
-<div id="outline-container-org484aa5d" class="outline-3">
-<h3 id="org484aa5d"><span class="section-number-3">4.3</span> Start with <code>calibredb-list</code></h3>
+<div id="outline-container-org6ae5081" class="outline-3">
+<h3 id="org6ae5081"><span class="section-number-3">4.3</span> Start with <code>calibredb-list</code></h3>
 <div class="outline-text-3" id="text-4-3">
 <ul class="org-ul">
 <li><code>M-x calibredb-list</code> to enter ebook dashboard (buffer <code>*calibredb-list*</code>)</li>
@@ -810,8 +819,8 @@ yourself. For example, with cloud services.
 </div>
 </div>
 
-<div id="outline-container-orgd50347b" class="outline-2">
-<h2 id="orgd50347b"><span class="section-number-2">5</span> Q&amp;A</h2>
+<div id="outline-container-org5b1a6d5" class="outline-2">
+<h2 id="org5b1a6d5"><span class="section-number-2">5</span> Q&amp;A</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 The keybindings mentioned below are referenced from
@@ -819,8 +828,8 @@ The keybindings mentioned below are referenced from
 <a href="#keybindings">keybindings</a>.
 </div>
 
-<div id="outline-container-org6bd76bd" class="outline-3">
-<h3 id="org6bd76bd"><span class="section-number-3">5.1</span> Transient commands</h3>
+<div id="outline-container-org0d7878d" class="outline-3">
+<h3 id="org0d7878d"><span class="section-number-3">5.1</span> Transient commands</h3>
 <div class="outline-text-3" id="text-5-1">
 <p>
 <code>calibredb</code> supports <code>Transient commands</code> just like <code>magit</code>. Most of the features are binded in <code>Transient commands</code>. You can press <code>?</code> to checkout.
@@ -837,8 +846,8 @@ The keybindings mentioned below are referenced from
 </div>
 </div>
 
-<div id="outline-container-org93d9f2e" class="outline-3">
-<h3 id="org93d9f2e"><span class="section-number-3">5.2</span> What is my working library?</h3>
+<div id="outline-container-orgca1d5e8" class="outline-3">
+<h3 id="orgca1d5e8"><span class="section-number-3">5.2</span> What is my working library?</h3>
 <div class="outline-text-3" id="text-5-2">
 <p>
 <code>M-x calibredb</code>, your current library path shows in the header in buffer <code>*calibredb-search*</code>
@@ -847,8 +856,8 @@ Besides, variable <code>calibredb-root-dir</code> also saves the current library
 </div>
 </div>
 
-<div id="outline-container-org242de31" class="outline-3">
-<h3 id="org242de31"><span class="section-number-3">5.3</span> How to open an ebook?</h3>
+<div id="outline-container-org0cce95a" class="outline-3">
+<h3 id="org0cce95a"><span class="section-number-3">5.3</span> How to open an ebook?</h3>
 <div class="outline-text-3" id="text-5-3">
 <ol class="org-ol">
 <li><code>M-x calibredb</code>
@@ -874,8 +883,8 @@ show details, or just <code>Right Click</code> on the ebook.</li>
 </div>
 </div>
 
-<div id="outline-container-orgf130ea5" class="outline-3">
-<h3 id="orgf130ea5"><span class="section-number-3">5.4</span> How to add ebooks?</h3>
+<div id="outline-container-org8d679d9" class="outline-3">
+<h3 id="org8d679d9"><span class="section-number-3">5.4</span> How to add ebooks?</h3>
 <div class="outline-text-3" id="text-5-4">
 <ol class="org-ol">
 <li><code>M-x calibredb-add</code>, select, mark ebooks (only ivy supports mark/unmark currently -
@@ -895,8 +904,8 @@ Please notice: Add books may fail! There are some reasons:
 </div>
 </div>
 
-<div id="outline-container-orgdc24326" class="outline-3">
-<h3 id="orgdc24326"><span class="section-number-3">5.5</span> How to remove ebooks?</h3>
+<div id="outline-container-org9d28128" class="outline-3">
+<h3 id="org9d28128"><span class="section-number-3">5.5</span> How to remove ebooks?</h3>
 <div class="outline-text-3" id="text-5-5">
 <ol class="org-ol">
 <li><code>M-x calibredb</code>
@@ -919,8 +928,8 @@ PS: If you want to delete in bulk with marked items, use <code>calibredb-remove-
 </div>
 </div>
 
-<div id="outline-container-orgfda0f2f" class="outline-3">
-<h3 id="orgfda0f2f"><span class="section-number-3">5.6</span> How to switch virtual libraries?</h3>
+<div id="outline-container-orgbf9225c" class="outline-3">
+<h3 id="orgbf9225c"><span class="section-number-3">5.6</span> How to switch virtual libraries?</h3>
 <div class="outline-text-3" id="text-5-6">
 <p>
 First, set <code>calibredb-library-alist</code> to include the calibre virtual libraries.
@@ -946,8 +955,8 @@ the library.
 </div>
 </div>
 
-<div id="outline-container-orgbaf6172" class="outline-3">
-<h3 id="orgbaf6172"><span class="section-number-3">5.7</span> How to switch libraries?</h3>
+<div id="outline-container-org17d19a3" class="outline-3">
+<h3 id="org17d19a3"><span class="section-number-3">5.7</span> How to switch libraries?</h3>
 <div class="outline-text-3" id="text-5-7">
 <p>
 Set <code>calibredb-library-alist</code> to include the calibre libraries.
@@ -988,8 +997,8 @@ switch temporarily.
 </div>
 </div>
 
-<div id="outline-container-org8815849" class="outline-3">
-<h3 id="org8815849"><span class="section-number-3">5.8</span> How to set metadata on ebooks?</h3>
+<div id="outline-container-org7a3124b" class="outline-3">
+<h3 id="org7a3124b"><span class="section-number-3">5.8</span> How to set metadata on ebooks?</h3>
 <div class="outline-text-3" id="text-5-8">
 <ul class="org-ul">
 <li>In <code>*calibredb-search*</code> buffer, <code>m/DEL/u</code> to mark/unmark backward/unmark forward items, and <code>s</code> to set metadata
@@ -1013,8 +1022,8 @@ Tips: You can filter the result via <code>/</code> before setting the metadata.
 </p>
 </div>
 
-<div id="outline-container-org221ad79" class="outline-4">
-<h4 id="org221ad79"><span class="section-number-4">5.8.1</span> About <code>fetch-ebook-metadata</code></h4>
+<div id="outline-container-orgf655f00" class="outline-4">
+<h4 id="orgf655f00"><span class="section-number-4">5.8.1</span> About <code>fetch-ebook-metadata</code></h4>
 <div class="outline-text-4" id="text-5-8-1">
 <p>
 We are using <code>fetch-ebook-metadata</code> cli tool to fetch the metadata. However,
@@ -1041,8 +1050,8 @@ configurations. Since the settings on calibre GUI would affect the
 </div>
 </div>
 
-<div id="outline-container-orgc2fee20" class="outline-3">
-<h3 id="orgc2fee20"><span class="section-number-3">5.9</span> How to mark favorite/highlight/archive on ebooks?</h3>
+<div id="outline-container-org8314d8e" class="outline-3">
+<h3 id="org8314d8e"><span class="section-number-3">5.9</span> How to mark favorite/highlight/archive on ebooks?</h3>
 <div class="outline-text-3" id="text-5-9">
 <ul class="org-ul">
 <li><p>
@@ -1055,14 +1064,14 @@ Demo:
 </p></li>
 </ul>
 
-<div id="org6080ede" class="figure">
+<div id="orgcf8d310" class="figure">
 <p><img src="img/favorite_highlight_archive.png" alt="favorite_highlight_archive.png" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org608cd34" class="outline-3">
-<h3 id="org608cd34"><span class="section-number-3">5.10</span> How to do live filtering?</h3>
+<div id="outline-container-orga96bad8" class="outline-3">
+<h3 id="orga96bad8"><span class="section-number-3">5.10</span> How to do live filtering?</h3>
 <div class="outline-text-3" id="text-5-10">
 <ul class="org-ul">
 <li>Press <code>/</code> to start live filtering.</li>
@@ -1075,8 +1084,8 @@ Here is the demo:
 </div>
 </div>
 
-<div id="outline-container-orgd576782" class="outline-3">
-<h3 id="orgd576782"><span class="section-number-3">5.11</span> How to do quick filtering?</h3>
+<div id="outline-container-orgcfa6dca" class="outline-3">
+<h3 id="orgcfa6dca"><span class="section-number-3">5.11</span> How to do quick filtering?</h3>
 <div class="outline-text-3" id="text-5-11">
 <ul class="org-ul">
 <li>Click the <code>calibredb-favorite-icon</code>, authors, file format, and tags.</li>
@@ -1089,7 +1098,7 @@ Demo:
 </p>
 
 
-<div id="orgd6df4fa" class="figure">
+<div id="org7dd8d2f" class="figure">
 <p><img src="img/quick_filter.gif" alt="quick_filter.gif" />
 </p>
 </div></li>
@@ -1097,9 +1106,48 @@ Demo:
 </div>
 </div>
 
-<div id="outline-container-org1fa2225" class="outline-3">
-<h3 id="org1fa2225"><span class="section-number-3">5.12</span> How to interact with org-ref?</h3>
+<div id="outline-container-org0ae84b8" class="outline-3">
+<h3 id="org0ae84b8"><span class="section-number-3">5.12</span> How to do group filtering?</h3>
 <div class="outline-text-3" id="text-5-12">
+<p>
+Press <code>f</code>, then press
+</p>
+<ul class="org-ul">
+<li>t: fitler by tag</li>
+<li>f: filter by format</li>
+<li>a: filter by author</li>
+<li>d: filter by date</li>
+<li>l: filter by virutal library</li>
+<li>L: filter by library</li>
+<li>r: reset (clearing the search filter)</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgc3dd88f" class="outline-3">
+<h3 id="orgc3dd88f"><span class="section-number-3">5.13</span> How to do sorting?</h3>
+<div class="outline-text-3" id="text-5-13">
+<p>
+Press <code>o</code>, then press
+</p>
+<ul class="org-ul">
+<li>o: toggle the order (desc or asc)</li>
+<li>i: sort by id</li>
+<li>t: sort by title</li>
+<li>f: sort by format</li>
+<li>a: sort by author</li>
+<li>d: sort by date</li>
+<li>p: sort by pubdate</li>
+<li>T: sort by Tag</li>
+<li>s: sort by size</li>
+<li>l: sort by language</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org20604a6" class="outline-3">
+<h3 id="org20604a6"><span class="section-number-3">5.14</span> How to interact with org-ref?</h3>
+<div class="outline-text-3" id="text-5-14">
 <ul class="org-ul">
 <li><p>
 Setup org-ref
@@ -1142,9 +1190,9 @@ Demo:
 </div>
 
 
-<div id="outline-container-org8a69972" class="outline-3">
-<h3 id="org8a69972"><span class="section-number-3">5.13</span> Why the loading time is so long?</h3>
-<div class="outline-text-3" id="text-5-13">
+<div id="outline-container-org54a32a7" class="outline-3">
+<h3 id="org54a32a7"><span class="section-number-3">5.15</span> Why the loading time is so long?</h3>
+<div class="outline-text-3" id="text-5-15">
 <p>
 For some big libraries, such as the libraries that has 10000+ books, the package
 will need a few seconds to query and decode all the metadata. This will be
@@ -1172,9 +1220,9 @@ decode the whole database.</li>
 </div>
 </div>
 
-<div id="outline-container-orgdacc7ad" class="outline-3">
-<h3 id="orgdacc7ad"><span class="section-number-3">5.14</span> Can not remember the keybindings?</h3>
-<div class="outline-text-3" id="text-5-14">
+<div id="outline-container-orgbeae151" class="outline-3">
+<h3 id="orgbeae151"><span class="section-number-3">5.16</span> Can not remember the keybindings?</h3>
+<div class="outline-text-3" id="text-5-16">
 <p>
 Press <code>?</code>, it will show you almost all actions.
 </p>
@@ -1183,16 +1231,16 @@ Press <code>?</code>, it will show you almost all actions.
 Demo:
 </p>
 
-<div id="org42bdca7" class="figure">
+<div id="orgcb82dad" class="figure">
 <p><img src="img/details.gif" alt="details.gif" />
 </p>
 </div>
 </div>
 </div>
 
-<div id="outline-container-org9f48c8d" class="outline-3">
-<h3 id="org9f48c8d"><span class="section-number-3">5.15</span> How to edit annotation with org-mode?</h3>
-<div class="outline-text-3" id="text-5-15">
+<div id="outline-container-org14beae4" class="outline-3">
+<h3 id="org14beae4"><span class="section-number-3">5.17</span> How to edit annotation with org-mode?</h3>
+<div class="outline-text-3" id="text-5-17">
 <p>
 In <code>*calibredb-search*</code> buffer,
 </p>
@@ -1219,9 +1267,9 @@ Please notice: Due to the limitation of <b>calibredb</b>, the blank new lines wi
 </div>
 </div>
 
-<div id="outline-container-org538c385" class="outline-3">
-<h3 id="org538c385"><span class="section-number-3">5.16</span> How to search in ebooks directly?</h3>
-<div class="outline-text-3" id="text-5-16">
+<div id="outline-container-org07de654" class="outline-3">
+<h3 id="org07de654"><span class="section-number-3">5.18</span> How to search in ebooks directly?</h3>
+<div class="outline-text-3" id="text-5-18">
 <p>
 We wrap <code>counsel-ag</code> in <code>calibredb-rga</code>, using the power of <a href="https://github.com/phiresky/ripgrep-all">ripgrep-all</a>.
 First, install <a href="https://github.com/phiresky/ripgrep-all">ripgrep-all</a>,
@@ -1234,9 +1282,9 @@ then in <code>*calibredb-search*</code>, <code>*calibredb-entry*</code> buffer o
 </div>
 </div>
 
-<div id="outline-container-org72f28a9" class="outline-3">
-<h3 id="org72f28a9"><span class="section-number-3">5.17</span> How to interact with calibredb files in org files?</h3>
-<div class="outline-text-3" id="text-5-17">
+<div id="outline-container-org0e68359" class="outline-3">
+<h3 id="org0e68359"><span class="section-number-3">5.19</span> How to interact with calibredb files in org files?</h3>
+<div class="outline-text-3" id="text-5-19">
 <p>
 In <code>*calibredb-search*</code> buffer,
 </p>
@@ -1247,9 +1295,9 @@ In <code>*calibredb-search*</code> buffer,
 </div>
 </div>
 
-<div id="outline-container-org77a8584" class="outline-3">
-<h3 id="org77a8584"><span class="section-number-3">5.18</span> More examples?</h3>
-<div class="outline-text-3" id="text-5-18">
+<div id="outline-container-org368fb70" class="outline-3">
+<h3 id="org368fb70"><span class="section-number-3">5.20</span> More examples?</h3>
+<div class="outline-text-3" id="text-5-20">
 <p>
 Please check
 </p>
@@ -1261,8 +1309,8 @@ All are self documented.
 </div>
 </div>
 
-<div id="outline-container-org3993ca2" class="outline-2">
-<h2 id="org3993ca2"><span class="section-number-2">6</span> Supported Features</h2>
+<div id="outline-container-org608b392" class="outline-2">
+<h2 id="org608b392"><span class="section-number-2">6</span> Supported Features</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 For more details on the actions, check the official calibre documents:
@@ -1270,8 +1318,8 @@ For more details on the actions, check the official calibre documents:
 </p>
 </div>
 
-<div id="outline-container-org47d9c63" class="outline-3">
-<h3 id="org47d9c63"><span class="section-number-3">6.1</span> calibredb</h3>
+<div id="outline-container-org8449b96" class="outline-3">
+<h3 id="org8449b96"><span class="section-number-3">6.1</span> calibredb</h3>
 <div class="outline-text-3" id="text-6-1">
 <p>
 Enter calibre emacs client, a new buffer called <code>*calibredb-search*</code> with <code>calibredb-search-mode</code>
@@ -1302,8 +1350,8 @@ TODO:
 </div>
 </div>
 
-<div id="outline-container-org99fe07c" class="outline-3">
-<h3 id="org99fe07c"><span class="section-number-3">6.2</span> calibredb-search-live-filter</h3>
+<div id="outline-container-orgc0cd01b" class="outline-3">
+<h3 id="orgc0cd01b"><span class="section-number-3">6.2</span> calibredb-search-live-filter</h3>
 <div class="outline-text-3" id="text-6-2">
 <p>
 In <code>*calibredb-search*</code>,
@@ -1369,8 +1417,8 @@ second-level filter with <code>calibredb-find-counsel</code>, and <code>calibred
 </div>
 </div>
 
-<div id="outline-container-orgf760d15" class="outline-3">
-<h3 id="orgf760d15"><span class="section-number-3">6.3</span> calibredb-find-helm</h3>
+<div id="outline-container-org51e1de9" class="outline-3">
+<h3 id="org51e1de9"><span class="section-number-3">6.3</span> calibredb-find-helm</h3>
 <div class="outline-text-3" id="text-6-3">
 <p>
 Use helm to list all ebooks
@@ -1382,8 +1430,8 @@ Use helm to list all ebooks
 </div>
 </div>
 
-<div id="outline-container-orga598b1b" class="outline-3">
-<h3 id="orga598b1b"><span class="section-number-3">6.4</span> calibredb-find-counsel</h3>
+<div id="outline-container-org010c656" class="outline-3">
+<h3 id="org010c656"><span class="section-number-3">6.4</span> calibredb-find-counsel</h3>
 <div class="outline-text-3" id="text-6-4">
 <p>
 Use counsel to list all ebooks
@@ -1395,8 +1443,8 @@ Use counsel to list all ebooks
 </div>
 </div>
 
-<div id="outline-container-orgbc74c4b" class="outline-3">
-<h3 id="orgbc74c4b"><span class="section-number-3">6.5</span> calibredb-list</h3>
+<div id="outline-container-org64699e1" class="outline-3">
+<h3 id="org64699e1"><span class="section-number-3">6.5</span> calibredb-list</h3>
 <div class="outline-text-3" id="text-6-5">
 <p>
 Generate an org buffer which contains all files&rsquo; cover images, titles and the file links.
@@ -1408,8 +1456,8 @@ Generate an org buffer which contains all files&rsquo; cover images, titles and 
 </div>
 </div>
 
-<div id="outline-container-org13766dd" class="outline-3">
-<h3 id="org13766dd"><span class="section-number-3">6.6</span> calibredb-clone</h3>
+<div id="outline-container-org2d7a622" class="outline-3">
+<h3 id="org2d7a622"><span class="section-number-3">6.6</span> calibredb-clone</h3>
 <div class="outline-text-3" id="text-6-6">
 <p>
 Create a clone of the current library. This creates a new, empty library that
@@ -1429,8 +1477,8 @@ lecture notes, one for research references etc.
 </div>
 </div>
 
-<div id="outline-container-orgdbc756d" class="outline-3">
-<h3 id="orgdbc756d"><span class="section-number-3">6.7</span> calibredb-library-list</h3>
+<div id="outline-container-org7c8d20a" class="outline-3">
+<h3 id="org7c8d20a"><span class="section-number-3">6.7</span> calibredb-library-list</h3>
 <div class="outline-text-3" id="text-6-7">
 <p>
 Switch library from library list defined in <code>calibredb-library-alist</code>.
@@ -1445,8 +1493,8 @@ selecting the new item.
 </div>
 </div>
 
-<div id="outline-container-org4684454" class="outline-3">
-<h3 id="org4684454"><span class="section-number-3">6.8</span> calibredb-switch-library</h3>
+<div id="outline-container-orgcc30fc1" class="outline-3">
+<h3 id="orgcc30fc1"><span class="section-number-3">6.8</span> calibredb-switch-library</h3>
 <div class="outline-text-3" id="text-6-8">
 <p>
 Switch a library temporary by selecting a path.
@@ -1459,8 +1507,8 @@ Switch a library temporary by selecting a path.
 </div>
 </div>
 
-<div id="outline-container-org26581a9" class="outline-3">
-<h3 id="org26581a9"><span class="section-number-3">6.9</span> Show details</h3>
+<div id="outline-container-org796d851" class="outline-3">
+<h3 id="org796d851"><span class="section-number-3">6.9</span> Show details</h3>
 <div class="outline-text-3" id="text-6-9">
 <p>
 This action will get you to the book details buffer called <code>*calibredb-entry*</code>
@@ -1468,12 +1516,12 @@ This action will get you to the book details buffer called <code>*calibredb-entr
 </div>
 </div>
 
-<div id="outline-container-org4d9d281" class="outline-3">
-<h3 id="org4d9d281"><span class="section-number-3">6.10</span> Dispatch</h3>
+<div id="outline-container-org8f7d8f9" class="outline-3">
+<h3 id="org8f7d8f9"><span class="section-number-3">6.10</span> Dispatch</h3>
 <div class="outline-text-3" id="text-6-10">
 </div>
-<div id="outline-container-org5558e36" class="outline-4">
-<h4 id="org5558e36"><span class="section-number-4">6.10.1</span> calibredb-dispatch</h4>
+<div id="outline-container-org2bdbca2" class="outline-4">
+<h4 id="org2bdbca2"><span class="section-number-4">6.10.1</span> calibredb-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-1">
 <p>
 Under <code>*calilbredb-search*</code> or <code>*calilbredb-entry*</code> buffer, you can make actions on
@@ -1490,8 +1538,8 @@ Or fire with keybinding <code>?</code>
 </div>
 </div>
 
-<div id="outline-container-org6225664" class="outline-4">
-<h4 id="org6225664"><span class="section-number-4">6.10.2</span> calibredb-set-metadata-dispatch</h4>
+<div id="outline-container-org76358d3" class="outline-4">
+<h4 id="org76358d3"><span class="section-number-4">6.10.2</span> calibredb-set-metadata-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-2">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-set-metadata-dispatch
@@ -1503,8 +1551,8 @@ Or fire with keybinding <code>s</code>
 </div>
 </div>
 
-<div id="outline-container-org4b83f07" class="outline-4">
-<h4 id="org4b83f07"><span class="section-number-4">6.10.3</span> calibredb-catalog-bib-dispatch</h4>
+<div id="outline-container-orgb2c0db7" class="outline-4">
+<h4 id="orgb2c0db7"><span class="section-number-4">6.10.3</span> calibredb-catalog-bib-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-3">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-catalog-bib-dispatch
@@ -1516,8 +1564,8 @@ Or fire with keybinding <code>b</code>
 </div>
 </div>
 
-<div id="outline-container-org8d53200" class="outline-4">
-<h4 id="org8d53200"><span class="section-number-4">6.10.4</span> calibredb-export-dispatch</h4>
+<div id="outline-container-orgb77f15b" class="outline-4">
+<h4 id="orgb77f15b"><span class="section-number-4">6.10.4</span> calibredb-export-dispatch</h4>
 <div class="outline-text-4" id="text-6-10-4">
 <div class="org-src-container">
 <pre class="src src-emacs-lisp">M-x calibredb-export-dispatch
@@ -1531,8 +1579,8 @@ Or fire with keybinding <code>e</code>
 </div>
 
 
-<div id="outline-container-orgb4d4f27" class="outline-3">
-<h3 id="orgb4d4f27"><span class="section-number-3">6.11</span> add</h3>
+<div id="outline-container-org9788ca2" class="outline-3">
+<h3 id="org9788ca2"><span class="section-number-3">6.11</span> add</h3>
 <div class="outline-text-3" id="text-6-11">
 <p>
 To add a file into calibre, call
@@ -1552,8 +1600,8 @@ To add a directory into calibre, call
 </div>
 </div>
 
-<div id="outline-container-org1a6ac10" class="outline-3">
-<h3 id="org1a6ac10"><span class="section-number-3">6.12</span> remove</h3>
+<div id="outline-container-orgcc04869" class="outline-3">
+<h3 id="orgcc04869"><span class="section-number-3">6.12</span> remove</h3>
 <div class="outline-text-3" id="text-6-12">
 <p>
 To remove an item, call
@@ -1573,8 +1621,8 @@ To remove the marked items, call
 </div>
 </div>
 
-<div id="outline-container-orgcba3725" class="outline-3">
-<h3 id="orgcba3725"><span class="section-number-3">6.13</span> set<sub>metadata</sub></h3>
+<div id="outline-container-org9b8db43" class="outline-3">
+<h3 id="org9b8db43"><span class="section-number-3">6.13</span> set<sub>metadata</sub></h3>
 <div class="outline-text-3" id="text-6-13">
 <p>
 To set metadata,
@@ -1586,8 +1634,8 @@ To set metadata,
 </div>
 </div>
 
-<div id="outline-container-org45cf872" class="outline-3">
-<h3 id="org45cf872"><span class="section-number-3">6.14</span> Export</h3>
+<div id="outline-container-org05e76cf" class="outline-3">
+<h3 id="org05e76cf"><span class="section-number-3">6.14</span> Export</h3>
 <div class="outline-text-3" id="text-6-14">
 <p>
 To export the ebook,
@@ -1599,8 +1647,8 @@ To export the ebook,
 </div>
 </div>
 
-<div id="outline-container-org1969b4f" class="outline-3">
-<h3 id="org1969b4f"><span class="section-number-3">6.15</span> Yank</h3>
+<div id="outline-container-orgb2cb458" class="outline-3">
+<h3 id="orgb2cb458"><span class="section-number-3">6.15</span> Yank</h3>
 <div class="outline-text-3" id="text-6-15">
 <p>
 To yank the ebook as org links,
@@ -1612,12 +1660,12 @@ To yank the ebook as org links,
 </div>
 </div>
 
-<div id="outline-container-org3895a36" class="outline-3">
-<h3 id="org3895a36"><span class="section-number-3">6.16</span> Catalog</h3>
+<div id="outline-container-orgb65117c" class="outline-3">
+<h3 id="orgb65117c"><span class="section-number-3">6.16</span> Catalog</h3>
 <div class="outline-text-3" id="text-6-16">
 </div>
-<div id="outline-container-org1e2e024" class="outline-4">
-<h4 id="org1e2e024"><span class="section-number-4">6.16.1</span> BibTex</h4>
+<div id="outline-container-orgf45d84e" class="outline-4">
+<h4 id="orgf45d84e"><span class="section-number-4">6.16.1</span> BibTex</h4>
 <div class="outline-text-4" id="text-6-16-1">
 <p>
 Export the ebook catalogs to a BibTex file.
@@ -1633,8 +1681,8 @@ PS: Document can be found in <a href="https://github.com/kovidgoyal/calibre/blob
 </div>
 </div>
 
-<div id="outline-container-orgf4e503a" class="outline-3">
-<h3 id="orgf4e503a"><span class="section-number-3">6.17</span> calibredb-rga</h3>
+<div id="outline-container-orge19def9" class="outline-3">
+<h3 id="orge19def9"><span class="section-number-3">6.17</span> calibredb-rga</h3>
 <div class="outline-text-3" id="text-6-17">
 <p>
 Search in ebooks.
@@ -1643,18 +1691,41 @@ Search in ebooks.
 </div>
 </div>
 
-<div id="outline-container-org36ae3dc" class="outline-2">
-<h2 id="org36ae3dc"><span class="section-number-2">7</span> Logs</h2>
+<div id="outline-container-org6a8e1cb" class="outline-2">
+<h2 id="org6a8e1cb"><span class="section-number-2">7</span> Logs</h2>
 <div class="outline-text-2" id="text-7">
 </div>
-<div id="outline-container-orgfca8d92" class="outline-3">
-<h3 id="orgfca8d92"><span class="section-number-3">7.1</span> <code>2021-03-21</code></h3>
+<div id="outline-container-orge7cd25c" class="outline-3">
+<h3 id="orge7cd25c"><span class="section-number-3">7.1</span> <code>2021-06-02</code></h3>
 <div class="outline-text-3" id="text-7-1">
+<p>
+Version <b>2.10.0</b>:
+</p>
+<ul class="org-ul">
+<li>Change keybind for <code>calibredb-toggle-favorite-at-point</code> to <code>*</code> (original <code>f</code>)</li>
+<li>Add <code>calibredb-filter-dispatch</code>, bind to <code>f</code></li>
+<li>Add <code>calibredb-sort-dispatch</code>, bind to <code>o</code></li>
+<li>Mouse click on format/tags/author is enabled for group filtering</li>
+<li>Improve the following functions:
+<ul class="org-ul">
+<li><code>calibredb-unmark-and-backward</code></li>
+<li><code>calibredb-add</code></li>
+<li><code>calibredb-remove</code></li>
+<li><code>calibredb-open-with-default-tool</code></li>
+</ul></li>
+<li>Add <code>calibredb-format-character-icons</code></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org226bf7b" class="outline-3">
+<h3 id="org226bf7b"><span class="section-number-3">7.2</span> <code>2021-03-21</code></h3>
+<div class="outline-text-3" id="text-7-2">
 <p>
 Version  <b>2.9.0:</b>
 </p>
 <ul class="org-ul">
-<li>Now, it is able to set metadata asynchronous.</li>
+<li>Now, it is able to set metadata asynchronously.</li>
 <li>Add <code>calibredb-org-link-setup</code> to support org-link: <code>calibredb:</code>, copy the marked items as org link with <code>y y</code> or <code>y f</code>.</li>
 <li>Improve exit functions on *~calibredb-search*~ and *~calibredb-entry*~ buffers.</li>
 <li><p>
@@ -1671,9 +1742,9 @@ will open the folder where the file located.
 </div>
 </div>
 
-<div id="outline-container-org5750451" class="outline-3">
-<h3 id="org5750451"><span class="section-number-3">7.2</span> <code>2020-12-25</code></h3>
-<div class="outline-text-3" id="text-7-2">
+<div id="outline-container-org3965b56" class="outline-3">
+<h3 id="org3965b56"><span class="section-number-3">7.3</span> <code>2020-12-25</code></h3>
+<div class="outline-text-3" id="text-7-3">
 <p>
 Merry Christmas! I am happy to release <b>2.8.0</b>
 </p>
@@ -1689,9 +1760,9 @@ Merry Christmas! I am happy to release <b>2.8.0</b>
 </div>
 
 
-<div id="outline-container-org84bcd08" class="outline-3">
-<h3 id="org84bcd08"><span class="section-number-3">7.3</span> <code>2020-10-12</code></h3>
-<div class="outline-text-3" id="text-7-3">
+<div id="outline-container-orgb8445f0" class="outline-3">
+<h3 id="orgb8445f0"><span class="section-number-3">7.4</span> <code>2020-10-12</code></h3>
+<div class="outline-text-3" id="text-7-4">
 <p>
 Version  <b>2.7.0:</b>
 </p>
@@ -1715,9 +1786,9 @@ Adjust keybindings:
 </div>
 </div>
 
-<div id="outline-container-org4a904e6" class="outline-3">
-<h3 id="org4a904e6"><span class="section-number-3">7.4</span> <code>2020-08-29</code></h3>
-<div class="outline-text-3" id="text-7-4">
+<div id="outline-container-org1903bfa" class="outline-3">
+<h3 id="org1903bfa"><span class="section-number-3">7.5</span> <code>2020-08-29</code></h3>
+<div class="outline-text-3" id="text-7-5">
 <p>
 Version <b>2.6.0</b>:
 </p>
@@ -1732,9 +1803,9 @@ Version <b>2.6.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgc20da3b" class="outline-3">
-<h3 id="orgc20da3b"><span class="section-number-3">7.5</span> <code>2020-08-09</code></h3>
-<div class="outline-text-3" id="text-7-5">
+<div id="outline-container-org510202a" class="outline-3">
+<h3 id="org510202a"><span class="section-number-3">7.6</span> <code>2020-08-09</code></h3>
+<div class="outline-text-3" id="text-7-6">
 <p>
 Version <b>2.5.0</b>:
 </p>
@@ -1744,9 +1815,9 @@ Version <b>2.5.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org0fc4564" class="outline-3">
-<h3 id="org0fc4564"><span class="section-number-3">7.6</span> <code>2020-07-16</code></h3>
-<div class="outline-text-3" id="text-7-6">
+<div id="outline-container-org90e2512" class="outline-3">
+<h3 id="org90e2512"><span class="section-number-3">7.7</span> <code>2020-07-16</code></h3>
+<div class="outline-text-3" id="text-7-7">
 <p>
 Version <b>2.4.1</b>:
 </p>
@@ -1756,9 +1827,9 @@ Version <b>2.4.1</b>:
 </div>
 </div>
 
-<div id="outline-container-org779e527" class="outline-3">
-<h3 id="org779e527"><span class="section-number-3">7.7</span> <code>2020-07-01</code></h3>
-<div class="outline-text-3" id="text-7-7">
+<div id="outline-container-org1db28b5" class="outline-3">
+<h3 id="org1db28b5"><span class="section-number-3">7.8</span> <code>2020-07-01</code></h3>
+<div class="outline-text-3" id="text-7-8">
 <p>
 Version <b>2.4.0</b>:
 </p>
@@ -1769,9 +1840,9 @@ Version <b>2.4.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org3a663b5" class="outline-3">
-<h3 id="org3a663b5"><span class="section-number-3">7.8</span> <code>2020-06-22</code></h3>
-<div class="outline-text-3" id="text-7-8">
+<div id="outline-container-org7e49036" class="outline-3">
+<h3 id="org7e49036"><span class="section-number-3">7.9</span> <code>2020-06-22</code></h3>
+<div class="outline-text-3" id="text-7-9">
 <p>
 Version <b>2.3.2</b>:
 </p>
@@ -1783,9 +1854,9 @@ Version <b>2.3.2</b>:
 </div>
 </div>
 
-<div id="outline-container-org91b4754" class="outline-3">
-<h3 id="org91b4754"><span class="section-number-3">7.9</span> <code>2020-06-21</code></h3>
-<div class="outline-text-3" id="text-7-9">
+<div id="outline-container-org4901ec0" class="outline-3">
+<h3 id="org4901ec0"><span class="section-number-3">7.10</span> <code>2020-06-21</code></h3>
+<div class="outline-text-3" id="text-7-10">
 <p>
 Version <b>2.3.1</b>:
 </p>
@@ -1796,9 +1867,9 @@ Version <b>2.3.1</b>:
 </div>
 </div>
 
-<div id="outline-container-orgc776b7c" class="outline-3">
-<h3 id="orgc776b7c"><span class="section-number-3">7.10</span> <code>2020-06-11</code></h3>
-<div class="outline-text-3" id="text-7-10">
+<div id="outline-container-orgd6379cd" class="outline-3">
+<h3 id="orgd6379cd"><span class="section-number-3">7.11</span> <code>2020-06-11</code></h3>
+<div class="outline-text-3" id="text-7-11">
 <p>
 Version <b>2.3.0</b>:
 </p>
@@ -1808,9 +1879,9 @@ Version <b>2.3.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org2a5c824" class="outline-3">
-<h3 id="org2a5c824"><span class="section-number-3">7.11</span> <code>2020-06-07</code></h3>
-<div class="outline-text-3" id="text-7-11">
+<div id="outline-container-orgb00e98d" class="outline-3">
+<h3 id="orgb00e98d"><span class="section-number-3">7.12</span> <code>2020-06-07</code></h3>
+<div class="outline-text-3" id="text-7-12">
 <p>
 Version <b>2.2.0</b>:
 </p>
@@ -1821,9 +1892,9 @@ Version <b>2.2.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org8884ab5" class="outline-3">
-<h3 id="org8884ab5"><span class="section-number-3">7.12</span> <code>2020-06-06</code></h3>
-<div class="outline-text-3" id="text-7-12">
+<div id="outline-container-orgb1139e4" class="outline-3">
+<h3 id="orgb1139e4"><span class="section-number-3">7.13</span> <code>2020-06-06</code></h3>
+<div class="outline-text-3" id="text-7-13">
 <p>
 Version 2.1.0:
 </p>
@@ -1833,9 +1904,9 @@ Version 2.1.0:
 </div>
 </div>
 
-<div id="outline-container-orge43576a" class="outline-3">
-<h3 id="orge43576a"><span class="section-number-3">7.13</span> <code>2020-06-05</code></h3>
-<div class="outline-text-3" id="text-7-13">
+<div id="outline-container-orgf7781ed" class="outline-3">
+<h3 id="orgf7781ed"><span class="section-number-3">7.14</span> <code>2020-06-05</code></h3>
+<div class="outline-text-3" id="text-7-14">
 <p>
 Version <b>2.0.0</b>:
 </p>
@@ -1848,9 +1919,9 @@ Version <b>2.0.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgf577511" class="outline-3">
-<h3 id="orgf577511"><span class="section-number-3">7.14</span> <code>2020-06-05</code></h3>
-<div class="outline-text-3" id="text-7-14">
+<div id="outline-container-org670d408" class="outline-3">
+<h3 id="org670d408"><span class="section-number-3">7.15</span> <code>2020-06-05</code></h3>
+<div class="outline-text-3" id="text-7-15">
 <p>
 Version <b>1.9.0</b>:
 </p>
@@ -1860,9 +1931,9 @@ Version <b>1.9.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org27389e6" class="outline-3">
-<h3 id="org27389e6"><span class="section-number-3">7.15</span> <code>2020-06-04</code></h3>
-<div class="outline-text-3" id="text-7-15">
+<div id="outline-container-orga261d1a" class="outline-3">
+<h3 id="orga261d1a"><span class="section-number-3">7.16</span> <code>2020-06-04</code></h3>
+<div class="outline-text-3" id="text-7-16">
 <p>
 Version <b>1.8.0</b>:
 </p>
@@ -1874,9 +1945,9 @@ Version <b>1.8.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org8b6fe21" class="outline-3">
-<h3 id="org8b6fe21"><span class="section-number-3">7.16</span> <code>2020-05-31</code></h3>
-<div class="outline-text-3" id="text-7-16">
+<div id="outline-container-orgd1e363c" class="outline-3">
+<h3 id="orgd1e363c"><span class="section-number-3">7.17</span> <code>2020-05-31</code></h3>
+<div class="outline-text-3" id="text-7-17">
 <p>
 Version <b>1.7.0</b>:
 </p>
@@ -1886,9 +1957,9 @@ Version <b>1.7.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org4424dd5" class="outline-3">
-<h3 id="org4424dd5"><span class="section-number-3">7.17</span> <code>2020-05-30</code></h3>
-<div class="outline-text-3" id="text-7-17">
+<div id="outline-container-orgb0308fc" class="outline-3">
+<h3 id="orgb0308fc"><span class="section-number-3">7.18</span> <code>2020-05-30</code></h3>
+<div class="outline-text-3" id="text-7-18">
 <p>
 Version <b>1.6.0</b>:
 </p>
@@ -1901,9 +1972,9 @@ Version <b>1.6.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgdb26658" class="outline-3">
-<h3 id="orgdb26658"><span class="section-number-3">7.18</span> <code>2020-05-16</code></h3>
-<div class="outline-text-3" id="text-7-18">
+<div id="outline-container-org33cfe47" class="outline-3">
+<h3 id="org33cfe47"><span class="section-number-3">7.19</span> <code>2020-05-16</code></h3>
+<div class="outline-text-3" id="text-7-19">
 <p>
 Version <b>1.5.0</b>:
 </p>
@@ -1913,9 +1984,9 @@ Version <b>1.5.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgc2a1c2d" class="outline-3">
-<h3 id="orgc2a1c2d"><span class="section-number-3">7.19</span> <code>2020-05-15</code></h3>
-<div class="outline-text-3" id="text-7-19">
+<div id="outline-container-org240174d" class="outline-3">
+<h3 id="org240174d"><span class="section-number-3">7.20</span> <code>2020-05-15</code></h3>
+<div class="outline-text-3" id="text-7-20">
 <p>
 Version <b>1.4.0</b>:
 </p>
@@ -1925,9 +1996,9 @@ Version <b>1.4.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org988475c" class="outline-3">
-<h3 id="org988475c"><span class="section-number-3">7.20</span> <code>2020-05-14</code></h3>
-<div class="outline-text-3" id="text-7-20">
+<div id="outline-container-org5fdc9b7" class="outline-3">
+<h3 id="org5fdc9b7"><span class="section-number-3">7.21</span> <code>2020-05-14</code></h3>
+<div class="outline-text-3" id="text-7-21">
 <p>
 Version <b>1.3.0</b>:
 </p>
@@ -1939,9 +2010,9 @@ Version <b>1.3.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org6357536" class="outline-3">
-<h3 id="org6357536"><span class="section-number-3">7.21</span> <code>2020-05-13</code></h3>
-<div class="outline-text-3" id="text-7-21">
+<div id="outline-container-org046ed74" class="outline-3">
+<h3 id="org046ed74"><span class="section-number-3">7.22</span> <code>2020-05-13</code></h3>
+<div class="outline-text-3" id="text-7-22">
 <p>
 Version <b>1.2.0</b>:
 </p>
@@ -1952,9 +2023,9 @@ Version <b>1.2.0</b>:
 </div>
 </div>
 
-<div id="outline-container-orgf0202d0" class="outline-3">
-<h3 id="orgf0202d0"><span class="section-number-3">7.22</span> <code>2020-05-10</code></h3>
-<div class="outline-text-3" id="text-7-22">
+<div id="outline-container-org72fbfca" class="outline-3">
+<h3 id="org72fbfca"><span class="section-number-3">7.23</span> <code>2020-05-10</code></h3>
+<div class="outline-text-3" id="text-7-23">
 <p>
 Version <b>1.1.0</b>:
 </p>
@@ -1964,9 +2035,9 @@ Version <b>1.1.0</b>:
 </div>
 </div>
 
-<div id="outline-container-org33d8d12" class="outline-3">
-<h3 id="org33d8d12"><span class="section-number-3">7.23</span> <code>2020-05-09</code></h3>
-<div class="outline-text-3" id="text-7-23">
+<div id="outline-container-org7648682" class="outline-3">
+<h3 id="org7648682"><span class="section-number-3">7.24</span> <code>2020-05-09</code></h3>
+<div class="outline-text-3" id="text-7-24">
 <p>
 Version <b>1.0.0</b>:
 </p>
@@ -1981,8 +2052,8 @@ Version <b>1.0.0</b>:
 </div>
 <div id="postamble" class="status">
 <p class="date">Date: Aug 9, 2020</p>
-<p class="author">Author: Damon Chan</p>
-<p class="date">Created: 2021-03-21 Sun 17:53</p>
+<p class="author">Author: CHANDAMON</p>
+<p class="date">Created: 2021-06-03 Thu 10:38</p>
 </div>
 </body>
 </html>
