@@ -41,6 +41,8 @@
 (eval-when-compile (defvar calibredb-detial-view))
 (eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-condense-comments "calibredb-search.el")
+(declare-function calibredb-attach-icon-for "calibredb-utils.el")
+
 
 (defgroup calibredb nil
   "calibredb group"

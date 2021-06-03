@@ -928,7 +928,6 @@ With universal ARG \\[universal-argument] use title as initial value."
 (calibredb-all "book-pubdate")
 (calibredb-all "book-title")
 (calibredb-all "file-path")
-(calibredb-all "tag")
 (calibredb-all "size")
 (calibredb-all "comment")
 (calibredb-all "ids")
