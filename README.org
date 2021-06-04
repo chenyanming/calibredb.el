@@ -341,7 +341,7 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
 
 Please notice: Add books may fail! There are some reasons:
 - The book already exists in the database. If you still want to add the duplicated books, you can set ~calibredb-add-duplicate~ to ~Non-Nil~.
-- Not all book formats are supported. If you can not add a specific book, check the logs in **Messages** buffer.
+- Not all book formats are supported. If you can not add a specific book, check the logs in ~*calibredb*~ buffer.
 
 ** How to remove ebooks?
 1. =M-x calibredb=
@@ -457,7 +457,7 @@ Here is the demo:
 [[file:img/filter.gif]]
 
 If you want to search by one type of metadata, for example, by tag, please check:
-#+html: <a href="#How to do group filtering?">How to do group filtering?</a>.
+#+html: <a href="#how-to-do-group-filtering">How to do group filtering?</a>.
 
 ** How to do group filtering?
 Press ~f~, then press
