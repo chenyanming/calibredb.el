@@ -435,19 +435,29 @@ configurations. Since the settings on calibre GUI would affect the
   Demo:
 #+attr_org: :width 600px
   [[file:img/favorite_highlight_archive.png]]
+
 ** How to do live filtering?
-- Press ~/~ to start live filtering.
+- Press ~/~ to start live filtering. 
+
+Minibuffer shows ~Filter (live)~, input some texts to start searching (REGEX is supported).
+
+The following columns will be searched:
+- id
+- text (comment)
+- tag
+- title
+- format
+- author_sort
+- ids
+
+If the keyword occurs in any of the columns above, the matched ebook records will
+be shown.
 
 Here is the demo:
 [[file:img/filter.gif]]
 
-** How to do quick filtering?
-- Click the =calibredb-favorite-icon=, authors, file format, and tags.
-- Press =r/R= to reset the filtering.
-
-  Demo:
-
-  [[file:img/quick_filter.gif]]
+If you want to search by one type of metadata, for example, by tag, please check:
+#+html: <a href="#How to do group filtering?">How to do group filtering?</a>.
 
 ** How to do group filtering?
 Press ~f~, then press
@@ -458,6 +468,19 @@ Press ~f~, then press
 - l: filter by virutal library
 - L: filter by library
 - r: reset (clearing the search filter)
+
+For example, after pressing ~f t~ then select any tags, group filter for tag is
+enabled. In this case, minibuffer shows ~Filter (tag)~, if you press ~/~, it only search in tag.
+
+If you press ~g r~ or ~f r~, you can switch back to live filtering, and minibuffer will show ~Filter (live)~.
+
+** How to do quick group filtering?
+- Click the =calibredb-favorite-icon=, authors, file format, and tags.
+- Press =r/R= to reset the filtering.
+
+  Demo:
+
+  [[file:img/quick_filter.gif]]
 
 ** How to do sorting?
 Press ~o~, then press
