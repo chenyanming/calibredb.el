@@ -185,7 +185,7 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (if arg
       (let ((calibredb-preferred-format nil))
-        (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+        (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
     (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
 
 (defun calibredb-quick-look (arg &optional candidate)
