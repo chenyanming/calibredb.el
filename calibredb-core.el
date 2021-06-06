@@ -363,7 +363,7 @@ WITH d AS (
     SELECT *
     FROM books
 )
-SELECT d.book AS id, b.author_sort, b.path, d.name, d.format, b.pubdate, b.title, t.tag, d.uncompressed_size, c.text, group_concat(i.type || ':' || i.val) AS ids, p.name AS publisher, s.name AS series, l.lang_code, b.last_modified
+SELECT d.book AS id, b.author_sort, b.path, d.name, group_concat(DISTINCT d.format) as format, b.pubdate, b.title, t.tag, d.uncompressed_size, c.text, group_concat(i.type || ':' || i.val) AS ids, p.name AS publisher, s.name AS series, l.lang_code, b.last_modified
 FROM d
 LEFT JOIN p
 ON d.book = p.book
@@ -379,7 +379,7 @@ LEFT JOIN b
 ON d.book = b.id
 LEFT JOIN identifiers AS i
 ON d.book = i.book
-GROUP BY d.book, d.format"
+GROUP BY d.book"
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)

@@ -248,12 +248,17 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
         (insert (format "Publisher   %s\n" (propertize publisher 'face 'calibredb-publisher-face)))
         (insert (format "Series      %s\n" (propertize series 'face 'calibredb-series-face)))
         (insert (format "Language    %s\n" (propertize lang_code 'face 'calibredb-language-face)))
-        (insert (format "File        %s\n" (propertize file
-                                                       'face 'calibredb-file-face
-                                                       'mouse-face 'calibredb-mouse-face
-                                                       'help-echo file
-                                                       'keymap file-map)))
-        (insert (format "Format      %s\n" (propertize format 'face 'calibredb-format-face)))
+        ;; (insert (format "File        %s\n" (propertize file 'face 'calibredb-file-face)))
+        (insert (format "Format      %s\n" (mapconcat
+                                            #'identity
+                                            (-map (lambda (ext)
+                                                    (propertize ext
+                                                                'face 'calibredb-format-face
+                                                                'mouse-face 'calibredb-mouse-face
+                                                                'help-echo (expand-file-name
+                                                                            (concat (file-name-base file) "." ext)
+                                                                            (file-name-directory file))
+                                                                'keymap file-map)) (s-split "," format)) ", ")))
         (insert (format "Size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
         (cond ((equal calibredb-entry-render-comments "face")
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
@@ -1006,7 +1011,7 @@ ARGUMENT FILTER is the filter string."
      (with-temp-buffer
        (dolist (cand candidates)
          (let ((id (calibredb-getattr cand :id))
-               (path (calibredb-getattr cand :file-path))
+               (path (calibredb-read-filepath (calibredb-getattr cand :file-path) ))
                (title (calibredb-getattr cand :book-title)))
            (insert (format "[[file:%s][%s %s - %s]]\n"
                            path

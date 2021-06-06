@@ -106,6 +106,14 @@ Argument FILEPATH is the file path."
                         "open" (expand-file-name filepath)))
         (t (message "unknown system!?"))))
 
+(defun calibredb-read-filepath (filepath)
+  (if (file-exists-p filepath)
+      filepath
+    (let* ((parent (file-name-directory filepath))
+           (filename (file-name-base filepath))
+           (ext (s-split "," (file-name-extension filepath)))
+           (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
+      (completing-read "Select a format: " files))))
 
 (defun calibredb-insert-image (path alt width height)
   "TODO: Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
@@ -137,7 +145,7 @@ Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file (calibredb-getattr candidate :file-path)))
+  (find-file (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
 
 (defun calibredb-find-file-other-frame (&optional candidate)
   "Open file in other frame of the selected item.
@@ -145,7 +153,7 @@ Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file-other-frame (calibredb-getattr candidate :file-path)))
+  (find-file-other-frame (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
 
 (defun calibredb-open-file-with-default-tool (arg &optional candidate)
   "Open file with the system default tool.
@@ -156,8 +164,8 @@ Optional argument CANDIDATE is the selected item."
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (if arg
-      (calibredb-open-with-default-tool (file-name-directory (calibredb-getattr candidate :file-path) ))
-    (calibredb-open-with-default-tool (calibredb-getattr candidate :file-path))))
+      (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)) ))
+    (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
 
 (defun calibredb-quick-look (&optional candidate)
   "Quick the file with the qlmanage, but it only Support macOS.
@@ -166,7 +174,7 @@ Optional argument CANDIDATE is the selected item."
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (let ((file (shell-quote-argument
-               (expand-file-name (calibredb-getattr candidate :file-path)))))
+               (expand-file-name (calibredb-read-filepath (calibredb-getattr candidate :file-path))))))
     (if (eq system-type 'darwin)
         (call-process-shell-command (concat "qlmanage -p " file) nil 0)
       (message "This feature only supports macOS."))))
@@ -196,7 +204,7 @@ Optional argument CANDIDATE is candidate to read."
         (unless candidates
           (setq candidates (calibredb-find-candidate-at-point)))
         (dolist (cand candidates)
-          (let ((path (calibredb-getattr cand :file-path))
+          (let ((path (calibredb-read-filepath (calibredb-getattr cand :file-path)))
                 (title (calibredb-getattr cand :book-title)))
             (setq capture-path path)
             (setq capture-title title)))))
@@ -853,7 +861,7 @@ With universal ARG \\[universal-argument] use title as initial value."
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let (;; (id (calibredb-getattr candidate :id))
-        (file (calibredb-getattr candidate :file-path)))
+        (file (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
     (calibredb-convert-process
      :input file
      :output (format "%s" (calibredb-complete-file-quote "Convert as"))
