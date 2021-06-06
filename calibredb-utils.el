@@ -113,7 +113,20 @@ Argument FILEPATH is the file path."
            (filename (file-name-base filepath))
            (ext (s-split "," (file-name-extension filepath)))
            (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
-      (completing-read "Select a format: " files))))
+      (if calibredb-preferred-format
+          (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files)
+        (completing-read "Select a format: " files)))))
+
+(defun calibredb-car-filepath (filepath)
+  (if (file-exists-p filepath)
+      filepath
+    (let* ((parent (file-name-directory filepath))
+           (filename (file-name-base filepath))
+           (ext (s-split "," (file-name-extension filepath)))
+           (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
+      (if calibredb-preferred-format
+          (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files)
+        (car files)))))
 
 (defun calibredb-insert-image (path alt width height)
   "TODO: Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
@@ -139,42 +152,54 @@ Argument FILEPATH is the file path."
           (insert-image image)
         (insert alt))))))
 
-(defun calibredb-find-file (&optional candidate)
+(defun calibredb-find-file (arg &optional candidate)
   "Open file of the selected item.
+If the universal prefix argument is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive)
+  (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
+  (find-file (if arg
+                 (let ((calibredb-preferred-format nil))
+                   (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
+               (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
 
-(defun calibredb-find-file-other-frame (&optional candidate)
+(defun calibredb-find-file-other-frame (arg &optional candidate)
   "Open file in other frame of the selected item.
+If the universal prefix argument is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive)
+  (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file-other-frame (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
+  (find-file-other-frame (if arg
+                             (let ((calibredb-preferred-format nil))
+                               (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
+                             (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
 
 (defun calibredb-open-file-with-default-tool (arg &optional candidate)
   "Open file with the system default tool.
-If the universal prefix argument is used then open the folder
-containing the current file by the default explorer.
+If the universal prefix argument is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (if arg
-      (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)) ))
+      (let ((calibredb-preferred-format nil))
+        (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
     (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
 
-(defun calibredb-quick-look (&optional candidate)
+(defun calibredb-quick-look (arg &optional candidate)
   "Quick the file with the qlmanage, but it only Support macOS.
+If the universal prefix argument is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive)
+  (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (let ((file (shell-quote-argument
-               (expand-file-name (calibredb-read-filepath (calibredb-getattr candidate :file-path))))))
+               (expand-file-name (if arg
+                                     (let ((calibredb-preferred-format nil))
+                                       (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
+                                   (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))))
     (if (eq system-type 'darwin)
         (call-process-shell-command (concat "qlmanage -p " file) nil 0)
       (message "This feature only supports macOS."))))
@@ -212,19 +237,23 @@ Optional argument CANDIDATE is candidate to read."
                       (insert (format "[[file:%s][%s]]" capture-path capture-title))
                       (buffer-string))))
 
-(defun calibredb-open-dired (&optional candidate)
+(defun calibredb-open-dired (arg &optional candidate)
   "Open dired of the selected item.
+If the universal prefix argument is used then open the folder
+containing the current file by the default explorer.
 Optional argument CANDIDATE is the selected item.
 Opens a dired buffer in FILE's directory.  If FILE is a
 directory, open this directory."
-  (interactive)
+  (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (let ((file (calibredb-getattr candidate :file-path)))
-    (if (file-directory-p file)
-        (dired file)
-      (dired (file-name-directory file))
-      (dired-goto-file file))))
+  (if arg
+      (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)) ))
+    (let ((file (calibredb-getattr candidate :file-path)))
+      (if (file-directory-p file)
+          (dired file)
+        (dired (file-name-directory file))
+        (dired-goto-file file)))))
 
 (defun calibredb-add (arg)
   "Add file(s) into calibredb.

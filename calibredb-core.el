@@ -101,6 +101,11 @@ nil: Prompt delete or not."
   :type 'boolean
   :group 'calibredb)
 
+(defcustom calibredb-preferred-format nil
+  "Set to your preferred book format."
+  :type 'string
+  :group 'calibredb)
+
 (defcustom calibredb-library-alist `((,calibredb-root-dir))
   "Alist for all your calibre libraries."
   :type 'alist
@@ -737,14 +742,14 @@ Argument BOOK-ALIST ."
        "%s%s%s %s %s %s (%s) %s %s %s")
      (cond (calibredb-format-all-the-icons
             (concat (if (fboundp 'all-the-icons-icon-for-file)
-                        (all-the-icons-icon-for-file (calibredb-getattr (list book-alist) :file-path)) "")
+                        (all-the-icons-icon-for-file (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) )) "")
                     " "))
            (calibredb-format-icons-in-terminal
             (concat (if (fboundp 'icons-in-terminal-icon-for-file)
-                        (icons-in-terminal-icon-for-file (calibredb-getattr (list book-alist) :file-path) :v-adjust 0 :height 1) "")
+                        (icons-in-terminal-icon-for-file (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) ) :v-adjust 0 :height 1) "")
                     " "))
            (calibredb-format-character-icons
-            (concat (calibredb-attach-icon-for (calibredb-getattr (list book-alist) :file-path)) " "))
+            (concat (calibredb-attach-icon-for (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) )) " "))
            (t ""))
      (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face 'id id)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
