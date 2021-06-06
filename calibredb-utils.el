@@ -125,7 +125,7 @@ Argument FILEPATH is the file path."
            (ext (s-split "," (file-name-extension filepath)))
            (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
       (if calibredb-preferred-format
-          (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files)
+          (or (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files) (car files))
         (car files)))))
 
 (defun calibredb-insert-image (path alt width height)
