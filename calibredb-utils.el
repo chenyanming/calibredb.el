@@ -142,30 +142,29 @@ Argument FILEPATH is the file path."
                           :max-width width
                           :max-height height))
            ((s-contains? "http" path)
-            ;; (let ((url-request-method "GET")
-            ;;       (url-request-extra-headers
-            ;;        `(("Content-Type" . "application/xml")
-            ;;          ("Authorization" . ,(concat "Basic "
-            ;;                                      (base64-encode-string
-            ;;                                       (concat opds-account ":" opds-password))))))
-            ;;       (url-automatic-caching t)
-            ;;       (filename (url-cache-create-filename path)))
-            ;;   (if (not (url-is-cached path))
-            ;;       (with-current-buffer (url-retrieve-synchronously path)
-            ;;         (goto-char (point-min))
-            ;;         (search-forward "\n\n")
-            ;;         (write-region (point) (point-max) filename)) )
-            ;;   (message filename)
-            ;;   (or (create-image filename nil nil :width width :height nil)
-            ;;       (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-            ;;                     :ascent 100
-            ;;                     :max-width width
-            ;;                     :max-height height)))
-            (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-                          :ascent 100
-                          :max-width width
-                          :max-height height)
-            )
+            (let* ((library (-first (lambda (lib)
+                                     (s-contains? (file-name-directory (car lib)) path))
+                                   calibredb-library-alist))
+                  (url-request-method "GET")
+                  (url-request-extra-headers
+                   `(("Content-Type" . "application/xml")
+                     ,(if (and (nth 1 library) (nth 2 library))
+                         `("Authorization" . ,(concat "Basic "
+                                                    (base64-encode-string
+                                                     (concat (nth 1 library) ":" (nth 2 library))))))))
+                  (url-automatic-caching t)
+                  (filename (url-cache-create-filename path)))
+              (if (not (url-is-cached path))
+                  (with-current-buffer (url-retrieve-synchronously path)
+                    (goto-char (point-min))
+                    (search-forward "\n\n")
+                    (write-region (point) (point-max) filename)) )
+              (message filename)
+              (or (create-image filename nil nil :width width :height nil)
+                  (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
+                                :ascent 100
+                                :max-width width
+                                :max-height height))))
            (t (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
                          :ascent 100
                          :max-width width
