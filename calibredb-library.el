@@ -62,6 +62,7 @@ selecting the new item."
           (let ((library (-first (lambda (lib)
                                    (s-contains? (file-name-directory (car lib)) result))
                                  calibredb-library-alist)))
+            (setq calibredb-root-dir (car library))
             (calibredb-opds-request-page result (nth 1 library) (nth 2 library)))
         (message "INVALID LIBRARY")))))
 
