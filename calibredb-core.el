@@ -32,6 +32,8 @@
 (require 'dired)
 (require 'thingatpt)
 (require 'pcase)
+(require 'mailcap)
+
 (ignore-errors
   (require 'helm)
   (require 'ivy)

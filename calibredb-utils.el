@@ -107,7 +107,7 @@ Argument FILEPATH is the file path."
         (t (message "unknown system!?"))))
 
 (defun calibredb-read-filepath (filepath)
-  (if (file-exists-p filepath)
+  (if (or (file-exists-p filepath) (s-contains? "http" filepath))
       filepath
     (let* ((parent (file-name-directory filepath))
            (filename (file-name-base filepath))
@@ -118,7 +118,7 @@ Argument FILEPATH is the file path."
         (completing-read "Select a format: " files)))))
 
 (defun calibredb-car-filepath (filepath)
-  (if (file-exists-p filepath)
+  (if (or (file-exists-p filepath) (s-contains? "http" filepath))
       filepath
     (let* ((parent (file-name-directory filepath))
            (filename (file-name-base filepath))
@@ -136,15 +136,40 @@ Argument FILEPATH is the file path."
    ;; TODO: add native resizing support once it's official
    ((fboundp 'imagemagick-types)
     (insert-image
-     (if (file-exists-p path)
-         (create-image path 'imagemagick nil
-                       :ascent 100
-                       :max-width width
-                       :max-height height)
-       (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-                     :ascent 100
-                     :max-width width
-                     :max-height height))))
+     (cond ((file-exists-p path)
+            (create-image path 'imagemagick nil
+                          :ascent 100
+                          :max-width width
+                          :max-height height))
+           ((s-contains? "http" path)
+            ;; (let ((url-request-method "GET")
+            ;;       (url-request-extra-headers
+            ;;        `(("Content-Type" . "application/xml")
+            ;;          ("Authorization" . ,(concat "Basic "
+            ;;                                      (base64-encode-string
+            ;;                                       (concat opds-account ":" opds-password))))))
+            ;;       (url-automatic-caching t)
+            ;;       (filename (url-cache-create-filename path)))
+            ;;   (if (not (url-is-cached path))
+            ;;       (with-current-buffer (url-retrieve-synchronously path)
+            ;;         (goto-char (point-min))
+            ;;         (search-forward "\n\n")
+            ;;         (write-region (point) (point-max) filename)) )
+            ;;   (message filename)
+            ;;   (or (create-image filename nil nil :width width :height nil)
+            ;;       (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
+            ;;                     :ascent 100
+            ;;                     :max-width width
+            ;;                     :max-height height)))
+            (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
+                          :ascent 100
+                          :max-width width
+                          :max-height height)
+            )
+           (t (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
+                         :ascent 100
+                         :max-width width
+                         :max-height height) ))))
    (t
     ;; emacs 27.1
     (let ((image (ignore-errors (create-image path nil nil :width width :height nil))))
@@ -159,10 +184,23 @@ Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file (if arg
-                 (let ((calibredb-preferred-format nil))
-                   (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
-               (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+  (let ((file (if arg
+                  (let ((calibredb-preferred-format nil))
+                    (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
+                (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+    (if (s-contains? "http" file)
+        (let ((url (calibredb-getattr candidate :file-path))
+              (title (calibredb-getattr candidate :book-title))
+              (type (calibredb-getattr candidate :book-format)))
+          (message url)
+          (message type)
+          (let ((library (-first (lambda (lib)
+                                   (s-contains? (file-name-directory (car lib)) url))
+                                 calibredb-library-alist)))
+            (if (calibredb-opds-mailcap-mime-to-extn type)
+                (calibredb-opds-download title url (calibredb-opds-mailcap-mime-to-extn type) (nth 1 library) (nth 2 library))
+              (calibredb-opds-request-page url (nth 1 library) (nth 2 library)))))
+      (find-file file))))
 
 (defun calibredb-find-file-other-frame (arg &optional candidate)
   "Open file in other frame of the selected item.

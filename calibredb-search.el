@@ -218,7 +218,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (pubdate (calibredb-getattr entry :book-pubdate))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new entry through SQL query
          (file (calibredb-getattr entry :file-path))
-         (cover (concat (file-name-directory file) "cover.jpg"))
+         (cover (or (calibredb-getattr entry :book-cover) (concat (file-name-directory file) "cover.jpg") ))
          (format (calibredb-getattr entry :book-format))
          (size (calibredb-getattr entry :size))
          (ids (calibredb-getattr entry :ids))
@@ -255,9 +255,11 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
                                                     (propertize ext
                                                                 'face 'calibredb-format-face
                                                                 'mouse-face 'calibredb-mouse-face
-                                                                'help-echo (expand-file-name
-                                                                            (concat (file-name-base file) "." ext)
-                                                                            (file-name-directory file))
+                                                                'help-echo (if (s-contains? "http" file)
+                                                                               file
+                                                                             (expand-file-name
+                                                                              (concat (file-name-base file) "." ext)
+                                                                              (file-name-directory file)) )
                                                                 'keymap file-map)) (s-split "," format)) ", ")))
         (insert (format "Size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
         (cond ((equal calibredb-entry-render-comments "face")
@@ -392,7 +394,9 @@ Indicating the library you use."
       (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date)))
   (if (boundp 'ivy-alt-done-functions-alist)
       (add-to-list 'ivy-alt-done-functions-alist '(calibredb-add . ivy--directory-done)))
-  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
+  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup)
+  (add-to-list 'mailcap-mime-extensions '(".epub" . "application/epub+zip"))
+  (add-to-list 'mailcap-mime-extensions '(".mobi" . "application/x-mobipocket-ebook")))
 
 (defun calibredb-search-mouse (event)
   "Visit the calibredb-entry click on.
@@ -870,8 +874,9 @@ ARGUMENT FILTER is the filter string."
                         (t 0 )))
              (file (calibredb-getattr (cdr entry) :file-path))
              (format (calibredb-getattr (cdr entry) :book-format))
+             ;; (cover (or (calibredb-getattr (cdr entry) :book-cover) (concat (file-name-directory file) "cover.jpg") ))
              (cover (concat (file-name-directory file) "cover.jpg")))
-          (if (image-type-available-p (intern format))
+        (if (and (image-type-available-p (intern format)) (not (s-contains? "http" cover)))
               (progn
                 (insert "\n")
                 (insert (make-string num ? ))
