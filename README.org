@@ -470,7 +470,7 @@ If you want to search by one type of metadata, for example, by tag, please check
 #+html: <a href="#how-to-do-group-filtering">How to do group filtering?</a>.
 
 ** How to do group filtering?
-Press ~f~, then press
+Press ~g~, then press
 - t: fitler by tag
 - f: filter by format
 - a: filter by author
@@ -479,10 +479,10 @@ Press ~f~, then press
 - L: filter by library
 - r: reset (clearing the search filter)
 
-For example, after pressing ~f t~ then select any tags, group filter for tag is
+For example, after pressing ~g t~ then select any tags, group filter for tag is
 enabled. In this case, minibuffer shows ~Filter (tag)~, if you press ~/~, it only search in tag.
 
-If you press ~g r~ or ~f r~, you can switch back to live filtering, and minibuffer will show ~Filter (live)~.
+If you press ~g r~, you can switch back to live filtering, and minibuffer will show ~Filter (live)~.
 
 ** How to do quick group filtering?
 - Click the =calibredb-favorite-icon=, authors, file format, and tags.
