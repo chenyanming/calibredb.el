@@ -41,7 +41,7 @@
     ("d" "Remove a file"   calibredb-remove)
     ("e" "Export" calibredb-export-dispatch)
     ("s" "set_metadata"   calibredb-set-metadata-dispatch)
-    ("f" "filter"   calibredb-filter-dispatch)
+    ("g" "filter"   calibredb-filter-dispatch)
     ("o" "sort"   calibredb-sort-dispatch)]
    [("RET" "Open file"         calibredb-find-file)
     ("O" "Open file other frame"            calibredb-find-file-other-frame)
