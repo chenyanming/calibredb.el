@@ -96,7 +96,7 @@
                   (:id                     ,(number-to-string no))
                   (:author-sort            ,(dom-text (esxml-query "author>name" entry)))
                   (:book-dir               "")
-                  (:book-cover             ,(let ((url (dom-attr (esxml-query "[type^=image]" entry) 'href)))
+                  (:book-cover             ,(let ((url (or (dom-attr (esxml-query "[type^=image]" entry) 'href) "")))
                                               (if (and (stringp url) (s-contains? "http" url))
                                                   url
                                                   (format "%s%s" (calibredb-opds-host) url))))
