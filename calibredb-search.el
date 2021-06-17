@@ -866,23 +866,13 @@ ARGUMENT FILTER is the filter string."
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
   (if (and calibredb-detial-view calibredb-detial-view-image-show)
-      (let* ((num (cond (calibredb-format-all-the-icons 3)
-                        (calibredb-format-icons-in-terminal 3)
-                        ((>= calibredb-id-width 0) calibredb-id-width)
-                        (t 0 )))
-             (file (calibredb-getattr (cdr entry) :file-path))
-             (format (calibredb-getattr (cdr entry) :book-format))
-             ;; (cover (or (calibredb-getattr (cdr entry) :book-cover) (concat (file-name-directory file) "cover.jpg") ))
-             (cover (concat (file-name-directory file) "cover.jpg")))
-        (if (and (image-type-available-p (intern format)) (not (s-contains? "http" cover)))
-              (progn
-                (insert "\n")
-                (insert (make-string num ? ))
-                (calibredb-insert-image file "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))
-            (progn
-              (insert "\n")
-              (insert (make-string num ? ))
-              (calibredb-insert-image cover "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))))
+      (let ((num (cond (calibredb-format-all-the-icons 3)
+                       (calibredb-format-icons-in-terminal 3)
+                       ((>= calibredb-id-width 0) calibredb-id-width)
+                       (t 0 ))))
+        (insert "\n")
+        (insert (make-string num ? ))
+        (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))
 
 (defun calibredb-toggle-view-at-point ()
   "Toggle between detail view or compact view in *calibredb-search* buffer at point."
