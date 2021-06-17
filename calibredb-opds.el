@@ -128,12 +128,12 @@
                   (:last_modified          ,(dom-text (esxml-query "updated" entry))))) )
         entries))) )))
 
-(defun calibredb-opds-search ()
+(defun calibredb-opds-search (&optional url)
   (interactive)
-  (let* ((result (completing-read "Search library: " calibredb-library-alist) )
+  (let* ((url (or url (completing-read "Search library: " calibredb-library-alist)))
          (library (-first (lambda (lib)
-                            (s-contains? (file-name-directory (car lib)) result))
+                            (s-contains? (file-name-directory (car lib)) url))
                           calibredb-library-alist)))
-    (calibredb-opds-request-page (format "%s/search\?query=%s" result  (read-string "Search: ")) (nth 1 library) (nth 2 library))))
+    (calibredb-opds-request-page (format "%s/search\?query=%s" url  (read-string "Search: ")) (nth 1 library) (nth 2 library))))
 
 (provide 'calibredb-opds)
