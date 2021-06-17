@@ -40,6 +40,7 @@
 
 (defun calibredb-opds-request-page (url &optional account password)
   (require 'request)
+  (message "Loading %s..." url)
   (let (output)
     (setq calibredb-opds-root-url url)
     (request url
@@ -50,7 +51,7 @@
                       `("Authorization" . ,(concat "Basic "
                                                    (base64-encode-string
                                                     (concat account ":" password))))))
-      :sync t
+      :sync nil
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
                   (let* ((dom (with-temp-buffer
@@ -65,6 +66,7 @@
                     (setq calibredb-date-filter-p nil)
                     (setq calibredb-format-filter-p nil)
                     (calibredb-search-keyword-filter "")
+                    (message "")
                     ;; (setq output (opds-page dom))
                     ))))
     output))
@@ -107,7 +109,7 @@
                                                   url
                                                   (format "%s%s" (calibredb-opds-host) url))))
                   (:book-name              "")
-                  (:book-format            ,(dom-attr (esxml-query "[type^=application]" entry) 'type))
+                  (:book-format            ,(or (dom-attr (esxml-query "[type^=application]" entry) 'type) ""))
                   (:book-pubdate           "")
                   (:book-title             ,(dom-text (esxml-query "title" entry)))
                   (:file-path              ,(let ((url (dom-attr (esxml-query "[type^=application]" entry) 'href)))
