@@ -1016,7 +1016,7 @@ ARGUMENT FILTER is the filter string."
      (with-temp-buffer
        (dolist (cand candidates)
          (let ((id (calibredb-getattr cand :id))
-               (path (calibredb-read-filepath (calibredb-getattr cand :file-path) ))
+               (path (calibredb-get-file-path cand t))
                (title (calibredb-getattr cand :book-title)))
            (insert (format "[[file:%s][%s %s - %s]]\n"
                            path

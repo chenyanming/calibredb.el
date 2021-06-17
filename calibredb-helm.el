@@ -59,9 +59,9 @@
                                        (unless (featurep 'org)
                                          (require 'org))
                                        (if (fboundp 'org-insert-link)
-                                           (org-insert-link nil (calibredb-read-filepath (calibredb-getattr candidate :file-path)) (calibredb-getattr candidate :book-title))))
+                                           (org-insert-link nil (calibredb-get-file-path candidate t) (calibredb-getattr candidate :book-title))))
        "Mail Add attachment"         (lambda (candidate)
-                                       (mail-add-attachment (calibredb-read-filepath (calibredb-getattr candidate :file-path))))))
+                                       (mail-add-attachment (calibredb-get-file-path candidate t)))))
   "Default actions for calibredb helm."
   :group 'calibredb
   :type '(alist :key-type string :value-type function))

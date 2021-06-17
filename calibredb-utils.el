@@ -106,27 +106,32 @@ Argument FILEPATH is the file path."
                         "open" (expand-file-name filepath)))
         (t (message "unknown system!?"))))
 
-(defun calibredb-read-filepath (filepath)
-  (if (or (file-exists-p filepath) (s-contains? "http" filepath))
-      filepath
-    (let* ((parent (file-name-directory filepath))
-           (filename (file-name-base filepath))
-           (ext (s-split "," (file-name-extension filepath)))
-           (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
-      (if calibredb-preferred-format
-          (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files)
-        (completing-read "Select a format: " files)))))
+(defun calibredb-get-file-path (entry &optional prompt)
+  "Get file path from a valid candidate ENTRY."
+  (let ((file-path (calibredb-getattr entry :file-path)))
+    (cond ((file-exists-p file-path) file-path) ; default file-path is a valid file
+          ((calibredb-local-file-exists-p entry) (calibredb-local-file entry)) ; valid local file is found
+          ((s-contains? "http" file-path) file-path) ; for http link, just return
+          (t (if (s-contains? "," (file-name-extension file-path)) ; try to split the extension (for example, it may be epub,pdf) and return the first format
+                 (let* ((parent (file-name-directory file-path))
+                        (filename (file-name-base file-path))
+                        (ext (s-split "," (file-name-extension file-path)))
+                        (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
+                   (if calibredb-preferred-format
+                       (or (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files) (car files))
+                     (if prompt
+                         (completing-read "Select a format: " files)
+                       (car files))))
+               file-path)))))           ; if extension does not have comma, at last just retrun it.
 
-(defun calibredb-car-filepath (filepath)
-  (if (or (file-exists-p filepath) (s-contains? "http" filepath))
-      filepath
-    (let* ((parent (file-name-directory filepath))
-           (filename (file-name-base filepath))
-           (ext (s-split "," (file-name-extension filepath)))
-           (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
-      (if calibredb-preferred-format
-          (or (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files) (car files))
-        (car files)))))
+(defun calibredb-local-file (entry)
+  (let* ((book-title (calibredb-getattr entry :book-title))
+         (book-format (calibredb-getattr entry :book-format))
+         (local-file (expand-file-name (format "%s%s" book-title (calibredb-opds-mailcap-mime-to-extn book-format)) calibredb-opds-download-dir)))
+    local-file))
+
+(defun calibredb-local-file-exists-p (entry)
+  (file-exists-p (calibredb-local-file entry)))
 
 (defun calibredb-insert-image (path alt width height)
   "TODO: Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
@@ -143,17 +148,17 @@ Argument FILEPATH is the file path."
                           :max-height height))
            ((s-contains? "http" path)
             (let* ((library (-first (lambda (lib)
-                                     (s-contains? (file-name-directory (car lib)) path))
-                                   calibredb-library-alist))
-                  (url-request-method "GET")
-                  (url-request-extra-headers
-                   `(("Content-Type" . "application/xml")
-                     ,(if (and (nth 1 library) (nth 2 library))
-                         `("Authorization" . ,(concat "Basic "
-                                                    (base64-encode-string
-                                                     (concat (nth 1 library) ":" (nth 2 library))))))))
-                  (url-automatic-caching t)
-                  (filename (url-cache-create-filename path)))
+                                      (s-contains? (file-name-directory (car lib)) path))
+                                    calibredb-library-alist))
+                   (url-request-method "GET")
+                   (url-request-extra-headers
+                    `(("Content-Type" . "application/xml")
+                      ,(if (and (nth 1 library) (nth 2 library))
+                           `("Authorization" . ,(concat "Basic "
+                                                        (base64-encode-string
+                                                         (concat (nth 1 library) ":" (nth 2 library))))))))
+                   (url-automatic-caching t)
+                   (filename (url-cache-create-filename path)))
               (if (not (url-is-cached path))
                   (with-current-buffer (url-retrieve-synchronously path)
                     (goto-char (point-min))
@@ -166,9 +171,9 @@ Argument FILEPATH is the file path."
                                 :max-width width
                                 :max-height height))))
            (t (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-                         :ascent 100
-                         :max-width width
-                         :max-height height) ))))
+                            :ascent 100
+                            :max-width width
+                            :max-height height) ))))
    (t
     ;; emacs 27.1
     (let ((image (ignore-errors (create-image path nil nil :width width :height nil))))
@@ -185,8 +190,8 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (let ((file (if arg
                   (let ((calibredb-preferred-format nil))
-                    (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
-                (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+                    (calibredb-get-file-path candidate t))
+                (calibredb-get-file-path candidate t))))
     (if (s-contains? "http" file)
         (let ((url (calibredb-getattr candidate :file-path))
               (title (calibredb-getattr candidate :book-title))
@@ -210,8 +215,8 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (find-file-other-frame (if arg
                              (let ((calibredb-preferred-format nil))
-                               (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
-                             (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+                               (calibredb-get-file-path candidate t))
+                             (calibredb-get-file-path candidate t))))
 
 (defun calibredb-open-file-with-default-tool (arg &optional candidate)
   "Open file with the system default tool.
@@ -222,8 +227,8 @@ Optional argument CANDIDATE is the selected item."
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (if arg
       (let ((calibredb-preferred-format nil))
-        (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
-    (calibredb-open-with-default-tool (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))
+        (calibredb-open-with-default-tool (calibredb-get-file-path candidate t)))
+    (calibredb-open-with-default-tool (calibredb-get-file-path candidate t))))
 
 (defun calibredb-quick-look (arg &optional candidate)
   "Quick the file with the qlmanage, but it only Support macOS.
@@ -235,8 +240,8 @@ Optional argument CANDIDATE is the selected item."
   (let ((file (shell-quote-argument
                (expand-file-name (if arg
                                      (let ((calibredb-preferred-format nil))
-                                       (calibredb-read-filepath (calibredb-getattr candidate :file-path)))
-                                   (calibredb-read-filepath (calibredb-getattr candidate :file-path)))))))
+                                       (calibredb-get-file-path candidate t))
+                                   (calibredb-get-file-path candidate t))))))
     (if (eq system-type 'darwin)
         (call-process-shell-command (concat "qlmanage -p " file) nil 0)
       (message "This feature only supports macOS."))))
@@ -266,7 +271,7 @@ Optional argument CANDIDATE is candidate to read."
         (unless candidates
           (setq candidates (calibredb-find-candidate-at-point)))
         (dolist (cand candidates)
-          (let ((path (calibredb-read-filepath (calibredb-getattr cand :file-path)))
+          (let ((path (calibredb-get-file-path cand t))
                 (title (calibredb-getattr cand :book-title)))
             (setq capture-path path)
             (setq capture-title title)))))
@@ -285,7 +290,7 @@ directory, open this directory."
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
   (if arg
-      (calibredb-open-with-default-tool (file-name-directory (calibredb-read-filepath (calibredb-getattr candidate :file-path)) ))
+      (calibredb-open-with-default-tool (file-name-directory (calibredb-get-file-path candidate t) ))
     (let ((file (calibredb-getattr candidate :file-path)))
       (if (file-directory-p file)
           (dired file)
@@ -927,7 +932,7 @@ With universal ARG \\[universal-argument] use title as initial value."
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let (;; (id (calibredb-getattr candidate :id))
-        (file (calibredb-read-filepath (calibredb-getattr candidate :file-path))))
+        (file (calibredb-get-file-path candidate t)))
     (calibredb-convert-process
      :input file
      :output (format "%s" (calibredb-complete-file-quote "Convert as"))

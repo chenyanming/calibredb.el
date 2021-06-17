@@ -50,7 +50,7 @@
                       `("Authorization" . ,(concat "Basic "
                                                    (base64-encode-string
                                                     (concat account ":" password))))))
-      :sync nil
+      :sync t
       :success (cl-function
                 (lambda (&key data &allow-other-keys)
                   (let* ((dom (with-temp-buffer
