@@ -678,7 +678,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
          (pubdate (cdr (assoc "Published" metadata)))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new metadata through SQL query
          ;; (cover (format "/tmp/%s.jpg" source))
-         (cover (concat (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path)) "cover.jpg"))
+         (cover (calibredb-get-cover (car (calibredb-find-candidate-at-point))))
          ;; (format (calibredb-getattr metadata :book-format))
          (original (point))
          beg end)
@@ -795,9 +795,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
   "Select and set cover."
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
     (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
-  (let ((original (concat
-                   (file-name-directory (calibredb-getattr (car (calibredb-find-candidate-at-point)) :file-path))
-                   "cover.jpg")))
+  (let ((original (calibredb-get-cover (car (calibredb-find-candidate-at-point)) :file-path)))
     (if (and (file-exists-p original) (file-exists-p "/tmp/cover.jpg"))
         (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
                (fetched "/tmp/cover.jpg"))
