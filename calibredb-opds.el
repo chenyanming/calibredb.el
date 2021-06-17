@@ -85,7 +85,13 @@
                (find-file file))))))))
 
 (defun calibredb-opds-dom (dom)
-  (let ((entries (esxml-query-all "feed>entry" dom)))
+  (let ((entries (-concat
+                  (-map (lambda (link)
+                          `(entry nil
+                                  (title nil ,(esxml-node-attribute 'rel link))
+                                  ,link))
+                        (esxml-query-all "feed>link" dom))
+                  (esxml-query-all "feed>entry" dom))))
     (nreverse (calibredb-getbooklist
      (let ((no 0))
        (-mapcat
