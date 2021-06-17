@@ -125,55 +125,58 @@ Argument FILEPATH is the file path."
                file-path)))))           ; if extension does not have comma, at last just retrun it.
 
 (defun calibredb-local-file (entry)
+  "Get the local book file based on ENTRY."
   (let* ((book-title (calibredb-getattr entry :book-title))
          (book-format (calibredb-getattr entry :book-format))
          (local-file (expand-file-name (format "%s%s" book-title (calibredb-opds-mailcap-mime-to-extn book-format)) calibredb-opds-download-dir)))
     local-file))
 
 (defun calibredb-local-file-exists-p (entry)
+  "Check local book file exists or not based on ENTRY."
   (file-exists-p (calibredb-local-file entry)))
 
+(defun calibredb-get-cover (entry)
+  "Get cover path based on ENTRY.
+Download it if book-cover is non-nil."
+  (let ((file-path (calibredb-getattr entry :file-path))
+        (book-format (calibredb-getattr entry :book-format))
+        (book-cover (calibredb-getattr entry :book-cover)))
+    (message book-cover)
+    (cond ((image-type-available-p (intern book-format)) file-path) ; the file is an image
+          ((file-exists-p (concat (file-name-directory file-path) "cover.jpg"))
+           (concat (file-name-directory file-path) "cover.jpg")) ; cover.jpg exists
+          (book-cover                   ; use the book-cover filed, it maybe a link or nil
+           (let* ((library (-first (lambda (lib)
+                                     (s-contains? (file-name-directory (car lib)) book-cover))
+                                   calibredb-library-alist))
+                  (url-request-method "GET")
+                  (url-request-extra-headers
+                   `(("Content-Type" . "application/xml")
+                     ,(if (and (nth 1 library) (nth 2 library))
+                          `("Authorization" . ,(concat "Basic "
+                                                       (base64-encode-string
+                                                        (concat (nth 1 library) ":" (nth 2 library))))))))
+                  (url-automatic-caching t)
+                  (filename (url-cache-create-filename book-cover)))
+             (if (not (url-is-cached book-cover))
+                 (with-current-buffer (url-retrieve-synchronously book-cover)
+                   (goto-char (point-min))
+                   (search-forward "\n\n")
+                   (write-region (point) (point-max) filename)))
+             filename))
+          (t (expand-file-name "cover.jpg" calibredb-images-path))))) ;return the default image
+
 (defun calibredb-insert-image (path alt width height)
-  "TODO: Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
+  "Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."
   (cond
    ((not (display-graphic-p))
     (insert alt))
-   ;; TODO: add native resizing support once it's official
    ((fboundp 'imagemagick-types)
     (insert-image
-     (cond ((file-exists-p path)
-            (create-image path 'imagemagick nil
-                          :ascent 100
-                          :max-width width
-                          :max-height height))
-           ((s-contains? "http" path)
-            (let* ((library (-first (lambda (lib)
-                                      (s-contains? (file-name-directory (car lib)) path))
-                                    calibredb-library-alist))
-                   (url-request-method "GET")
-                   (url-request-extra-headers
-                    `(("Content-Type" . "application/xml")
-                      ,(if (and (nth 1 library) (nth 2 library))
-                           `("Authorization" . ,(concat "Basic "
-                                                        (base64-encode-string
-                                                         (concat (nth 1 library) ":" (nth 2 library))))))))
-                   (url-automatic-caching t)
-                   (filename (url-cache-create-filename path)))
-              (if (not (url-is-cached path))
-                  (with-current-buffer (url-retrieve-synchronously path)
-                    (goto-char (point-min))
-                    (search-forward "\n\n")
-                    (write-region (point) (point-max) filename)) )
-              (message filename)
-              (or (create-image filename nil nil :width width :height nil)
-                  (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-                                :ascent 100
-                                :max-width width
-                                :max-height height))))
-           (t (create-image (expand-file-name "cover.jpg" calibredb-images-path) 'imagemagick nil
-                            :ascent 100
-                            :max-width width
-                            :max-height height) ))))
+     (create-image path 'imagemagick nil
+                   :ascent 100
+                   :max-width width
+                   :max-height height)))
    (t
     ;; emacs 27.1
     (let ((image (ignore-errors (create-image path nil nil :width width :height nil))))

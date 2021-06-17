@@ -281,9 +281,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
               (t
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))))
         (insert "\n")
-        (if (image-type-available-p (intern format))
-            (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
-          (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height))
+        (calibredb-insert-image (calibredb-get-cover entry) "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
         ;; (setq end (point))
         (calibredb-show-mode)
         (setq calibredb-show-entry entry)
