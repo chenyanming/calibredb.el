@@ -141,21 +141,33 @@ Download it if book-cover is non-nil."
   (let ((file-path (calibredb-getattr entry :file-path))
         (book-format (calibredb-getattr entry :book-format))
         (book-cover (calibredb-getattr entry :book-cover)))
-    (message book-cover)
+    (pp book-cover)
     (cond ((image-type-available-p (intern book-format)) file-path) ; the file is an image
           ((file-exists-p (concat (file-name-directory file-path) "cover.jpg"))
            (concat (file-name-directory file-path) "cover.jpg")) ; cover.jpg exists
-          (book-cover                   ; use the book-cover filed, it maybe a link or nil
+          ((not book-cover)                                      ; book-cover is nil, use default cover
+           (expand-file-name "cover.jpg" calibredb-images-path))
+          ((s-contains? "base64" book-cover)
+           (if (string-match "data:image/\\(.*\\);base64,\\(.*\\)" book-cover)
+               (let ((cover (expand-file-name (format "cover.%s" (match-string 1 book-cover)) temporary-file-directory)))
+                 (with-current-buffer (generate-new-buffer " *temp*")
+                   (insert (base64-decode-string (match-string 2 book-cover)))
+                   (write-region (point-min) (point-max) cover))
+                 cover)
+             (expand-file-name "cover.jpg" calibredb-images-path))) ; TODO: handle base64 cover images
+          ((not (s-contains? "base64" book-cover))
            (let* ((library (-first (lambda (lib)
                                      (s-contains? (file-name-directory (car lib)) book-cover))
                                    calibredb-library-alist))
                   (url-request-method "GET")
+                  (url-user-agent "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
                   (url-request-extra-headers
-                   `(("Content-Type" . "application/xml")
-                     ,(if (and (nth 1 library) (nth 2 library))
-                          `("Authorization" . ,(concat "Basic "
+                   `,(if (and (nth 1 library) (nth 2 library))
+                         `(("Content-Type" . "application/xml")
+                           ("Authorization" . ,(concat "Basic "
                                                        (base64-encode-string
-                                                        (concat (nth 1 library) ":" (nth 2 library))))))))
+                                                        (concat (nth 1 library) ":" (nth 2 library))))))
+                      '(("Content-Type" . "application/xml"))))
                   (url-automatic-caching t)
                   (filename (url-cache-create-filename book-cover)))
              (if (not (url-is-cached book-cover))

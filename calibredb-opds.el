@@ -107,7 +107,9 @@
                   (:book-cover             ,(let ((url (or (dom-attr (esxml-query "[type^=image]" entry) 'href) "")))
                                               (if (and (stringp url) (s-contains? "http" url))
                                                   url
-                                                  (format "%s%s" (calibredb-opds-host) url))))
+                                                (cond ((s-equals-p "" url) nil) ; no image url, return nil
+                                                      ((s-contains? "base64" url) url) ; base64 image
+                                                      (t (format "%s%s" (calibredb-opds-host) url))))))
                   (:book-name              "")
                   (:book-format            ,(or (dom-attr (esxml-query "[type^=application]" entry) 'type) ""))
                   (:book-pubdate           "")
