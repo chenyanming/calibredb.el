@@ -218,7 +218,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (pubdate (calibredb-getattr entry :book-pubdate))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new entry through SQL query
          (file (calibredb-getattr entry :file-path))
-         (cover (or (calibredb-getattr entry :book-cover) (concat (file-name-directory file) "cover.jpg") ))
+         (cover (calibredb-get-cover entry))
          (format (calibredb-getattr entry :book-format))
          (size (calibredb-getattr entry :size))
          (ids (calibredb-getattr entry :ids))
@@ -281,7 +281,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
               (t
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))))
         (insert "\n")
-        (calibredb-insert-image (calibredb-get-cover entry) "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
+        (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
         ;; (setq end (point))
         (calibredb-show-mode)
         (setq calibredb-show-entry entry)
