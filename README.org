@@ -386,11 +386,7 @@ it in ~calibredb-library-alist~.
                                   ("http://opds.oreilly.com/opds/")
                                   ("https://bookserver.archive.org/catalog/")
                                   ("http://arxiv.maplepop.com/catalog/")
-                                  ("http://www.shucang.org")
                                   ("https://m.gutenberg.org/ebooks.opds/")
-                                  ("http://pragprog.com/magazines")
-                                  ("http://manybooks.net")
-                                  ("http://ebooksgratuits.com.index.php")
                                   ("http://www.feedbooks.com/catalog.atom")))
 #+END_SRC
 Then, in =*calibredb-search*= buffer,

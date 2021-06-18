@@ -2,6 +2,7 @@
 
 (require 'calibredb-core)
 (require 'esxml-query)
+(require 'esxml)
 (require 'dom)
 
 (defvar calibredb-opds-root-url nil)
@@ -102,7 +103,7 @@
           (list `(
                   ;; (:id                     ,(dom-text (esxml-query "id" entry)))
                   (:id                     ,(number-to-string no))
-                  (:author-sort            ,(dom-text (esxml-query "author>name" entry)))
+                  (:author-sort            ,(dom-text (esxml-query "author>name" entry))) ; TODO: support mutitple authors
                   (:book-dir               "")
                   (:book-cover             ,(let ((url (or (dom-attr (esxml-query "[type^=image]" entry) 'href) "")))
                                               (if (and (stringp url) (s-contains? "http" url))
@@ -111,20 +112,30 @@
                                                       ((s-contains? "base64" url) url) ; base64 image
                                                       (t (format "%s%s" (calibredb-opds-host) url))))))
                   (:book-name              "")
-                  (:book-format            ,(or (dom-attr (esxml-query "[type^=application]" entry) 'type) ""))
-                  (:book-pubdate           "")
+                  (:book-format            ,(or (dom-attr (esxml-query "[type^=application]" entry) 'type) "")) ; TODO: support more formats
+                  (:book-pubdate           ,(dom-text (or (esxml-query "issued" entry)
+                                                          (esxml-query "published" entry))))
                   (:book-title             ,(dom-text (esxml-query "title" entry)))
-                  (:file-path              ,(let ((url (dom-attr (esxml-query "[type^=application]" entry) 'href)))
+                  (:file-path              ,(let ((url (or (dom-attr (esxml-query "[type^=application]" entry) 'href) "")))
                                               (if (and (stringp url) (s-contains? "http" url))
                                                   url
-                                                (format "%s%s" (calibredb-opds-host) url))))
+                                                (cond ((s-equals-p "" url) "")
+                                                      ((s-equals-p (s-left 1 url) "/") (format "%s%s" (calibredb-opds-host) url))
+                                                      (t (format "%s/%s" (calibredb-opds-host) url))))))
                   (:tag                    ,(mapconcat #'identity
                                                        (-map (lambda (cat)
-                                                               (esxml-node-attribute 'label cat)) (esxml-query-all "category" entry)) ", "))
+                                                               (or (esxml-node-attribute 'label cat)
+                                                                   (esxml-node-attribute 'term cat))) (esxml-query-all "category" entry)) ", "))
                   (:size                   ,(format "%.2f" (/ (string-to-number (or (dom-attr (esxml-query "[type^=application]" entry) 'length ) "0" ) ) 1048576.0) ))
-                  (:comment                ,(dom-text (esxml-query "summary" entry) ))
-                  (:ids                    "")
-                  (:publisher              ,(dom-text (esxml-query "publisher>name" entry)))
+                  (:comment                ,(cond ((esxml-query "summary" entry)
+                                                   (dom-text (esxml-query "summary" entry)))
+                                                  ((esxml-query "content" entry)
+                                                   (esxml-to-xml (esxml-query "content" entry)))
+                                                  (t "" )))
+                  (:ids                    ,(dom-text (or (esxml-query "identifier" entry)
+                                                          (esxml-query "id" entry))))
+                  (:publisher              ,(dom-text (or (esxml-query "publisher>name" entry)
+                                                          (esxml-query "publisher" entry))))
                   (:series                 "")
                   (:lang_code              ,(dom-text (esxml-query "language" entry)))
                   (:last_modified          ,(dom-text (esxml-query "updated" entry))))) )

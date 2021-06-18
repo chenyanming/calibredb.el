@@ -109,7 +109,8 @@ Argument FILEPATH is the file path."
 (defun calibredb-get-file-path (entry &optional prompt)
   "Get file path from a valid candidate ENTRY."
   (let ((file-path (calibredb-getattr entry :file-path)))
-    (cond ((file-exists-p file-path) file-path) ; default file-path is a valid file
+    (cond ((s-equals? "" file-path) "")                  ; no file-path field
+          ((file-exists-p file-path) file-path) ; default file-path is a valid file
           ((calibredb-local-file-exists-p entry) (calibredb-local-file entry)) ; valid local file is found
           ((s-contains? "http" file-path) file-path) ; for http link, just return
           (t (if (s-contains? "," (file-name-extension file-path)) ; try to split the extension (for example, it may be epub,pdf) and return the first format
@@ -207,21 +208,22 @@ Optional argument CANDIDATE is the selected item."
                   (let ((calibredb-preferred-format nil))
                     (calibredb-get-file-path candidate t))
                 (calibredb-get-file-path candidate t))))
-    (if (s-contains? "http" file)
-        (let ((url (calibredb-getattr candidate :file-path))
-              (title (calibredb-getattr candidate :book-title))
-              (type (calibredb-getattr candidate :book-format)))
-          (if (s-equals-p title "search") ; TODO: Workaround, now it only works with calibre-web
-              (calibredb-opds-search calibredb-root-dir)
-            (message url)
-            (message type)
-            (let ((library (-first (lambda (lib)
-                                     (s-contains? (file-name-directory (car lib)) url))
-                                   calibredb-library-alist)))
-              (if (calibredb-opds-mailcap-mime-to-extn type)
-                  (calibredb-opds-download title url (calibredb-opds-mailcap-mime-to-extn type) (nth 1 library) (nth 2 library))
-                (calibredb-opds-request-page url (nth 1 library) (nth 2 library))))))
-      (find-file file))))
+    (cond ((s-contains? "http" file)
+           (let ((url (calibredb-getattr candidate :file-path))
+                 (title (calibredb-getattr candidate :book-title))
+                 (type (calibredb-getattr candidate :book-format)))
+             (if (s-equals-p title "search") ; TODO: Workaround, now it only works with calibre-web
+                 (calibredb-opds-search calibredb-root-dir)
+               (message url)
+               (message type)
+               (let ((library (-first (lambda (lib)
+                                        (s-contains? (file-name-directory (car lib)) url))
+                                      calibredb-library-alist)))
+                 (if (calibredb-opds-mailcap-mime-to-extn type)
+                     (calibredb-opds-download title url (calibredb-opds-mailcap-mime-to-extn type) (nth 1 library) (nth 2 library))
+                   (calibredb-opds-request-page url (nth 1 library) (nth 2 library)))))) )
+          ((s-equals? "" file) (message "No files."))
+          (t (find-file file)))))
 
 (defun calibredb-find-file-other-frame (arg &optional candidate)
   "Open file in other frame of the selected item.

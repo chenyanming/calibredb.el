@@ -60,7 +60,7 @@ selecting the new item."
           (calibredb-search-refresh-or-resume))
       (if (s-contains? "http" result)
           (let ((library (-first (lambda (lib)
-                                   (s-contains? (file-name-directory (car lib)) result))
+                                   (s-contains? (car lib) result))
                                  calibredb-library-alist)))
             (setq calibredb-root-dir (car library))
             (calibredb-opds-request-page result (nth 1 library) (nth 2 library)))
