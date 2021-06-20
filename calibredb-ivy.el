@@ -71,13 +71,29 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
     (if (s-contains? "Added book ids" output)
         (cond ((string= calibredb-add-delete-original-file "yes")
                (if arg (message "Adding files succeeded, files were kept.")
-                 (delete-file file)))
+                 (calibredb-move-to-trash file)))
               ((string= calibredb-add-delete-original-file "no"))
               (t (unless arg
                    (if (yes-or-no-p
                         (concat "File has been copied to database. Subsequently delete original file? " file))
-                       (delete-file file)))))
+                       (calibredb-move-to-trash file)))))
       (message "Adding book failed, please add it manually."))))
+
+(defun calibredb-move-to-trash (file)
+  "Move the FILE to trash."
+  (let ((delete-by-moving-to-trash t))
+    (pcase system-type
+      ('windows-nt
+       (system-move-file-to-trash file))
+      ('gnu/linux
+       (move-file-to-trash file))
+      ('darwin
+       (let ((trash-directory "~/.Trash"))
+         (cond ((featurep 'osx-trash)
+                (osx-trash-move-file-to-trash file))
+               ((executable-find "trash")
+                (call-process "trash" nil nil nil file))
+               (t (move-file-to-trash file))))))))
 
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
