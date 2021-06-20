@@ -387,7 +387,9 @@ it in ~calibredb-library-alist~.
                                   ("https://bookserver.archive.org/catalog/")
                                   ("http://arxiv.maplepop.com/catalog/")
                                   ("https://m.gutenberg.org/ebooks.opds/")
-                                  ("http://www.feedbooks.com/catalog.atom")))
+                                  ("http://www.feedbooks.com/catalog.atom")
+                                  ("https://tatsu-zine.com/catalogs.opds")
+                                  ("http://aozora.textlive.net/catalog.opds")))
 #+END_SRC
 Then, in =*calibredb-search*= buffer,
  - Press =L= to open the library list and select the library.
