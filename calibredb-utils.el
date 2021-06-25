@@ -424,9 +424,12 @@ Optional argument CANDIDATE is the selected item."
   (interactive)
   (unless candidate
     (setq candidate (car (calibredb-find-candidate-at-point))))
-  (let ((id (calibredb-getattr candidate :id))
-        (format (calibredb-getattr candidate :book-format))
-        (title (calibredb-getattr candidate :book-title)))
+  (let* ((id (calibredb-getattr candidate :id))
+         (formats (s-split "," (calibredb-getattr candidate :book-format)))
+         (title (calibredb-getattr candidate :book-title))
+         (format (if (> (length formats) 1)
+                     (completing-read (concat "Which format you want to delete for id - " id ", title - " title ":") formats)
+                   (car formats))))
     (if (yes-or-no-p (concat "Confirm Delete: id - " id ", title - " title ", format - " format))
         (calibredb-command :command "remove_format"
                            :id (concat id " " format)
@@ -948,12 +951,27 @@ With universal ARG \\[universal-argument] use title as initial value."
     (if (eq major-mode 'calibredb-search-mode)
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let (;; (id (calibredb-getattr candidate :id))
-        (file (calibredb-get-file-path candidate t)))
-    (calibredb-convert-process
-     :input file
-     :output (format "%s" (calibredb-complete-file-quote "Convert as"))
-     :option (s-join " " (-remove 's-blank? (-flatten (calibredb-convert-arguments)))))))
+  (let* ((id (calibredb-getattr candidate :id))
+         (title (calibredb-getattr candidate :book-title))
+         (file (calibredb-get-file-path candidate t))
+         (input (format "\"%s\"" (expand-file-name file)))
+         (output (format "\"%s\"" (read-file-name  "Convert as: " "~/Downloads/" nil nil title))))
+    (set-process-sentinel
+     (calibredb-convert-process
+      :input input
+      :output output
+      :option (s-join " " (-remove 's-blank? (-flatten (calibredb-convert-arguments)))))
+     (lambda (p _e)
+       (when (= 0 (process-exit-status p))
+         (when (yes-or-no-p (format "Convertion succeeded, add %s to calibre? " input output output))
+           (calibredb-command :command "add_format"
+                              :input (concat id " " output)
+                              :library (format "--library-path %s" (calibredb-root-dir-quote)))
+           (cond ((equal major-mode 'calibredb-show-mode)
+                  (kill-buffer (calibredb-show--buffer-name candidate))
+                  (calibredb-search-refresh))
+                 ((eq major-mode 'calibredb-search-mode)
+                  (calibredb-search-refresh-or-resume)))))))))
 
 ;; catalog
 
