@@ -54,34 +54,39 @@
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (let ((cand (if calibredb-search-entries
-                  calibredb-search-entries
-                (progn
-                  (setq calibredb-search-entries (calibredb-candidates))
-                  (setq calibredb-full-entries calibredb-search-entries)))))
-    (cond ((not cand)
-           (message "INVALID LIBRARY"))
-          (t
-           (when (get-buffer (calibredb-search-buffer))
-             (kill-buffer (calibredb-search-buffer)))
-           ;; Set virtual library name when the first time to launch calibredb
-           (if (equal calibredb-search-filter "")
-               (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
-           (switch-to-buffer (calibredb-search-buffer))
-           (goto-char (point-min))
-           (unless (equal cand '(""))   ; not empty library
-             (dolist (item cand)
-               (let (beg end)
-                 (setq beg (point))
-                 (insert (car item))
-                 (calibredb-detailed-view-insert-image item)
-                 (setq end (point))
-                 (put-text-property beg end 'calibredb-entry item)
-                 (insert "\n")))
-             (goto-char (point-min)))
-           (calibredb-ref-default-bibliography)
-           (unless (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-mode))))))
+  (cond ((null calibredb-db-dir)
+         (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
+        ((not (file-regular-p calibredb-db-dir))
+         (message "calibredb: %s doesn't exist!") calibredb-db-dir)
+        (t
+         (let ((cand (if calibredb-search-entries
+                         calibredb-search-entries
+                       (progn
+                         (setq calibredb-search-entries (calibredb-candidates))
+                         (setq calibredb-full-entries calibredb-search-entries)))))
+           (cond ((not cand)
+                  (message "INVALID LIBRARY"))
+                 (t
+                  (when (get-buffer (calibredb-search-buffer))
+                    (kill-buffer (calibredb-search-buffer)))
+                  ;; Set virtual library name when the first time to launch calibredb
+                  (if (equal calibredb-search-filter "")
+                      (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+                  (switch-to-buffer (calibredb-search-buffer))
+                  (goto-char (point-min))
+                  (unless (equal cand '(""))   ; not empty library
+                    (dolist (item cand)
+                      (let (beg end)
+                        (setq beg (point))
+                        (insert (car item))
+                        (calibredb-detailed-view-insert-image item)
+                        (setq end (point))
+                        (put-text-property beg end 'calibredb-entry item)
+                        (insert "\n")))
+                    (goto-char (point-min)))
+                  (calibredb-ref-default-bibliography)
+                  (unless (eq major-mode 'calibredb-search-mode)
+                    (calibredb-search-mode))))))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here
