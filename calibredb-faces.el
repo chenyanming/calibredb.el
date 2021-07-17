@@ -39,13 +39,13 @@
   "Face used for title on compact view."
   :group 'calibredb-faces)
 
-(defface calibredb-title-detail-view-face
+(defface calibredb-title-detailed-view-face
   '((((class color) (background light))
      :background "gray85")
     (((class color) (background dark))
      :background "gray25")
     (t :inherit calibredb-title-face))
-  "Face used for title on detail view."
+  "Face used for title on detailed view."
   :group 'calibredb-faces)
 
 (defface calibredb-author-face

@@ -33,7 +33,7 @@
 (eval-when-compile (defvar calibredb-images-path))
 
 (declare-function calibredb-search-buffer "calibredb-search.el")
-(declare-function calibredb-detail-view-insert-image "calibredb-utils.el")
+(declare-function calibredb-detailed-view-insert-image "calibredb-utils.el")
 (declare-function calibredb-search-mode "calibredb-search.el")
 (declare-function calibredb-search--buffer-name "calibredb-search.el")
 (declare-function calibredb-counsel-add-file-action "calibredb-ivy.el")
@@ -482,7 +482,7 @@ Argument CANDS is the list of candiates."
   (interactive)
   (if (eq major-mode 'calibredb-search-mode)
       (list (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                     (get-text-property (point) 'calibredb-detail nil)
+                     (get-text-property (point) 'calibredb-detailed nil)
                      (get-text-property (point) 'calibredb-compact nil))))
     (list (get-text-property (point-min) 'calibredb-entry nil) )))
 
