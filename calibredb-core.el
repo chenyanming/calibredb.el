@@ -470,17 +470,37 @@ OR author_sort LIKE '%%%s%%'
   (replace-regexp-in-string "[\s\n]+$" "" s))
 
 (defun calibredb-query (sql-query)
-  "Query calibre databse and return the result.
-Argument SQL-QUERY is the sqlite sql query string."
+  "Query calibre database and return the result.
+Argument SQL-QUERY is the sqlite sql query string.
+
+The function works by sending SQL-QUERY to `sql-sqlite-program' for the
+database file defined by `calibredb-db-dir', dump the output to a hidden
+buffer called *calibredb-query-output*, then if the sqlite program
+terminates successfully, it will return the string of the output
+buffer. If the program fails, it will switch to the output buffer and
+tell user something’s wrong."
   (interactive)
-  (if (file-exists-p calibredb-db-dir)
-      (shell-command-to-string
-       (format "%s -separator %s -newline %s -list -nullvalue \"\" -noheader %s \"%s\""
-               sql-sqlite-program
-               calibredb-sql-separator
-               calibredb-sql-newline
-               (shell-quote-argument (expand-file-name calibredb-db-dir))
-               sql-query)) nil))
+  (let ((out-buf " *calibredb-query-output*"))
+    (when (get-buffer out-buf)
+      (kill-buffer out-buf))
+    (if (not (file-exists-p calibredb-db-dir))
+        (message "calibredb-query: calibredb-db-dir is nil! calibredb-query won't work without it.")
+      (if (zerop (call-process-shell-command
+                  (format "%s -separator %s -newline %s -list -nullvalue '' -noheader %s \"%s\""
+                          sql-sqlite-program
+                          calibredb-sql-separator
+                          calibredb-sql-newline
+                          (shell-quote-argument (expand-file-name calibredb-db-dir))
+                          sql-query)
+                  nil (list out-buf t)))
+          ;; If this command terminates successfully (return 0)
+          ;; Return the output's string
+          (with-current-buffer out-buf
+            (buffer-string))
+        ;; If this command fails return 'error
+        (switch-to-buffer out-buf)
+        (goto-char (point-min))
+        (error (format "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir)))))))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
@@ -592,7 +612,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                                                   (_ " ORDER BY id"))
                                                 (when (eq calibredb-order 'desc)
                                                   " DESC"))))
-         (line-list (when query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
+         (line-list (split-string (calibredb-chomp query-result) calibredb-sql-newline)))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list h-list f-list a-list)
                (dolist (line line-list)
