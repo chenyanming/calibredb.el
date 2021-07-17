@@ -497,7 +497,7 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
                                   (file-name-as-directory (nth 2 spl-query-result))
                                   (nth 3 spl-query-result) "." (downcase (nth 4 spl-query-result))))
-          (:tag                    ,(or ((nth 7 spl-query-result))))
+          (:tag                    ,(or (nth 7 spl-query-result)))
           (:size                   ,(format "%.2f" (/ (string-to-number (nth 8 spl-query-result) ) 1048576.0) ))
           (:comment                ,(or (nth 9 spl-query-result) ""))
           (:ids                    ,(or (nth 10 spl-query-result) ""))
