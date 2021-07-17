@@ -497,32 +497,14 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
                                   (file-name-as-directory (nth 2 spl-query-result))
                                   (nth 3 spl-query-result) "." (downcase (nth 4 spl-query-result))))
-          (:tag                    ,(format "%s"
-                                            (if (not (nth 7 spl-query-result))
-                                                ""
-                                              (nth 7 spl-query-result))))
+          (:tag                    ,(or (nth 7 spl-query-result)))
           (:size                   ,(format "%.2f" (/ (string-to-number (nth 8 spl-query-result) ) 1048576.0) ))
-          (:comment                ,(format "%s"
-                                            (if (not (nth 9 spl-query-result))
-                                                ""
-                                              (nth 9 spl-query-result))))
-          (:ids                    ,(format "%s"
-                                            (if (not (nth 10 spl-query-result))
-                                                ""
-                                              (nth 10 spl-query-result))))
-          (:publisher              ,(format "%s"
-                                            (if (not (nth 11 spl-query-result))
-                                                ""
-                                              (nth 11 spl-query-result))))
-          (:series                 ,(format "%s"
-                                            (if (not (nth 12 spl-query-result))
-                                                ""
-                                              (nth 12 spl-query-result))))
-          (:lang_code              ,(format "%s"
-                                            (if (not (nth 13 spl-query-result))
-                                                ""
-                                              (nth 13 spl-query-result))))
-          (:last_modified          ,(nth 14 spl-query-result))))))
+          (:comment                ,(or (nth 9 spl-query-result) ""))
+          (:ids                    ,(or (nth 10 spl-query-result) ""))
+          (:publisher              ,(or (nth 11 spl-query-result) ""))
+          (:series                 ,(or (nth 12 spl-query-result) ""))
+          (:lang_code              ,(or (nth 13 spl-query-result) ""))
+          (:last_modified          ,(or (nth 14 spl-query-result) ""))))))
 
 (defun calibredb-getattr (my-alist key)
   "Get the attribute.
