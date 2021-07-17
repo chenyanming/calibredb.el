@@ -167,7 +167,8 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(define-obsolete-variable-alias 'calibredb-detial-view 'calibredb-detailed-view)
+(define-obsolete-variable-alias 'calibredb-detial-view 'calibredb-detailed-view
+  "See https://github.com/chenyanming/calibredb.el/pull/45" "Fixing typos.")
 
 (defcustom calibredb-detailed-view-image-show t
   "Set Non-nil to show images in detailed view - *calibredb-search*."
