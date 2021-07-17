@@ -74,7 +74,7 @@
                (let (beg end)
                  (setq beg (point))
                  (insert (car item))
-                 (calibredb-detail-view-insert-image item)
+                 (calibredb-detailed-view-insert-image item)
                  (setq end (point))
                  (put-text-property beg end 'calibredb-entry item)
                  (insert "\n")))

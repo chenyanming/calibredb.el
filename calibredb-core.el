@@ -38,7 +38,7 @@
   (require 'all-the-icons)
   (require 'icons-in-terminal))
 
-(eval-when-compile (defvar calibredb-detial-view))
+(eval-when-compile (defvar calibredb-detailed-view))
 (eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-condense-comments "calibredb-search.el")
 (declare-function calibredb-attach-icon-for "calibredb-utils.el")
@@ -522,49 +522,49 @@ ALIGN should be a keyword :left or :right."
 
 (defun calibredb-title-face ()
   "Return the title face base on the view."
-  (if calibredb-detial-view
-      'calibredb-title-detail-view-face
+  (if calibredb-detailed-view
+      'calibredb-title-detailed-view-face
       'calibredb-title-face))
 
 (defun calibredb-title-width ()
   "Return the title width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-title-width))
 
 (defun calibredb-format-width ()
   "Return the format width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-format-width))
 
 (defun calibredb-tag-width ()
   "Return the tag width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-tag-width))
 
 (defun calibredb-ids-width ()
   "Return the ids width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-ids-width))
 
 (defun calibredb-author-width ()
   "Return the author width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-author-width))
 
 (defun calibredb-comment-width ()
   "Return the comment width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-comment-width))
 
 (defun calibredb-date-width ()
   "Return the last_modified date width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-date-width))
 
@@ -671,10 +671,10 @@ Argument BOOK-ALIST ."
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
     (define-key date-map [mouse-1] 'calibredb-date-mouse-1)
-    (if calibredb-detial-view
+    (if calibredb-detailed-view
         (setq title (concat title "\n")))
     (format
-     (if calibredb-detial-view
+     (if calibredb-detailed-view
          (let ((num (cond (calibredb-format-all-the-icons 3)
                           (calibredb-format-icons-in-terminal 3)
                           ((>= calibredb-id-width 0) calibredb-id-width)

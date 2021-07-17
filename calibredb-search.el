@@ -162,24 +162,27 @@ time."
 (define-obsolete-function-alias 'calibredb-search-ret
   'calibredb-view "calibredb 2.0.0")
 
-(defcustom calibredb-detial-view nil
+(defcustom calibredb-detailed-view nil
   "Set Non-nil to change detail view, nil to compact view - *calibredb-search*."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-detial-view-image-show t
-  "Set Non-nil to show images in detail view - *calibredb-search*."
+(define-obsolete-variable-alias 'calibredb-detial-view 'calibredb-detailed-view
+  "See https://github.com/chenyanming/calibredb.el/pull/45" "Fixing typos.")
+
+(defcustom calibredb-detailed-view-image-show t
+  "Set Non-nil to show images in detailed view - *calibredb-search*."
   :group 'calibredb
   :type 'boolean)
 
-(defcustom calibredb-detail-view-image-max-width 250
-  "Max Width for images in detail view - *calibredb-search*.
+(defcustom calibredb-detailed-view-image-max-width 250
+  "Max Width for images in detailed view - *calibredb-search*.
 For emacs 27.1+, if imagemagick is disabled, it would the image width."
   :group 'calibredb
   :type 'integer)
 
-(defcustom calibredb-detail-view-image-max-height 250
-  "Max height for images in detail view - *calibredb-search*.
+(defcustom calibredb-detailed-view-image-max-height 250
+  "Max height for images in detailed view - *calibredb-search*.
 For emacs 27.1+, if imagemagick is disabled, the image height is ignored."
   :group 'calibredb
   :type 'integer)
@@ -705,7 +708,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
     (let ((content (car entry)) beg end)
       (setq beg (point))
       (insert content)
-      (calibredb-detail-view-insert-image entry)
+      (calibredb-detailed-view-insert-image entry)
       (setq end (point))
       (put-text-property beg end 'calibredb-entry entry))))
 
@@ -848,17 +851,17 @@ ARGUMENT FILTER is the filter string."
                  (push line res-list)))))
     (nreverse res-list)))
 
-;;; detail view
+;;; detailed view
 
 (defun calibredb-toggle-view ()
-  "Toggle between detail view or compact view in *calibredb-search* buffer."
+  "Toggle between detailed view or compact view in *calibredb-search* buffer."
   (interactive)
-  (setq calibredb-detial-view (if (eq calibredb-detial-view nil) t nil))
+  (setq calibredb-detailed-view (if (eq calibredb-detailed-view nil) t nil))
   (calibredb-search-toggle-view-refresh))
 
-(defun calibredb-detail-view-insert-image (entry)
-  "Insert image in *calibredb-search* under detail view based on ENTRY."
-  (if (and calibredb-detial-view calibredb-detial-view-image-show)
+(defun calibredb-detailed-view-insert-image (entry)
+  "Insert image in *calibredb-search* under detailed view based on ENTRY."
+  (if (and calibredb-detailed-view calibredb-detailed-view-image-show)
       (let* ((num (cond (calibredb-format-all-the-icons 3)
                         (calibredb-format-icons-in-terminal 3)
                         ((>= calibredb-id-width 0) calibredb-id-width)
@@ -870,23 +873,23 @@ ARGUMENT FILTER is the filter string."
               (progn
                 (insert "\n")
                 (insert (make-string num ? ))
-                (calibredb-insert-image file "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))
+                (calibredb-insert-image file "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))
             (progn
               (insert "\n")
               (insert (make-string num ? ))
-              (calibredb-insert-image cover "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))))
+              (calibredb-insert-image cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))))))
 
 (defun calibredb-toggle-view-at-point ()
-  "Toggle between detail view or compact view in *calibredb-search* buffer at point."
+  "Toggle between detailed view or compact view in *calibredb-search* buffer at point."
   (interactive)
   (let ((inhibit-read-only t)
-        (status calibredb-detial-view))
-    (if calibredb-detial-view
-        ;; detail view
+        (status calibredb-detailed-view))
+    (if calibredb-detailed-view
+        ;; detailed view
         (cond
          ;; save to calibredb-entry
          ((get-text-property (point) 'calibredb-entry nil)
-          (setq calibredb-detial-view nil)
+          (setq calibredb-detailed-view nil)
           (let* ((original (get-text-property (point) 'calibredb-entry nil))
                  (entry (cadr original))
                  (format (list (calibredb-format-item entry)))
@@ -913,11 +916,11 @@ ARGUMENT FILTER is the filter string."
                   (insert content)
                   (setq end (point))
                   (put-text-property beg end 'calibredb-compact list)))))
-          (setq calibredb-detial-view status))
+          (setq calibredb-detailed-view status))
 
          ;; save to calibredb-compact
          ((get-text-property (point) 'calibredb-compact nil)
-          (setq calibredb-detial-view t)
+          (setq calibredb-detailed-view t)
           (let* ((original (get-text-property (point) 'calibredb-compact nil))
                  (entry (cadr original))
                  (format (list (calibredb-format-item entry))))
@@ -929,16 +932,16 @@ ARGUMENT FILTER is the filter string."
                       beg end)
                   (setq beg (point))
                   (insert content)
-                  (calibredb-detail-view-insert-image original)
+                  (calibredb-detailed-view-insert-image original)
                   (setq end (point))
                   (put-text-property beg end 'calibredb-entry list)))))
-          (setq calibredb-detial-view status)))
+          (setq calibredb-detailed-view status)))
 
       ;; compact view
       (cond
        ;; save to calibredb-entry
        ((get-text-property (point) 'calibredb-entry nil)
-        (setq calibredb-detial-view t)
+        (setq calibredb-detailed-view t)
         (let* ((original (get-text-property (point) 'calibredb-entry nil))
                (entry (cadr original))
                (format (list (calibredb-format-item entry))))
@@ -950,26 +953,26 @@ ARGUMENT FILTER is the filter string."
                     beg end)
                 (setq beg (point))
                 (insert content)
-                (calibredb-detail-view-insert-image original)
+                (calibredb-detailed-view-insert-image original)
                 (setq end (point))
-                (put-text-property beg end 'calibredb-detail list)))))
-        (setq calibredb-detial-view status))
+                (put-text-property beg end 'calibredb-detailed list)))))
+        (setq calibredb-detailed-view status))
 
-       ;; save to calibredb-detail
-       ((get-text-property (point) 'calibredb-detail nil)
-        (setq calibredb-detial-view nil)
-        (let* ((original (get-text-property (point) 'calibredb-detail nil))
+       ;; save to calibredb-detailed
+       ((get-text-property (point) 'calibredb-detailed nil)
+        (setq calibredb-detailed-view nil)
+        (let* ((original (get-text-property (point) 'calibredb-detailed nil))
                (entry (cadr original))
                (format (list (calibredb-format-item entry)))
-               (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil)))) ; the "id" of current point
+               (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detailed nil)))) ; the "id" of current point
                d-beg d-end)
-          (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-detail nil))))
+          (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-detailed nil))))
               (setq d-beg (point-min))
-            (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil))))
+            (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detailed nil))))
                               (forward-line -1))
                             (forward-line 1)
                             (setq d-beg (point))))
-          (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detail nil))))
+          (save-excursion (while (equal id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-detailed nil))))
                             (forward-line 1))
                           (goto-char (1- (point)))
                           (setq d-end (point)))
@@ -983,7 +986,7 @@ ARGUMENT FILTER is the filter string."
                 (insert content)
                 (setq end (point))
                 (put-text-property beg end 'calibredb-entry list)))))
-        (setq calibredb-detial-view status))))))
+        (setq calibredb-detailed-view status))))))
 
 (defun calibredb-fontify (string mode)
   "Fontify STRING with Major MODE."
