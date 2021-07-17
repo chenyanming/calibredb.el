@@ -224,14 +224,14 @@ With ivy-mode: Add marked items.
 Others: Add only one item.
 If prefix ARG is non-nil, keep the files after adding without prompt."
   (interactive "P")
-  (cond ((boundp 'ivy-mode)
-             (if ivy-mode
-                 (if (fboundp 'counsel--find-file-1)
-                     (counsel--find-file-1
-                      "Add file(s) to calibre: " calibredb-download-dir
-                      (lambda (file)
-                        (calibredb-counsel-add-file-action arg file))
-                      'calibredb-add))))
+  (cond ((and (boundp 'ivy-mode)
+              ivy-mode
+              (fboundp 'counsel--find-file-1))
+         (counsel--find-file-1
+          "Add file(s) to calibre: " calibredb-download-dir
+          (lambda (file)
+            (calibredb-counsel-add-file-action arg file))
+          'calibredb-add))
         (t (let ((file (read-file-name "Add a file to Calibre: " calibredb-download-dir)))
              (calibredb-counsel-add-file-action arg file))))
   (if (equal major-mode 'calibredb-search-mode)
