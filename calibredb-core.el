@@ -501,8 +501,8 @@ tell user something’s wrong."
           ;; If this command terminates successfully (return 0)
           ;; Return the output's string
           (with-current-buffer out-buf
-            (calibredb-chomp (buffer-string))
-            (delete-file tmp-file))
+            (delete-file tmp-file)
+            (calibredb-chomp (buffer-string)))
         (delete-file tmp-file)
         ;; If this command fails, show output buffer
         (switch-to-buffer out-buf)
