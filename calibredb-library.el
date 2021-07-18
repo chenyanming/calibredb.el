@@ -58,7 +58,13 @@ selecting the new item."
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
           (calibredb-ref-default-bibliography)
           (calibredb-search-refresh-or-resume))
-      (message "INVALID LIBRARY"))))
+      (if (s-contains? "http" result)
+          (let ((library (-first (lambda (lib)
+                                   (s-contains? (car lib) result))
+                                 calibredb-library-alist)))
+            (setq calibredb-root-dir (car library))
+            (calibredb-opds-request-page result (nth 1 library) (nth 2 library)))
+        (message "INVALID LIBRARY")))))
 
 (defun calibredb-library-previous ()
   "Next library from variable `calibredb-library-alist'.

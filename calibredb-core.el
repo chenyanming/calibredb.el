@@ -32,6 +32,8 @@
 (require 'dired)
 (require 'thingatpt)
 (require 'pcase)
+(require 'mailcap)
+
 (ignore-errors
   (require 'helm)
   (require 'ivy)
@@ -742,14 +744,14 @@ Argument BOOK-ALIST ."
        "%s%s%s %s %s %s (%s) %s %s %s")
      (cond (calibredb-format-all-the-icons
             (concat (if (fboundp 'all-the-icons-icon-for-file)
-                        (all-the-icons-icon-for-file (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) )) "")
+                        (all-the-icons-icon-for-file (calibredb-get-file-path (list book-alist))) "")
                     " "))
            (calibredb-format-icons-in-terminal
             (concat (if (fboundp 'icons-in-terminal-icon-for-file)
-                        (icons-in-terminal-icon-for-file (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) ) :v-adjust 0 :height 1) "")
+                        (icons-in-terminal-icon-for-file (calibredb-get-file-path (list book-alist) ) :v-adjust 0 :height 1) "")
                     " "))
            (calibredb-format-character-icons
-            (concat (calibredb-attach-icon-for (calibredb-car-filepath (calibredb-getattr (list book-alist) :file-path) )) " "))
+            (concat (calibredb-attach-icon-for (calibredb-get-file-path (list book-alist))) " "))
            (t ""))
      (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face 'id id)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"

@@ -381,7 +381,15 @@ it in ~calibredb-library-alist~.
                                   ("/Users/damonchan/Documents/Books Library")
                                   ("/Users/damonchan/Documents/HELLO")
                                   ("/Users/damonchan/Documents/Books")
-                                  ("/Users/damonchan/Documents/World")))
+                                  ("/Users/damonchan/Documents/World")
+                                  ("http://192.168.1.2/opds" "account" "password") ; https://github.com/janeczku/calibre-web
+                                  ("http://opds.oreilly.com/opds/")
+                                  ("https://bookserver.archive.org/catalog/")
+                                  ("http://arxiv.maplepop.com/catalog/")
+                                  ("https://m.gutenberg.org/ebooks.opds/")
+                                  ("http://www.feedbooks.com/catalog.atom")
+                                  ("https://tatsu-zine.com/catalogs.opds")
+                                  ("http://aozora.textlive.net/catalog.opds")))
 #+END_SRC
 Then, in =*calibredb-search*= buffer,
  - Press =L= to open the library list and select the library.

@@ -51,12 +51,12 @@
        ("e" (lambda (candidate)
               (calibredb-export (cdr candidate))) "Export")
        ("m" (lambda (candidate)
-              (mail-add-attachment (calibredb-read-filepath (calibredb-getattr (cdr candidate) :file-path) ))) "Mail add attachment")
+              (mail-add-attachment (calibredb-get-file-path (cdr candidate) t))) "Mail add attachment")
        ("i" (lambda (candidate)
               (unless (featurep 'org)
                 (require 'org))
               (if (fboundp 'org-insert-link)
-                  (org-insert-link nil (calibredb-read-filepath (calibredb-getattr (cdr candidate) :file-path)) (calibredb-getattr (cdr candidate) :book-title)) )) "Insert an org link"))))
+                  (org-insert-link nil (calibredb-get-file-path (cdr candidate) t) (calibredb-getattr (cdr candidate) :book-title)) )) "Insert an org link"))))
 
 
 (defun calibredb-counsel-add-file-action (arg file)

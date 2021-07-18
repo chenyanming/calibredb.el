@@ -218,7 +218,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
          (pubdate (calibredb-getattr entry :book-pubdate))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new entry through SQL query
          (file (calibredb-getattr entry :file-path))
-         (cover (concat (file-name-directory file) "cover.jpg"))
+         (cover (calibredb-get-cover entry))
          (format (calibredb-getattr entry :book-format))
          (size (calibredb-getattr entry :size))
          (ids (calibredb-getattr entry :ids))
@@ -255,9 +255,11 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
                                                     (propertize ext
                                                                 'face 'calibredb-format-face
                                                                 'mouse-face 'calibredb-mouse-face
-                                                                'help-echo (expand-file-name
-                                                                            (concat (file-name-base file) "." ext)
-                                                                            (file-name-directory file))
+                                                                'help-echo (if (s-contains? "http" file)
+                                                                               file
+                                                                             (expand-file-name
+                                                                              (concat (file-name-base file) "." ext)
+                                                                              (file-name-directory file)) )
                                                                 'keymap file-map)) (s-split "," format)) ", ")))
         (insert (format "Size        %s\n" (propertize (concat size "Mb") 'face 'calibredb-size-face)))
         (cond ((equal calibredb-entry-render-comments "face")
@@ -279,9 +281,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
               (t
                (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face)))))
         (insert "\n")
-        (if (image-type-available-p (intern format))
-            (calibredb-insert-image file "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
-          (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height))
+        (calibredb-insert-image cover "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
         ;; (setq end (point))
         (calibredb-show-mode)
         (setq calibredb-show-entry entry)
@@ -392,7 +392,9 @@ Indicating the library you use."
       (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date)))
   (if (boundp 'ivy-alt-done-functions-alist)
       (add-to-list 'ivy-alt-done-functions-alist '(calibredb-add . ivy--directory-done)))
-  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup))
+  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup)
+  (add-to-list 'mailcap-mime-extensions '(".epub" . "application/epub+zip"))
+  (add-to-list 'mailcap-mime-extensions '(".mobi" . "application/x-mobipocket-ebook")))
 
 (defun calibredb-search-mouse (event)
   "Visit the calibredb-entry click on.
@@ -864,22 +866,13 @@ ARGUMENT FILTER is the filter string."
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
   (if (and calibredb-detial-view calibredb-detial-view-image-show)
-      (let* ((num (cond (calibredb-format-all-the-icons 3)
-                        (calibredb-format-icons-in-terminal 3)
-                        ((>= calibredb-id-width 0) calibredb-id-width)
-                        (t 0 )))
-             (file (calibredb-getattr (cdr entry) :file-path))
-             (format (calibredb-getattr (cdr entry) :book-format))
-             (cover (concat (file-name-directory file) "cover.jpg")))
-          (if (image-type-available-p (intern format))
-              (progn
-                (insert "\n")
-                (insert (make-string num ? ))
-                (calibredb-insert-image file "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))
-            (progn
-              (insert "\n")
-              (insert (make-string num ? ))
-              (calibredb-insert-image cover "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))))
+      (let ((num (cond (calibredb-format-all-the-icons 3)
+                       (calibredb-format-icons-in-terminal 3)
+                       ((>= calibredb-id-width 0) calibredb-id-width)
+                       (t 0 ))))
+        (insert "\n")
+        (insert (make-string num ? ))
+        (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))
 
 (defun calibredb-toggle-view-at-point ()
   "Toggle between detail view or compact view in *calibredb-search* buffer at point."
@@ -1011,7 +1004,7 @@ ARGUMENT FILTER is the filter string."
      (with-temp-buffer
        (dolist (cand candidates)
          (let ((id (calibredb-getattr cand :id))
-               (path (calibredb-read-filepath (calibredb-getattr cand :file-path) ))
+               (path (calibredb-get-file-path cand t))
                (title (calibredb-getattr cand :book-title)))
            (insert (format "[[file:%s][%s %s - %s]]\n"
                            path
