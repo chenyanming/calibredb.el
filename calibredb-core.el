@@ -480,27 +480,34 @@ terminates successfully, it will return the string of the output
 buffer. If the program fails, it will switch to the output buffer and
 tell user something’s wrong."
   (interactive)
-  (let ((out-buf " *calibredb-query-output*"))
+  (let ((out-buf " *calibredb-query-output*")
+        (tmp-file (make-temp-file "calibredb-query-string" nil nil sql-query)))
     (when (get-buffer out-buf)
       (kill-buffer out-buf))
-    (cond ((not (file-exists-p calibredb-db-dir))
-           (message "calibredb-query: calibredb-db-dir is nil! calibredb-query won't work without it."))
-          (t
-           (if (zerop (call-process-shell-command
-                       (format "%s -separator %s -newline %s -list -nullvalue \"\" -noheader %s \"%s\""
-                               sql-sqlite-program
-                               calibredb-sql-separator
-                               calibredb-sql-newline
-                               (shell-quote-argument (expand-file-name calibredb-db-dir))
-                               sql-query)
-                       nil (list out-buf t)))
-               ;; If this command terminates successfully (return 0)
-               ;; Return the output's string
-               (with-current-buffer out-buf
-                 (calibredb-chomp (buffer-string)))
-             ;; If this command fails return 'error
-             (switch-to-buffer out-buf)
-             (error (format "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir))))))))
+    (if (not (file-exists-p calibredb-db-dir))
+        (message "calibredb-query: calibredb-db-dir is nil! calibredb-query won't work without it.")
+      (if (zerop (call-process-shell-command
+                  (format "%s -separator %s %s -list -nullvalue '' -noheader %s -init %s"
+                          sql-sqlite-program
+                          (if (equal calibredb-sql-separator "|")
+                              ""
+                            (format "-separator '%s" calibredb-sql-separator))
+                          (if (equal calibredb-sql-newline "\n")
+                              ""
+                            (format "-newline '%s'" calibredb-sql-newline))
+                          (shell-quote-argument (expand-file-name calibredb-db-dir))
+                          tmp-file)
+                  nil (list out-buf t)))
+          ;; If this command terminates successfully (return 0)
+          ;; Return the output's string
+          (with-current-buffer out-buf
+            (calibredb-chomp (buffer-string))
+            (delete-file tmp-file))
+        (delete-file tmp-file)
+        ;; If this command fails, show output buffer
+        (switch-to-buffer out-buf)
+        (error (format "calibredb-query: Can't query \"%s\". switching to its error buffer."
+                       (expand-file-name calibredb-db-dir)))))))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
