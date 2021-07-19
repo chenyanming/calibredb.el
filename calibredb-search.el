@@ -866,7 +866,6 @@ ARGUMENT FILTER is the filter string."
   (setq calibredb-detailed-view (if (eq calibredb-detailed-view nil) t nil))
   (calibredb-search-toggle-view-refresh))
 
-<<<<<<< HEAD
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
   (if (and calibredb-detial-view calibredb-detial-view-image-show)
@@ -877,7 +876,7 @@ ARGUMENT FILTER is the filter string."
         (insert "\n")
         (insert (make-string num ? ))
         (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))
-=======
+
 (defun calibredb-detailed-view-insert-image (entry)
   "Insert image in *calibredb-search* under detailed view based on ENTRY."
   (if (and calibredb-detailed-view calibredb-detailed-view-image-show)
@@ -897,7 +896,6 @@ ARGUMENT FILTER is the filter string."
               (insert "\n")
               (insert (make-string num ? ))
               (calibredb-insert-image cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))))))
->>>>>>> 4eaaa1f252031ab3d461b430b3f981543db14f68
 
 (defun calibredb-toggle-view-at-point ()
   "Toggle between detailed view or compact view in *calibredb-search* buffer at point."
