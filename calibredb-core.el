@@ -40,7 +40,7 @@
   (require 'all-the-icons)
   (require 'icons-in-terminal))
 
-(eval-when-compile (defvar calibredb-detial-view))
+(eval-when-compile (defvar calibredb-detailed-view))
 (eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-condense-comments "calibredb-search.el")
 (declare-function calibredb-attach-icon-for "calibredb-utils.el")
@@ -477,17 +477,37 @@ OR author_sort LIKE '%%%s%%'
   (replace-regexp-in-string "[\s\n]+$" "" s))
 
 (defun calibredb-query (sql-query)
-  "Query calibre databse and return the result.
-Argument SQL-QUERY is the sqlite sql query string."
+  "Query calibre database and return the result.
+Argument SQL-QUERY is the sqlite sql query string.
+
+The function works by sending SQL-QUERY to `sql-sqlite-program' for the
+database file defined by `calibredb-db-dir', dump the output to a hidden
+buffer called *calibredb-query-output*, then if the sqlite program
+terminates successfully, it will return the string of the output
+buffer. If the program fails, it will switch to the output buffer and
+tell user something’s wrong."
   (interactive)
-  (if (file-exists-p calibredb-db-dir)
-      (shell-command-to-string
-       (format "%s -separator %s -newline %s -list -nullvalue \"\" -noheader %s \"%s\""
-               sql-sqlite-program
-               calibredb-sql-separator
-               calibredb-sql-newline
-               (shell-quote-argument (expand-file-name calibredb-db-dir))
-               sql-query)) nil))
+  (let ((out-buf " *calibredb-query-output*"))
+    (when (get-buffer out-buf)
+      (kill-buffer out-buf))
+    (if (not (file-exists-p calibredb-db-dir))
+        (message "calibredb-query: calibredb-db-dir is nil! calibredb-query won't work without it.")
+      (if (zerop (call-process-shell-command
+                  (format "%s -separator %s -newline %s -list -nullvalue '' -noheader %s \"%s\""
+                          sql-sqlite-program
+                          calibredb-sql-separator
+                          calibredb-sql-newline
+                          (shell-quote-argument (expand-file-name calibredb-db-dir))
+                          sql-query)
+                  nil (list out-buf t)))
+          ;; If this command terminates successfully (return 0)
+          ;; Return the output's string
+          (with-current-buffer out-buf
+            (buffer-string))
+        ;; If this command fails return 'error
+        (switch-to-buffer out-buf)
+        (goto-char (point-min))
+        (error (format "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir)))))))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
@@ -504,38 +524,20 @@ Argument QUERY-RESULT is the query result generate by sqlite."
           (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
                                   (file-name-as-directory (nth 2 spl-query-result))
                                   (nth 3 spl-query-result) "." (downcase (nth 4 spl-query-result))))
-          (:tag                    ,(format "%s"
-                                            (if (not (nth 7 spl-query-result))
-                                                ""
-                                              (nth 7 spl-query-result))))
+          (:tag                    ,(or (nth 7 spl-query-result)))
           (:size                   ,(format "%.2f" (/ (string-to-number (nth 8 spl-query-result) ) 1048576.0) ))
-          (:comment                ,(format "%s"
-                                            (if (not (nth 9 spl-query-result))
-                                                ""
-                                              (nth 9 spl-query-result))))
-          (:ids                    ,(format "%s"
-                                            (if (not (nth 10 spl-query-result))
-                                                ""
-                                              (nth 10 spl-query-result))))
-          (:publisher              ,(format "%s"
-                                            (if (not (nth 11 spl-query-result))
-                                                ""
-                                              (nth 11 spl-query-result))))
-          (:series                 ,(format "%s"
-                                            (if (not (nth 12 spl-query-result))
-                                                ""
-                                              (nth 12 spl-query-result))))
-          (:lang_code              ,(format "%s"
-                                            (if (not (nth 13 spl-query-result))
-                                                ""
-                                              (nth 13 spl-query-result))))
-          (:last_modified          ,(nth 14 spl-query-result))))))
+          (:comment                ,(or (nth 9 spl-query-result) ""))
+          (:ids                    ,(or (nth 10 spl-query-result) ""))
+          (:publisher              ,(or (nth 11 spl-query-result) ""))
+          (:series                 ,(or (nth 12 spl-query-result) ""))
+          (:lang_code              ,(or (nth 13 spl-query-result) ""))
+          (:last_modified          ,(or (nth 14 spl-query-result) ""))))))
 
 (defun calibredb-getattr (my-alist key)
   "Get the attribute.
 Argument MY-ALIST is the alist.
 Argument KEY is the key."
-  (cadr (assoc key (car my-alist))))
+  (cadr (assq key (car my-alist))))
 
 (defun calibredb-format-column (string width &optional align)
   "Return STRING truncated or padded to WIDTH following ALIGNment.
@@ -547,49 +549,49 @@ ALIGN should be a keyword :left or :right."
 
 (defun calibredb-title-face ()
   "Return the title face base on the view."
-  (if calibredb-detial-view
-      'calibredb-title-detail-view-face
+  (if calibredb-detailed-view
+      'calibredb-title-detailed-view-face
       'calibredb-title-face))
 
 (defun calibredb-title-width ()
   "Return the title width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-title-width))
 
 (defun calibredb-format-width ()
   "Return the format width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-format-width))
 
 (defun calibredb-tag-width ()
   "Return the tag width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-tag-width))
 
 (defun calibredb-ids-width ()
   "Return the ids width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-ids-width))
 
 (defun calibredb-author-width ()
   "Return the author width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-author-width))
 
 (defun calibredb-comment-width ()
   "Return the comment width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-comment-width))
 
 (defun calibredb-date-width ()
   "Return the last_modified date width base on the view."
-  (if calibredb-detial-view
+  (if calibredb-detailed-view
       -1
     calibredb-date-width))
 
@@ -601,51 +603,23 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       (setq display-alist
             (cons (list (calibredb-format-item item) item) display-alist)))))
 
-(defun calibredb-candidates()
+(defun calibredb-candidates ()
   "Generate ebooks candidates alist."
-  (let* ((query-result (calibredb-query (cond ((eq calibredb-order 'desc)
-                                               (cond ((eq calibredb-sort-by 'id)
-                                                      (concat calibredb-query-string " ORDER BY id DESC"))
-                                                     ((eq calibredb-sort-by 'title)
-                                                      (concat calibredb-query-string " ORDER BY title DESC"))
-                                                     ((eq calibredb-sort-by 'author)
-                                                      (concat calibredb-query-string " ORDER BY author_sort DESC"))
-                                                     ((eq calibredb-sort-by 'format)
-                                                      (concat calibredb-query-string " ORDER BY format DESC"))
-                                                     ((eq calibredb-sort-by 'date)
-                                                      (concat calibredb-query-string " ORDER BY last_modified DESC"))
-                                                     ((eq calibredb-sort-by 'pubdate)
-                                                      (concat calibredb-query-string " ORDER BY pubdate DESC"))
-                                                     ((eq calibredb-sort-by 'tag)
-                                                      (concat calibredb-query-string " ORDER BY tag DESC"))
-                                                     ((eq calibredb-sort-by 'size)
-                                                      (concat calibredb-query-string " ORDER BY uncompressed_size DESC"))
-                                                     ((eq calibredb-sort-by 'language)
-                                                      (concat calibredb-query-string " ORDER BY lang_code DESC"))
-                                                     (t
-                                                      (concat calibredb-query-string " ORDER BY id DESC"))))
-                                              ((eq calibredb-order 'asc)
-                                               (cond ((eq calibredb-sort-by 'id)
-                                                      (concat calibredb-query-string " ORDER BY id"))
-                                                     ((eq calibredb-sort-by 'title)
-                                                      (concat calibredb-query-string " ORDER BY title"))
-                                                     ((eq calibredb-sort-by 'author)
-                                                      (concat calibredb-query-string " ORDER BY author_sort"))
-                                                     ((eq calibredb-sort-by 'format)
-                                                      (concat calibredb-query-string " ORDER BY format"))
-                                                     ((eq calibredb-sort-by 'date)
-                                                      (concat calibredb-query-string " ORDER BY last_modified"))
-                                                     ((eq calibredb-sort-by 'pubdate)
-                                                      (concat calibredb-query-string " ORDER BY pubdate"))
-                                                     ((eq calibredb-sort-by 'tag)
-                                                      (concat calibredb-query-string " ORDER BY tag"))
-                                                     ((eq calibredb-sort-by 'size)
-                                                      (concat calibredb-query-string " ORDER BY uncompressed_size"))
-                                                     ((eq calibredb-sort-by 'language)
-                                                      (concat calibredb-query-string " ORDER BY lang_code"))
-                                                     (t
-                                                      (concat calibredb-query-string " ORDER BY id")))))))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
+  (let* ((query-result (calibredb-query (concat calibredb-query-string
+                                                (pcase calibredb-sort-by
+                                                  ('id " ORDER BY id")
+                                                  ('title " ORDER BY title")
+                                                  ('author " ORDER BY author_sort")
+                                                  ('format " ORDER BY format")
+                                                  ('date " ORDER BY last_modified")
+                                                  ('pubdate " ORDER BY pubdate")
+                                                  ('tag " ORDER BY tag")
+                                                  ('size " ORDER BY uncompressed_size")
+                                                  ('language " ORDER BY lang_code")
+                                                  (_ " ORDER BY id"))
+                                                (when (eq calibredb-order 'desc)
+                                                  " DESC"))))
+         (line-list (split-string (calibredb-chomp query-result) calibredb-sql-newline)))
     (cond ((equal "" query-result) '(""))
           (t (let (res-list h-list f-list a-list)
                (dolist (line line-list)
@@ -724,10 +698,10 @@ Argument BOOK-ALIST ."
     (define-key format-map [mouse-1] 'calibredb-format-mouse-1)
     (define-key author-map [mouse-1] 'calibredb-author-mouse-1)
     (define-key date-map [mouse-1] 'calibredb-date-mouse-1)
-    (if calibredb-detial-view
+    (if calibredb-detailed-view
         (setq title (concat title "\n")))
     (format
-     (if calibredb-detial-view
+     (if calibredb-detailed-view
          (let ((num (cond (calibredb-format-all-the-icons 3)
                           (calibredb-format-icons-in-terminal 3)
                           ((>= calibredb-id-width 0) calibredb-id-width)

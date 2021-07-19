@@ -55,14 +55,15 @@
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (let ((cand (if calibredb-search-entries
-                  calibredb-search-entries
-                (progn
-                  (setq calibredb-search-entries (calibredb-candidates))
-                  (setq calibredb-full-entries calibredb-search-entries)))))
-    (cond ((not cand)
-           (message "INVALID LIBRARY"))
-          (t
+  (cond ((null calibredb-db-dir)
+         (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
+        ((not (file-regular-p calibredb-db-dir))
+         (message "calibredb: %s doesn't exist!") calibredb-db-dir)
+        (t
+         (let ((cand (or calibredb-search-entries
+                         (setq calibredb-search-entries (calibredb-candidates)))))
+           (unless calibredb-full-entries
+             (setq calibredb-full-entries calibredb-search-entries))
            (when (get-buffer (calibredb-search-buffer))
              (kill-buffer (calibredb-search-buffer)))
            ;; Set virtual library name when the first time to launch calibredb
@@ -75,7 +76,7 @@
                (let (beg end)
                  (setq beg (point))
                  (insert (car item))
-                 (calibredb-detail-view-insert-image item)
+                 (calibredb-detailed-view-insert-image item)
                  (setq end (point))
                  (put-text-property beg end 'calibredb-entry item)
                  (insert "\n")))

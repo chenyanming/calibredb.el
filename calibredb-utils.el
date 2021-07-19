@@ -33,7 +33,7 @@
 (eval-when-compile (defvar calibredb-images-path))
 
 (declare-function calibredb-search-buffer "calibredb-search.el")
-(declare-function calibredb-detail-view-insert-image "calibredb-utils.el")
+(declare-function calibredb-detailed-view-insert-image "calibredb-utils.el")
 (declare-function calibredb-search-mode "calibredb-search.el")
 (declare-function calibredb-search--buffer-name "calibredb-search.el")
 (declare-function calibredb-counsel-add-file-action "calibredb-ivy.el")
@@ -322,14 +322,14 @@ With ivy-mode: Add marked items.
 Others: Add only one item.
 If prefix ARG is non-nil, keep the files after adding without prompt."
   (interactive "P")
-  (cond ((boundp 'ivy-mode)
-             (if ivy-mode
-                 (if (fboundp 'counsel--find-file-1)
-                     (counsel--find-file-1
-                      "Add file(s) to calibre: " calibredb-download-dir
-                      (lambda (file)
-                        (calibredb-counsel-add-file-action arg file))
-                      'calibredb-add))))
+  (cond ((and (boundp 'ivy-mode)
+              ivy-mode
+              (fboundp 'counsel--find-file-1))
+         (counsel--find-file-1
+          "Add file(s) to calibre: " calibredb-download-dir
+          (lambda (file)
+            (calibredb-counsel-add-file-action arg file))
+          'calibredb-add))
         (t (let ((file (read-file-name "Add a file to Calibre: " calibredb-download-dir)))
              (calibredb-counsel-add-file-action arg file))))
   (if (equal major-mode 'calibredb-search-mode)
@@ -580,7 +580,7 @@ Argument CANDS is the list of candiates."
   (interactive)
   (if (eq major-mode 'calibredb-search-mode)
       (list (cdr (or (get-text-property (point) 'calibredb-entry nil)
-                     (get-text-property (point) 'calibredb-detail nil)
+                     (get-text-property (point) 'calibredb-detailed nil)
                      (get-text-property (point) 'calibredb-compact nil))))
     (list (get-text-property (point-min) 'calibredb-entry nil) )))
 
