@@ -530,7 +530,7 @@ Argument QUERY-RESULT is the query result generate by sqlite."
   "Get the attribute.
 Argument MY-ALIST is the alist.
 Argument KEY is the key."
-  (cadr (assoc key (car my-alist))))
+  (cadr (assq key (car my-alist))))
 
 (defun calibredb-format-column (string width &optional align)
   "Return STRING truncated or padded to WIDTH following ALIGNment.
