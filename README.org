@@ -789,6 +789,13 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
+** TBD
+Version x.x.x:
+- Add ~calibredb-convert-program~
+- Add ~calibredb-device-dir~
+- Support ebook conversion and export ebooks to device
+- Support opds
+
 ** =2021-06-02=
 Version *2.10.0*:
 - Change keybind for ~calibredb-toggle-favorite-at-point~ to ~*~ (original ~f~)
