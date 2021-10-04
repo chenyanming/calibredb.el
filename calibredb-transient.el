@@ -154,6 +154,31 @@
 
 (transient-define-prefix calibredb-export-dispatch ()
   "Dispatch for export files."
+  [["Export"
+    ("E" "Export (No conversion)"         calibredb-export-without-conversion-dispatch)
+    ("a" "azw3"   calibredb-convert-to-azw3)
+    ("d" "docx"   calibredb-convert-to-docx)
+    ("e" "epub"   calibredb-convert-to-epub)
+    ("f" "fb2"    calibredb-convert-to-fb2)
+    ("h" "html"   calibredb-convert-to-html)
+    ("H" "htmlz"  calibredb-convert-to-htmlz)
+    ("l" "lit"   calibredb-convert-to-lit)
+    ("L" "lrf"   calibredb-convert-to-lrf)
+    ("m" "mobi"   calibredb-convert-to-mobi)
+    ("o" "oeb"   calibredb-convert-to-oeb)
+    ("P" "pdb"   calibredb-convert-to-pdb)
+    ("p" "pdf"   calibredb-convert-to-pdf)
+    ("M" "pml"   calibredb-convert-to-pml)
+    ("r" "rb"   calibredb-convert-to-rb)
+    ("R" "rtf"   calibredb-convert-to-rtf)
+    ("s" "snb"   calibredb-convert-to-snb)
+    ("T" "tcr"   calibredb-convert-to-tcr)
+    ("t" "txt"   calibredb-convert-to-txt)
+    ("z" "txtz"   calibredb-convert-to-txtz)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-export-without-conversion-dispatch ()
+  "Dispatch for export files without conversion."
   ["Arguments"
    ("-a" "Do not convert non English characters for the file names"  "--dont-asciiize")
    ("-c" "Do not save cover"  "--dont-save-cover")
@@ -170,8 +195,6 @@
    ("-A" "Export all books in database, ignoring the list of ids" "--all")]
   [["Export"
     ("e" "Export"         calibredb-export)]]
-  ;; [["Convert"
-  ;;   ("E" "Epub"   calibredb-convert-to-epub-dispatch)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-convert-to-epub-dispatch ()
@@ -190,7 +213,26 @@
    ("-l" "If specified, the output plugin will try to create output that is as human readable as possible." "--pretty-print")
    ("-A" "Title for any generated in-line table of contents." "--toc-title")]
   [["Export"
-    ("e" "Export" calibredb-convert)]]
+    ("e" "Export" calibredb-convert-to-epub)]]
+  [("q" "Quit"   transient-quit-one)])
+
+(transient-define-prefix calibredb-convert-to-mobi-dispatch ()
+  "TODO: Dispatch for convert to mobi."
+  ["Arguments"
+   ("-d" "Disable compression of the file contents."  " --dont-compress")
+   ("-e" "Extract the contents of the generated MOBI file to the specified folder."  "-extract-to")
+   ("-f" "By default calibre generates MOBI files that contain the old MOBI 6 format."  " --mobi-file-type")
+   ("-i" "Ignore margins in the input document. " " --mobi-ignore-margins")
+   ("-k" "By default calibre converts all images to JPEG format in the output MOBI file."  " --mobi-keep-original-images")
+   ("-t" "When adding the Table of Contents to the book, add it at the start of the book instead of the end."  "--mobi-toc-at-start")
+   ("-n" "Don't add Table of Contents to the book. Useful if the book has its own table of contents." "--no-inline-toc")
+   ("-p" "Tag for MOBI files to be marked as personal documents." "--personal-doc")
+   ("-a" "When present, use author sort field as author."  "--prefer-author-sort")
+   ("-P" "If specified, the output plugin will try to create output that is as human readable as possible." "--pretty-print")
+   ("-s" "Enable sharing of book content via Facebook etc." "--share-not-sync")
+   ("-T" "Title for any generated in-line table of contents." "--toc-title")]
+  [["Export"
+    ("e" "Export" calibredb-convert-to-mobi)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-catalog-bib-dispatch ()

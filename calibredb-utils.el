@@ -933,27 +933,64 @@ With universal ARG \\[universal-argument] use title as initial value."
     (if (eq major-mode 'calibredb-search-mode)
         (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
       (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let ((id (calibredb-getattr candidate :id)))
+  (let ((id (calibredb-getattr candidate :id))
+        (output-folder (file-name-directory (if (file-executable-p calibredb-device-dir)
+                                                (if (yes-or-no-p "Found kindle, do you want to convert and export to kindle?")
+                                                    calibredb-device-dir
+                                                  (calibredb-complete-file-quote "Export to (select a directory)"))
+                                              (calibredb-complete-file-quote "Export to (select a directory)")))))
     (calibredb-command :command "export"
                        :option (s-join " " (-remove 's-blank? (-flatten (calibredb-export-arguments))))
-                       :input (format "--to-dir %s" (calibredb-complete-file-quote "Export to (select a path)"))
+                       :input (format "--to-dir %s" output-folder)
                        :id id
                        :library (format "--library-path %s" (calibredb-root-dir-quote)))))
 
-;; TODO convert ebooks
-(defun calibredb-convert (&optional candidate)
-  "TODO: Convert the slected CANDIDATE."
-  (interactive)
-  (unless candidate
-    (if (eq major-mode 'calibredb-search-mode)
-        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
-      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
-  (let (;; (id (calibredb-getattr candidate :id))
-        (file (calibredb-get-file-path candidate t)))
-    (calibredb-convert-process
-     :input file
-     :output (format "%s" (calibredb-complete-file-quote "Convert as"))
-     :option (s-join " " (-remove 's-blank? (-flatten (calibredb-convert-arguments)))))))
+;; convert ebooks
+(defmacro calibredb-convert (type)
+  `(defun ,(intern (format "calibredb-convert-to-%s" type)) (&optional candidate)
+    ,(format "TODO: Convert the slected CANDIDATE to %s." type)
+    (interactive)
+    (unless candidate
+      (if (eq major-mode 'calibredb-search-mode)
+          (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+        (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
+    (let (;; (id (calibredb-getattr candidate :id))
+          (file (calibredb-get-file-path candidate t))
+          (output-folder (file-name-directory (if (file-executable-p calibredb-device-dir)
+                                                  (if (yes-or-no-p "Found kindle, do you want to convert and export to kindle?")
+                                                      calibredb-device-dir
+                                                    (calibredb-complete-file-quote "Convert and export to (select a directory)"))
+                                                (calibredb-complete-file-quote "Convert and export to (select a directory)")))))
+      (set-process-sentinel
+       (calibredb-convert-process
+        :input (shell-quote-argument (expand-file-name file))
+        :output (shell-quote-argument (expand-file-name
+                                       (format "%s.%s" (file-name-base file) ,type)
+                                       output-folder))
+        :option (s-join " " (-remove 's-blank? (-flatten (calibredb-convert-arguments)))))
+       (lambda (p _e)
+         (when (= 0 (process-exit-status p))
+           (message "Conversion finished. Please check logs in *ebook-convert*.")))))) )
+
+(calibredb-convert "azw3")
+(calibredb-convert "docx")
+(calibredb-convert "epub")
+(calibredb-convert "fb2")
+(calibredb-convert "html")
+(calibredb-convert "htmlz")
+(calibredb-convert "lit")
+(calibredb-convert "lrf")
+(calibredb-convert "mobi")
+(calibredb-convert "oeb")
+(calibredb-convert "pdb")
+(calibredb-convert "pdf")
+(calibredb-convert "pml")
+(calibredb-convert "rb")
+(calibredb-convert "rtf")
+(calibredb-convert "snb")
+(calibredb-convert "tcr")
+(calibredb-convert "txt")
+(calibredb-convert "txtz")
 
 ;; catalog
 
