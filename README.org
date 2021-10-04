@@ -789,12 +789,12 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
-** TBD
+** unrelease and testing
 Version x.x.x:
+- Support opds
 - Add ~calibredb-convert-program~
 - Add ~calibredb-device-dir~
 - Support ebook conversion and export ebooks to device
-- Support opds
 
 ** =2021-06-02=
 Version *2.10.0*:
