@@ -140,6 +140,18 @@ nil: Prompt delete or not."
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-device-dir
+  (cond ((eq system-type 'gnu/linux)
+         "/TODO")
+        ((eq system-type 'windows-nt)
+         "/TODO")
+        ((eq system-type 'darwin)
+         "/Volumes/Kindle/documents/")
+        (t "/TODO"))
+  "Directory of electronic device, e.g. kindle."
+  :type 'directory
+  :group 'calibredb)
+
 (defcustom calibredb-debug-program
   (cond
    ((eq system-type 'darwin)
