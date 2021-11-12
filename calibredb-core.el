@@ -355,6 +355,12 @@ GROUP BY id, format"
 
 (defvar calibredb-query-string "
 WITH d AS (
+    SELECT books.id, books.id as book, format, uncompressed_size, name
+    FROM books
+    LEFT JOIN data
+    ON books.id = data.book
+    WHERE data.book IS NULL
+    UNION
     SELECT *
     FROM data
 ), t AS (
