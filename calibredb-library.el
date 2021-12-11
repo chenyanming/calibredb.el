@@ -29,6 +29,8 @@
 (declare-function calibredb-ref-default-bibliography "calibredb-utils.el")
 (declare-function calibredb-search-refresh-or-resume "calibredb-search.el")
 (declare-function calibredb-search-keyword-filter "calibredb-search.el")
+(declare-function calibredb-opds-request-page "calibredb-opds.el")
+
 
 ;;;###autoload
 (defun calibredb-switch-library ()

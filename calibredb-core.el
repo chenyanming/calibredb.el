@@ -44,6 +44,7 @@
 (eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-condense-comments "calibredb-search.el")
 (declare-function calibredb-attach-icon-for "calibredb-utils.el")
+(declare-function calibredb-get-file-path "calibredb-utils.el")
 
 
 (defgroup calibredb nil

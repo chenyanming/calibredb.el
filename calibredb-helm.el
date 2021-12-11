@@ -30,6 +30,7 @@
 (declare-function calibredb-set-metadata--comments "calibredb-utils.el")
 (declare-function calibredb-open-file-with-default-tool "calibredb-utils.el")
 (declare-function calibredb-show-entry "calibredb-search.el")
+(declare-function calibredb-get-file-path "calibredb-utils.el")
 
 (defvar calibredb-helm-map
   (if (boundp 'helm-map)

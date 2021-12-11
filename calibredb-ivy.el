@@ -118,10 +118,14 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
 
 (defun calibredb-rga ()
   "Search calibredb with rga, using `counsel-ag'.
-1. In `calibredb-search-mode', search in the `calibredb-root-dir'.
-2. In `calibredb-show-mode', search in the corresponding format under the working directory.
-3. In `pdf-view-mode', search in PDF files under the working directory.
-4. In `nov-mode', search in EPUB files under the working directory."
+1. In `calibredb-search-mode', search in the
+`calibredb-root-dir'.
+2. In `calibredb-show-mode', search in the corresponding format
+under the working directory.
+3. In `pdf-view-mode', search in PDF files under the working
+directory.
+4. In `nov-mode', search in EPUB files under the working
+directory."
   (interactive)
   (setq-local counsel-ag-base-command "rga --color never --no-heading --smart-case --line-number --with-filename %s")
   (cond
