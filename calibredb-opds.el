@@ -1,4 +1,4 @@
-;;; calibredb-opds.el -*- lexical-binding: t; -*-
+;;; calibredb-opds.el --- opds for calibredb -*- lexical-binding: t; -*-
 
 ;; Author: Damon Chan <elecming@gmail.com>
 
