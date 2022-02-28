@@ -789,8 +789,8 @@ PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/s
 Search in ebooks.
 
 * Logs
-** unrelease and testing
-Version x.x.x:
+** =2022-02-28=
+Version *2.11.0*:
 - Support opds
 - Add ~calibredb-convert-program~
 - Add ~calibredb-device-dir~
