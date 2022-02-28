@@ -701,7 +701,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
   (let* ((buff (get-buffer-create (calibredb-show--buffer-name metadata)))
          (tag (cdr (assoc "Tags" metadata)))
          (comment (cdr (assoc "Comments" metadata)))
-         (authors (cdr (assoc "Authors" metadata)))
+         (myauthors (cdr (assoc "Authors" metadata)))
          (title (cdr (assoc "Title" metadata)))
          (pubdate (cdr (assoc "Published" metadata)))
          ;; (query-result (cdr (car (calibredb-candidate id)))) ; get the new metadata through SQL query
@@ -719,7 +719,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
         (setq end (point))
         (put-text-property beg end 'calibredb-metadata metadata)
         (insert (format "Title       %s\n" (propertize title 'face 'calibredb-title-face)))
-        (insert (format "Author(s)   %s\n" (propertize authors 'face 'calibredb-author-face)))
+        (insert (format "Author(s)   %s\n" (propertize myauthors 'face 'calibredb-author-face)))
         (when tag (insert (format "Tags        %s\n" (propertize tag 'face 'calibredb-tag-face))))
         (when comment
           (insert (format "Comments    %s\n" (propertize comment 'face 'calibredb-comment-face))))
@@ -874,16 +874,16 @@ Optional argument ARG."
   (let* ((candidate (car (calibredb-find-candidate-at-point)))
          (id (calibredb-getattr candidate :id))
          (ids (split-string (calibredb-getattr candidate :ids) ","))
-         (authors (calibredb-getattr candidate :author-sort))
+         (myauthors (calibredb-getattr candidate :author-sort))
          (title (calibredb-getattr candidate :book-title))
          (metadata
-          (cond ((string= type "id") (calibredb-fetch-metadata title authors ids))
-                ((string= type "author") (if arg (calibredb-fetch-metadata title authors)
-                                           (calibredb-fetch-metadata authors title)))
+          (cond ((string= type "id") (calibredb-fetch-metadata title myauthors ids))
+                ((string= type "author") (if arg (calibredb-fetch-metadata title myauthors)
+                                           (calibredb-fetch-metadata myauthors title)))
                 ((string= type "isbn") (if arg
-                                           (calibredb-fetch-metadata authors title nil title)
+                                           (calibredb-fetch-metadata myauthors title nil title)
                                          (calibredb-fetch-metadata
-                                          authors
+                                          myauthors
                                           title
                                           nil
                                           (cond ((calibredb-auto-detect-isbn))
@@ -901,7 +901,7 @@ Optional argument ARG."
                (switch-to-buffer-other-window "*calibredb-search*")))
            (calibredb-search-refresh-or-resume)
            (if calibredb-show-results (calibredb-show-results metadata t))
-           (message "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors))
+           (message "Metadata updated: ID - %s, Title - %s, Authors - %s." id title myauthors))
           ;; (switch-to-buffer-other-window "*calibredb-entry*"))
           (t (print "No metadata retrieved from sources")))))
 
