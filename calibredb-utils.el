@@ -36,6 +36,8 @@
 (eval-when-compile (defvar calibredb-search-entries))
 (eval-when-compile (defvar calibredb-full-entries))
 (eval-when-compile (defvar calibredb-images-path))
+(eval-when-compile (defvar calibredb-opds-download-dir))
+
 
 (declare-function calibredb-search-buffer "calibredb-search.el")
 (declare-function calibredb-detailed-view-insert-image "calibredb-utils.el")
@@ -49,6 +51,10 @@
 (declare-function calibredb-set-metadata-arguments "calibredb-transient.el")
 (declare-function calibredb-export-arguments "calibredb-transient.el")
 (declare-function calibredb-catalog-bib-arguments "calibredb-transient.el")
+(declare-function calibredb-opds-download "calibredb-opds.el")
+(declare-function calibredb-opds-request-page "calibredb-opds.el")
+(declare-function calibredb-opds-search "calibredb-opds.el")
+(declare-function calibredb-opds-mailcap-mime-to-extn "calibredb-opds.el")
 (declare-function pdf-info-search-string "pdf-info")
 (declare-function pdf-info-gettext "pdf-info")
 (declare-function djvu-find-file "djvu")
@@ -817,7 +823,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
   "Select and set cover."
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
     (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
-  (let ((original (calibredb-get-cover (car (calibredb-find-candidate-at-point)) :file-path)))
+  (let ((original (calibredb-get-cover (car (calibredb-find-candidate-at-point)))))
     (if (and (file-exists-p original) (file-exists-p (expand-file-name "cover.jpg" temporary-file-directory)))
         (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
                (fetched (expand-file-name "cover.jpg" temporary-file-directory)))

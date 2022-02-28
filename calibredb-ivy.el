@@ -89,13 +89,16 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
   (let ((delete-by-moving-to-trash t))
     (pcase system-type
       ('windows-nt
-       (system-move-file-to-trash file))
+       (if (fboundp 'system-move-file-to-trash)
+           (system-move-file-to-trash file)))
       ('gnu/linux
-       (move-file-to-trash file))
+       (if (fboundp 'move-file-to-trash)
+           (move-file-to-trash file)))
       ('darwin
        (let ((trash-directory "~/.Trash"))
          (cond ((featurep 'osx-trash)
-                (osx-trash-move-file-to-trash file))
+                (if (fboundp 'osx-trash-move-file-to-trash)
+                    (osx-trash-move-file-to-trash file)))
                ((executable-find "trash")
                 (call-process "trash" nil nil nil file))
                (t (move-file-to-trash file))))))))

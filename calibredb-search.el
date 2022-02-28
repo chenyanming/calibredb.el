@@ -877,14 +877,14 @@ ARGUMENT FILTER is the filter string."
 
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
-  (if (and calibredb-detial-view calibredb-detial-view-image-show)
+  (if (and calibredb-detial-view calibredb-detailed-view-image-show)
       (let ((num (cond (calibredb-format-all-the-icons 3)
                        (calibredb-format-icons-in-terminal 3)
                        ((>= calibredb-id-width 0) calibredb-id-width)
                        (t 0 ))))
         (insert "\n")
         (insert (make-string num ? ))
-        (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detail-view-image-max-width calibredb-detail-view-image-max-height))))
+        (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))))
 
 (defun calibredb-detailed-view-insert-image (entry)
   "Insert image in *calibredb-search* under detailed view based on ENTRY."
@@ -1057,7 +1057,8 @@ ARGUMENT FILTER is the filter string."
       (remove-text-properties beg end '(calibredb-mark nil)))))
 
 (defmacro calibredb-sort-by (field)
-  "Macro of functions calibredb-sort-by-FIELD."
+  "Macro of functions calibredb-sort-by-*.
+Argument FIELD."
   `(defun ,(intern (format "calibredb-sort-by-%s" field)) ()
      (interactive)
      ,(format "Sort by %s, refresh *calibredb-search*, and clear filter." field)

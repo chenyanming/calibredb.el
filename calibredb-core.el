@@ -530,7 +530,7 @@ tell user something’s wrong."
         ;; If this command fails return 'error
         (switch-to-buffer out-buf)
         (goto-char (point-min))
-        (error "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir))))))
+        (error "Error: `calibredb-query' can't query \"%s\". switching to its error buffer" (expand-file-name calibredb-db-dir))))))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
