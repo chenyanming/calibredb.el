@@ -798,7 +798,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
             (standard-output (current-buffer)))
         (erase-buffer)
         ;; reset calibredb-virtual-library-name
-        (unless (-contains? (mapcar #'cdr 'calibredb-virtual-library-alist) calibredb-search-filter)
+        (unless (-contains? (mapcar #'cdr calibredb-virtual-library-alist) calibredb-search-filter)
           (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
         (calibredb-search--update-list)
         ;; (setq calibredb-search-entries (calibredb-candidates))
