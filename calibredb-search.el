@@ -6,7 +6,6 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -31,13 +30,17 @@
 
 (eval-when-compile (defvar calibredb-show-entry))
 (eval-when-compile (defvar calibredb-show-entry-switch))
+(eval-when-compile (defvar calibredb-virtual-library-alist))
 
+(declare-function calibredb "calibredb.el")
 (declare-function calibredb-find-file "calibredb-utils.el")
 (declare-function calibredb-add "calibredb-utils.el")
 (declare-function calibredb-add-dir "calibredb-utils.el")
 (declare-function calibredb-clone "calibredb-utils.el")
 (declare-function calibredb-remove "calibredb-utils.el")
 (declare-function calibredb-remove-marked-items "calibredb-utils.el")
+(declare-function calibredb-switch-library "calibredb-library.el")
+(declare-function calibredb-library-list "calibredb-library.el")
 (declare-function calibredb-library-next "calibredb-library.el")
 (declare-function calibredb-library-previous "calibredb-library.el")
 (declare-function calibredb-set-metadata-dispatch "calibredb-transient.el")
@@ -165,7 +168,7 @@ time."
   :group 'calibredb
   :type 'boolean)
 
-(define-obsolete-function-alias 'calibredb-search-ret
+(define-obsolete-function-alias #'calibredb-search-ret
   'calibredb-view "calibredb 2.0.0")
 
 (defcustom calibredb-detailed-view nil
@@ -183,19 +186,19 @@ time."
 
 (defcustom calibredb-detailed-view-image-max-width 250
   "Max Width for images in detailed view - *calibredb-search*.
-For emacs 27.1+, if imagemagick is disabled, it would the image width."
+For Emacs 27.1+, if imagemagick is disabled, it would the image width."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-detailed-view-image-max-height 250
   "Max height for images in detailed view - *calibredb-search*.
-For emacs 27.1+, if imagemagick is disabled, the image height is ignored."
+For Emacs 27.1+, if imagemagick is disabled, the image height is ignored."
   :group 'calibredb
   :type 'integer)
 
 (defcustom calibredb-list-view-image-max-width 500
   "Max Width for images in list view - *calibredb-list*.
-For emacs 27.1+, if imagemagick is disabled, it is the image width."
+For Emacs 27.1+, if imagemagick is disabled, it is the image width."
   :group 'calibredb
   :type 'integer)
 
@@ -401,7 +404,7 @@ Indicating the library you use."
       (add-to-list 'ivy-sort-matches-functions-alist '(calibredb-add . ivy--sort-files-by-date)))
   (if (boundp 'ivy-alt-done-functions-alist)
       (add-to-list 'ivy-alt-done-functions-alist '(calibredb-add . ivy--directory-done)))
-  (add-hook 'minibuffer-setup-hook 'calibredb-search--minibuffer-setup)
+  (add-hook 'minibuffer-setup-hook #'calibredb-search--minibuffer-setup)
   (add-to-list 'mailcap-mime-extensions '(".epub" . "application/epub+zip"))
   (add-to-list 'mailcap-mime-extensions '(".mobi" . "application/x-mobipocket-ebook")))
 
@@ -456,7 +459,7 @@ Argument EVENT mouse event."
       (calibredb-search-refresh))
     (while (not (equal id (calibredb-read-metadatas "id")))
       (forward-line 1))
-    (goto-char (line-beginning-position))
+    (beginning-of-line)
     (recenter)))
 
 (defun calibredb-search-refresh-and-clear-filter ()
@@ -729,7 +732,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
   "Set up the minibuffer for live filtering."
   (when calibredb-search-filter-active
     (when (eq :live calibredb-search-filter-active)
-      (add-hook 'post-command-hook 'calibredb-search--live-update nil :local))))
+      (add-hook 'post-command-hook #'calibredb-search--live-update nil :local))))
 
 (defun calibredb-search--live-update ()
   "Update the calibredb-search buffer based on the contents of the minibuffer."
@@ -795,7 +798,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
             (standard-output (current-buffer)))
         (erase-buffer)
         ;; reset calibredb-virtual-library-name
-        (unless (-contains? (mapcar 'cdr calibredb-virtual-library-alist) calibredb-search-filter)
+        (unless (-contains? (mapcar #'cdr 'calibredb-virtual-library-alist) calibredb-search-filter)
           (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
         (calibredb-search--update-list)
         ;; (setq calibredb-search-entries (calibredb-candidates))
@@ -869,7 +872,7 @@ ARGUMENT FILTER is the filter string."
 (defun calibredb-toggle-view ()
   "Toggle between detailed view or compact view in *calibredb-search* buffer."
   (interactive)
-  (setq calibredb-detailed-view (if (eq calibredb-detailed-view nil) t nil))
+  (setq calibredb-detailed-view (not calibredb-detailed-view))
   (calibredb-search-toggle-view-refresh))
 
 (defun calibredb-detail-view-insert-image (entry)
@@ -1054,6 +1057,7 @@ ARGUMENT FILTER is the filter string."
       (remove-text-properties beg end '(calibredb-mark nil)))))
 
 (defmacro calibredb-sort-by (field)
+  "Macro of functions calibredb-sort-by-FIELD."
   `(defun ,(intern (format "calibredb-sort-by-%s" field)) ()
      (interactive)
      ,(format "Sort by %s, refresh *calibredb-search*, and clear filter." field)

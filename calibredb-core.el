@@ -6,7 +6,6 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -123,7 +122,7 @@ nil: Prompt delete or not."
 (defcustom calibredb-virtual-library-alist '()
   "Alist for all your calibre virtual libraries.
 1. Left is the virtual library name that shows in the *calibredb-search* header.
-2. Right is the filter keywords - `calibredb-search-filter'. "
+2. Right is the filter keywords - `calibredb-search-filter'."
   :type 'alist
   :group 'calibredb)
 
@@ -312,8 +311,7 @@ Set negative to keep original length."
   :type 'string)
 
 (defcustom calibredb-add-duplicate t
-  "Add file to calibredb even it is duplicated, when using
-`calibredb-add'. Set nil to Disable it."
+  "Add file to calibredb even it is duplicated, when using `calibredb-add'. Set nil to Disable it."
   :type 'boolean
   :group 'calibredb)
 
@@ -532,7 +530,7 @@ tell user something’s wrong."
         ;; If this command fails return 'error
         (switch-to-buffer out-buf)
         (goto-char (point-min))
-        (error (format "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir)))))))
+        (error "calibredb-query: Can't query \"%s\". switching to its error buffer." (expand-file-name calibredb-db-dir))))))
 
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.

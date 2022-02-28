@@ -6,7 +6,6 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -314,7 +313,8 @@ Argument PROMPT prompt to show."
 
 (defun calibredb-transient-read-metadata (prompt _initial-input _history &optional type)
   "Read metadata - title.
-Argument PROMPT prompt to show."
+Argument PROMPT prompt to show.
+Optional argument TYPE."
   (let ((cand))
     (if (eq major-mode 'calibredb-search-mode)
         (setq cand (cdr (get-text-property (point) 'calibredb-entry nil)))

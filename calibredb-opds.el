@@ -6,7 +6,6 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -35,8 +34,10 @@
 (defvar calibredb-opds-root-url nil)
 (defvar calibredb-opds-download-dir "~/Downloads")
 
+(declare-function calibredb "calibredb.el")
+
 (defun calibredb-opds-mailcap-mime-to-extn (mime)
-  "Return the file extensions EXTN based on the MIME content type"
+  "Return the file extensions EXTN based on the MIME content type."
   (mailcap-parse-mimetypes)
   (if (stringp mime)
       (car (rassoc (downcase mime) mailcap-mime-extensions))))
@@ -68,54 +69,62 @@
             )))
 
 (defun calibredb-opds-request-page (url &optional account password)
+  "Request URL.
+Optional argument ACCOUNT.
+Optional argument PASSWORD."
   (require 'request)
   (message "Loading %s..." url)
   (let (output)
     (setq calibredb-opds-root-url url)
-    (request url
-      :parser 'buffer-string
-      :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
-                 ("Content-Type" . "application/xml")
-                 ,(if (and account password)
-                      `("Authorization" . ,(concat "Basic "
-                                                   (base64-encode-string
-                                                    (concat account ":" password))))))
-      :sync nil
-      :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (let* ((dom (with-temp-buffer
-                                (insert data)
-                                (libxml-parse-xml-region (point-min) (point-max)))))
-                    (setq calibredb-search-entries (calibredb-opds-dom dom))
-                    (setq calibredb-full-entries calibredb-search-entries)
-                    (calibredb)
-                    (setq calibredb-tag-filter-p nil)
-                    (setq calibredb-favorite-filter-p nil)
-                    (setq calibredb-author-filter-p nil)
-                    (setq calibredb-date-filter-p nil)
-                    (setq calibredb-format-filter-p nil)
-                    (calibredb-search-keyword-filter "")
-                    (message "")
-                    ;; (setq output (opds-page dom))
-                    ))))
+    (if (fboundp 'request)
+        (request url
+                 :parser 'buffer-string
+                 :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                            ("Content-Type" . "application/xml")
+                            ,(if (and account password)
+                                 `("Authorization" . ,(concat "Basic "
+                                                              (base64-encode-string
+                                                               (concat account ":" password))))))
+                 :sync nil
+                 :success (cl-function
+                           (lambda (&key data &allow-other-keys)
+                             (let* ((dom (with-temp-buffer
+                                           (insert data)
+                                           (libxml-parse-xml-region (point-min) (point-max)))))
+                               (setq calibredb-search-entries (calibredb-opds-dom dom))
+                               (setq calibredb-full-entries calibredb-search-entries)
+                               (calibredb)
+                               (setq calibredb-tag-filter-p nil)
+                               (setq calibredb-favorite-filter-p nil)
+                               (setq calibredb-author-filter-p nil)
+                               (setq calibredb-date-filter-p nil)
+                               (setq calibredb-format-filter-p nil)
+                               (calibredb-search-keyword-filter "")
+                               (message "")
+                               ;; (setq output (opds-page dom))
+                               )))))
     output))
 
 (defun calibredb-opds-download (title url format &optional account password)
+  "Download file of TITLE URL FORMAT.
+Optional argument ACCOUNT.
+Optional argument PASSWORD."
   (let* ((file (expand-file-name (format "%s%s" title format) calibredb-opds-download-dir))
          (cmd (if (and account password)
                   (format "curl -u %s:\"%s\" -L %s -o %s" account password (shell-quote-argument url) (shell-quote-argument file ))
-                  (format "curl -L %s -o %s" (shell-quote-argument url) (shell-quote-argument file)))))
+                (format "curl -L %s -o %s" (shell-quote-argument url) (shell-quote-argument file)))))
     (message cmd)
     (if (file-exists-p file)
         (find-file file)
       (set-process-sentinel
        (start-process-shell-command "calibredb-opds" "*calibredb-opds*" cmd)
-       (lambda (p e)
+       (lambda (p _e)
          (when (= 0 (process-exit-status p))
            (if (file-exists-p file)
                (find-file file))))))))
 
 (defun calibredb-opds-dom (dom)
+  "Parse DOM."
   (let ((entries (-concat
                   (-map (lambda (link)
                           `(entry nil
@@ -170,6 +179,7 @@
         entries))) )))
 
 (defun calibredb-opds-search (&optional url)
+  "Search library from URL."
   (interactive)
   (let* ((url (or url (completing-read "Search library: " calibredb-library-alist)))
          (library (-first (lambda (lib)
@@ -178,3 +188,5 @@
     (calibredb-opds-request-page (format "%s/search\?query=%s" url  (read-string "Search: ")) (nth 1 library) (nth 2 library))))
 
 (provide 'calibredb-opds)
+
+;;; calibredb-opds.el ends here

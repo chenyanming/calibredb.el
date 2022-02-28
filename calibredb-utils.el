@@ -6,7 +6,6 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -86,7 +85,7 @@
             (when (file-exists-p cover)
               (insert "\n")
               (insert "#+attr_org: :width 200px\n")
-              (insert (concat "[[file:" cover "]]")))
+              (insert "[[file:" cover "]]"))
             (insert "\n")
             (insert (format "[[file:%s][%s]]" book title))
             (insert "\n")))))
@@ -113,9 +112,10 @@ Argument FILEPATH is the file path."
         (t (message "unknown system!?"))))
 
 (defun calibredb-get-file-path (entry &optional prompt)
-  "Get file path from a valid candidate ENTRY."
+  "Get file path from a valid candidate ENTRY.
+Optional argument PROMPT to Select a format."
   (let ((file-path (calibredb-getattr entry :file-path)))
-    (cond ((s-equals? "" file-path) "")                  ; no file-path field
+    (cond ((s-equals? "" file-path) "")         ; no file-path field
           ((file-exists-p file-path) file-path) ; default file-path is a valid file
           ((calibredb-local-file-exists-p entry) (calibredb-local-file entry)) ; valid local file is found
           ((s-contains? "http" file-path) file-path) ; for http link, just return
@@ -205,7 +205,7 @@ Download it if book-cover is non-nil."
 
 (defun calibredb-find-file (arg &optional candidate)
   "Open file of the selected item.
-If the universal prefix argument is used, ignore `calibredb-preferred-format'.
+If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
@@ -233,7 +233,7 @@ Optional argument CANDIDATE is the selected item."
 
 (defun calibredb-find-file-other-frame (arg &optional candidate)
   "Open file in other frame of the selected item.
-If the universal prefix argument is used, ignore `calibredb-preferred-format'.
+If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
@@ -245,7 +245,7 @@ Optional argument CANDIDATE is the selected item."
 
 (defun calibredb-open-file-with-default-tool (arg &optional candidate)
   "Open file with the system default tool.
-If the universal prefix argument is used, ignore `calibredb-preferred-format'.
+If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
@@ -257,7 +257,7 @@ Optional argument CANDIDATE is the selected item."
 
 (defun calibredb-quick-look (arg &optional candidate)
   "Quick the file with the qlmanage, but it only Support macOS.
-If the universal prefix argument is used, ignore `calibredb-preferred-format'.
+If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
   (interactive "P")
   (unless candidate
@@ -306,7 +306,7 @@ Optional argument CANDIDATE is candidate to read."
 
 (defun calibredb-open-dired (arg &optional candidate)
   "Open dired of the selected item.
-If the universal prefix argument is used then open the folder
+If the universal prefix ARG is used then open the folder
 containing the current file by the default explorer.
 Optional argument CANDIDATE is the selected item.
 Opens a dired buffer in FILE's directory.  If FILE is a
@@ -416,7 +416,7 @@ If prefix ARG is non-nil, delete the files without prompt."
             (calibredb-command :command "remove"
                                :id ids
                                :library (format "--library-path %s" (calibredb-root-dir-quote)))
-            (message (format "Deleted %s - %s" ids)))
+            (message "Deleted %s" ids))
         (if (yes-or-no-p (concat "Are you sure to move: " ids " to recycle bin?"))
             (calibredb-command :command "remove"
                                :id ids
@@ -742,7 +742,7 @@ This function is a slighly modified version from function `calibredb-show-entry'
 (defun calibredb-fetch-metadata-from-sources (author title &optional ids isbn fetch-cover)
   "Fetch metadata from online source via author and title or ISBN.
 Invoke from *calibredb-search* buffer.
-AUTHOR, TITLE and ISBN should be strings.
+AUTHOR, TITLE, IDS and ISBN should be strings.
 Returns an alist with elements (SOURCE RESULTS) where SOURCE is a
 string and RESULTS is an alist with elements (PROP VALUE). If no
 metadata was found from a source then in then nil is returned in
@@ -818,20 +818,20 @@ the outer alist (nil instead of (SOURCE RESULTS))."
   (when (get-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point)))
     (kill-buffer (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
   (let ((original (calibredb-get-cover (car (calibredb-find-candidate-at-point)) :file-path)))
-    (if (and (file-exists-p original) (file-exists-p "/tmp/cover.jpg"))
+    (if (and (file-exists-p original) (file-exists-p (expand-file-name "cover.jpg" temporary-file-directory)))
         (let* ((buff (get-buffer-create (calibredb-show--buffer-name (calibredb-find-candidate-at-point))))
-               (fetched "/tmp/cover.jpg"))
-          (clear-image-cache "/tmp/cover.jpg")
+               (fetched (expand-file-name "cover.jpg" temporary-file-directory)))
+          (clear-image-cache (expand-file-name "cover.jpg" temporary-file-directory))
           (with-current-buffer buff
             (calibredb-insert-image original "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
             (insert " original  fetched ")
             (calibredb-insert-image fetched "" calibredb-list-view-image-max-width calibredb-list-view-image-max-height)
             (switch-to-buffer buff)
             (when (string= (completing-read "Select cover: " '("original" "fetched")) "fetched")
-              (rename-file "/tmp/cover.jpg" original t))
+              (rename-file (expand-file-name "cover.jpg" temporary-file-directory) original t))
             (kill-buffer)))
-      (cond ((file-exists-p "/tmp/cover.jpg")
-             (rename-file "/tmp/cover.jpg" original t)
+      (cond ((file-exists-p (expand-file-name "cover.jpg" temporary-file-directory))
+             (rename-file (expand-file-name "cover.jpg" temporary-file-directory) original t)
              (print "Fetched cover added to entry"))
             (t (print "No cover could be fetched"))))))
 
@@ -849,6 +849,7 @@ Argument RESULTS is the source list."
 (defun calibredb-fetch-metadata (author title &optional ids isbn)
   "Fetch metadata.
 Argument AUTHOR prompts to input the author.
+Argument IDS prompts to input the ids.
 Argument TITLE prompts to input the title.
 Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
@@ -894,7 +895,7 @@ Optional argument ARG."
                (switch-to-buffer-other-window "*calibredb-search*")))
            (calibredb-search-refresh-or-resume)
            (if calibredb-show-results (calibredb-show-results metadata t))
-           (message (format "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors)))
+           (message "Metadata updated: ID - %s, Title - %s, Authors - %s." id title authors))
           ;; (switch-to-buffer-other-window "*calibredb-entry*"))
           (t (print "No metadata retrieved from sources")))))
 
@@ -953,6 +954,7 @@ With universal ARG \\[universal-argument] use title as initial value."
 
 ;; convert ebooks
 (defmacro calibredb-convert (type)
+  "Macro of function calibredb-convert-to-TYPE."
   `(defun ,(intern (format "calibredb-convert-to-%s" type)) (&optional candidate)
     ,(format "TODO: Convert the slected CANDIDATE to %s." type)
     (interactive)
@@ -1051,6 +1053,7 @@ With universal ARG \\[universal-argument] use title as initial value."
       )))
 
 (defmacro calibredb-all (field)
+  "Macro of function calibredb-all-FIELD."
   `(defun ,(intern (format "calibredb-all-%s" field)) ()
      ,(format "Get all %s and return as a list." field)
      (seq-uniq
