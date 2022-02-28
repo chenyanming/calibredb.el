@@ -7,7 +7,7 @@
 ;; Keywords: tools
 ;; Created: 9 May 2020
 ;; Version: 2.10.0
-;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7")
+;; Package-Requires: ((emacs "25.1") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
 
