@@ -1,4 +1,5 @@
 #+TITLE:   [[https://github.com/chenyanming/calibredb.el][calibredb.el]]
+#+AUTHOR: Damon Chan
 #+DATE:    Aug 9, 2020
 #+SINCE:   <replace with next tagged release version>
 #+STARTUP: inlineimages nofold
