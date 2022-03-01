@@ -769,27 +769,27 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                     (id
                                      (format
                                       (if fetch-cover
-                                          `,(format "%%s -p '%%s' --identifier '%%s' -c %s  2>/dev/null"
+                                          `,(format "%%s -p \"%%s\" --identifier \"%%s\" -c %s  2>/dev/null"
                                                     (expand-file-name "cover.jpg" temporary-file-directory))
-                                        "%s -p '%s' --identifier '%s' 2>/dev/null")
+                                        "%s -p \"%s\" --identifier \"%s\" 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
                                       id))
                                     (isbn
                                      (format
                                       (if fetch-cover
-                                          `,(format "%%s -p '%%s' --isbn '%%s' -c %s  2>/dev/null"
+                                          `,(format "%%s -p \"%%s\" --isbn \"%%s\" -c %s  2>/dev/null"
                                                    (expand-file-name "cover.jpg" temporary-file-directory))
-                                        "%s -p '%s' --isbn '%s' 2>/dev/null")
+                                        "%s -p \"%s\" --isbn \"%s\" 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
                                       isbn))
                                     (t
                                      (format
                                       (if fetch-cover
-                                          `,(format "%%s -p '%%s' --authors '%%s' --title '%%s' -c %s  2>/dev/null"
+                                          `,(format "%%s -p \"%%s\" --authors \"%%s\" --title \"%%s\" -c %s  2>/dev/null"
                                                    (expand-file-name "cover.jpg" temporary-file-directory))
-                                        "%s -p '%s' --authors '%s' --title '%s' 2>/dev/null")
+                                        "%s -p \"%s\" --authors \"%s\" --title \"%s\" 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
                                       authors
@@ -806,7 +806,7 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                                                  (match-string 3 string))))
                                                        (split-string (car md-split) "\n" t " *"))
                                              nil))
-                              (kovids-magic "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" '%s'")
+                              (kovids-magic "%s -c  \"from calibre.ebooks.metadata import *; import sys; print(author_to_author_sort(' '.join(sys.argv[1:])))\" \"%s\"")
                               (author-sort (when (cdr (assoc "Authors" no-comments))
                                              (shell-command-to-string (format
                                                                        kovids-magic
