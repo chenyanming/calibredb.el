@@ -769,7 +769,8 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                     (id
                                      (format
                                       (if fetch-cover
-                                          "%s -p '%s' --identifier '%s' -c /tmp/cover.jpg  2>/dev/null"
+                                          `,(format "%%s -p '%%s' --identifier '%%s' -c %s  2>/dev/null"
+                                                    (expand-file-name "cover.jpg" temporary-file-directory))
                                         "%s -p '%s' --identifier '%s' 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
@@ -777,7 +778,8 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                     (isbn
                                      (format
                                       (if fetch-cover
-                                          "%s -p '%s' --isbn '%s' -c /tmp/cover.jpg 2>/dev/null"
+                                          `,(format "%%s -p '%%s' --isbn '%%s' -c %s  2>/dev/null"
+                                                   (expand-file-name "cover.jpg" temporary-file-directory))
                                         "%s -p '%s' --isbn '%s' 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
@@ -785,7 +787,8 @@ the outer alist (nil instead of (SOURCE RESULTS))."
                                     (t
                                      (format
                                       (if fetch-cover
-                                          "%s -p '%s' --authors '%s' --title '%s' -c /tmp/cover.jpg  2>/dev/null"
+                                          `,(format "%%s -p '%%s' --authors '%%s' --title '%%s' -c %s  2>/dev/null"
+                                                   (expand-file-name "cover.jpg" temporary-file-directory))
                                         "%s -p '%s' --authors '%s' --title '%s' 2>/dev/null")
                                       calibredb-fetch-metadata-program
                                       source
