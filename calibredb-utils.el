@@ -976,8 +976,8 @@ With universal ARG \\[universal-argument] use title as initial value."
           (output-folder (file-name-directory (if (file-executable-p calibredb-device-dir)
                                                   (if (yes-or-no-p "Found kindle, do you want to convert and export to kindle?")
                                                       calibredb-device-dir
-                                                    (calibredb-complete-file-quote "Convert and export to (select a directory)"))
-                                                (calibredb-complete-file-quote "Convert and export to (select a directory)")))))
+                                                    (read-file-name "Convert and export to (select a directory): "))
+                                                (read-file-name "Convert and export to (select a directory): ")))))
       (set-process-sentinel
        (calibredb-convert-process
         :input (shell-quote-argument (expand-file-name file))
