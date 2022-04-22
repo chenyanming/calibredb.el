@@ -58,7 +58,7 @@
   (cond ((null calibredb-db-dir)
          (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
         ((not (file-regular-p calibredb-db-dir))
-         (message "calibredb: %s doesn't exist!") calibredb-db-dir)
+         (message "calibredb: %s doesn't exist!" calibredb-db-dir))
         (t
          (let ((cand (or calibredb-search-entries
                          (setq calibredb-search-entries (calibredb-candidates)))))
