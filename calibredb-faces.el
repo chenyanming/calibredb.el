@@ -176,6 +176,26 @@
   "Face used for archive."
   :group 'calibredb-faces)
 
+(defface calibredb-search-header-library-name-face '((t :inherit font-lock-preprocessor-face))
+  "Face used for library name in *calibredb-search* header."
+  :group 'calibredb-faces)
+
+(defface calibredb-search-header-library-path-face '((t :inherit font-lock-type-face))
+  "Face used for library path in *calibredb-search* header."
+  :group 'calibredb-faces)
+
+(defface calibredb-search-header-total-face '((t :inherit font-lock-warning-face))
+  "Face used for total count in *calibredb-search* header."
+  :group 'calibredb-faces)
+
+(defface calibredb-search-header-sort-face '((t :inherit font-lock-keyword-face))
+  "Face used for sort field *calibredb-search* header."
+  :group 'calibredb-faces)
+
+(defface calibredb-search-header-filter-face '((t :inherit font-lock-negation-char-face))
+  "Face used for filter field *calibredb-search* header."
+  :group 'calibredb-faces)
+
 (defface calibredb-mouse-face '((t :inherit mode-line-highlight))
   "Face used for *calibredb-search* mouse face"
   :group 'calibredb-faces)
