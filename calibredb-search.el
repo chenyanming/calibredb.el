@@ -344,13 +344,13 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
   "TODO: Return the string to be used as the Calibredb header.
 Indicating the library you use."
   (format "%s: %s   %s"
-          (propertize calibredb-virtual-library-name 'face font-lock-preprocessor-face)
-          (propertize calibredb-root-dir 'face font-lock-type-face)
+          (propertize calibredb-virtual-library-name 'face 'calibredb-search-title-library-name-face)
+          (propertize calibredb-root-dir 'face 'calibredb-search-title-library-path-face)
           (concat
            (propertize (format "Total: %s"
                                (if (equal calibredb-search-entries '(""))
                                    "0   "
-                                 (concat (number-to-string (length calibredb-search-entries)) "  "))) 'face font-lock-warning-face)
+                                 (concat (number-to-string (length calibredb-search-entries)) "  "))) 'face 'calibredb-search-title-total-face)
            (cond ((eq calibredb-sort-by 'id)
                   "Sort: id ")
                  ((eq calibredb-sort-by 'title)
@@ -386,10 +386,10 @@ Indicating the library you use."
                                 (t ""))
                                (if (equal calibredb-search-filter "")
                                    ""
-                                 (concat calibredb-search-filter "   "))) 'face font-lock-keyword-face)
+                                 (concat calibredb-search-filter "   "))) 'face 'calibredb-search-title-sort-face)
            (propertize (let ((len (length (calibredb-find-marked-candidates))))
                          (if (> len 0)
-                             (concat "Marked: " (number-to-string len)) "")) 'face font-lock-negation-char-face))))
+                             (concat "Marked: " (number-to-string len)) "")) 'face 'calibredb-search-title-filter-face))))
 
 (define-derived-mode calibredb-search-mode fundamental-mode "calibredb-search"
   "Major mode for listing calibre entries.
