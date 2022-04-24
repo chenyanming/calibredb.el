@@ -45,17 +45,26 @@
 The optional PREFIX argument is ignored.
 Please notice: `calibredb-id-width' must >= the real id lenth."
   (ignore prefix)
-  (let* ((cands (if calibredb-search-entries
+  (let* ((candidates (if calibredb-search-entries
                    calibredb-search-entries
                  (progn
                    (setq calibredb-search-entries (calibredb-candidates))
                    (setq calibredb-full-entries calibredb-search-entries)))))
-    (if cands
-        (let* ((cand (completing-read "Insert: " cands))
-               (id-point (text-property-not-all 0 (length cand) 'id nil cand))
-               (id (get-text-property id-point 'id cand)))
-          (concat (format "calibredb:%s" id)))
-      "calibredb:")))
+    (if (fboundp 'consult--read)
+        (if candidates
+            (let* ((cand (consult--read candidates
+                                        :prompt "Pick a book: "
+                                        :lookup #'consult--lookup-cdr
+                                        :sort nil))
+                   (id (cadr (assoc :id (car cand )) )))
+              (concat (format "calibredb:%s" id)))
+          "calibredb:")
+      (if candidates
+          (let* ((cand (completing-read "Pick a book: " candidates))
+                 (id-point (text-property-not-all 0 (length cand) 'id nil cand))
+                 (id (get-text-property id-point 'id cand)))
+            (concat (format "calibredb:%s" id)))
+        "calibredb:"))))
 
 ;; TODO: The description can not be set.
 (org-link-set-parameters
