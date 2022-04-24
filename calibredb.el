@@ -50,6 +50,7 @@
 (require 'calibredb-library)
 (require 'calibredb-org)
 (require 'calibredb-opds)
+(require 'calibredb-consult)
 
 ;;;###autoload
 (defun calibredb ()
