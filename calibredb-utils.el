@@ -209,14 +209,14 @@ Download it if book-cover is non-nil."
           (insert-image image)
         (insert alt))))))
 
-(defun calibredb-find-file (arg &optional candidate)
+(defun calibredb-find-file (&optional candidate arg)
   "Open file of the selected item.
 If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive "P")
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
-  (let ((file (if arg
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
+  (let ((file (if current-prefix-arg
                   (let ((calibredb-preferred-format nil))
                     (calibredb-get-file-path candidate t))
                 (calibredb-get-file-path candidate t))))
@@ -237,39 +237,39 @@ Optional argument CANDIDATE is the selected item."
           ((s-equals? "" file) (message "No files."))
           (t (find-file file)))))
 
-(defun calibredb-find-file-other-frame (arg &optional candidate)
+(defun calibredb-find-file-other-frame (&optional candidate arg)
   "Open file in other frame of the selected item.
 If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive "P")
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
-  (find-file-other-frame (if arg
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
+  (find-file-other-frame (if current-prefix-arg
                              (let ((calibredb-preferred-format nil))
                                (calibredb-get-file-path candidate t))
                              (calibredb-get-file-path candidate t))))
 
-(defun calibredb-open-file-with-default-tool (arg &optional candidate)
+(defun calibredb-open-file-with-default-tool (&optional candidate arg)
   "Open file with the system default tool.
 If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive "P")
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
-  (if arg
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
+  (if current-prefix-arg
       (let ((calibredb-preferred-format nil))
         (calibredb-open-with-default-tool (calibredb-get-file-path candidate t)))
     (calibredb-open-with-default-tool (calibredb-get-file-path candidate t))))
 
-(defun calibredb-quick-look (arg &optional candidate)
+(defun calibredb-quick-look (&optional candidate arg)
   "Quick the file with the qlmanage, but it only Support macOS.
 If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
 Optional argument CANDIDATE is the selected item."
-  (interactive "P")
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
   (let ((file (shell-quote-argument
-               (expand-file-name (if arg
+               (expand-file-name (if current-prefix-arg
                                      (let ((calibredb-preferred-format nil))
                                        (calibredb-get-file-path candidate t))
                                    (calibredb-get-file-path candidate t))))))
@@ -310,17 +310,17 @@ Optional argument CANDIDATE is candidate to read."
                       (insert (format "[[file:%s][%s]]" capture-path capture-title))
                       (buffer-string))))
 
-(defun calibredb-open-dired (arg &optional candidate)
+(defun calibredb-open-dired (&optional candidate arg)
   "Open dired of the selected item.
 If the universal prefix ARG is used then open the folder
 containing the current file by the default explorer.
 Optional argument CANDIDATE is the selected item.
 Opens a dired buffer in FILE's directory.  If FILE is a
 directory, open this directory."
-  (interactive "P")
-  (unless candidate
-    (setq candidate (car (calibredb-find-candidate-at-point))))
-  (if arg
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
+  (if current-prefix-arg
       (calibredb-open-with-default-tool (file-name-directory (calibredb-get-file-path candidate t) ))
     (let ((file (calibredb-getattr candidate :file-path)))
       (if (file-directory-p file)

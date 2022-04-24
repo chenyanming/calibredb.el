@@ -46,7 +46,7 @@
        ("v" (lambda (candidate)
               (calibredb-show-entry (cdr candidate))) "View details")
        ("V" (lambda (candidate)
-              (calibredb-open-file-with-default-tool nil (cdr candidate))) "Open with default tool")
+              (calibredb-open-file-with-default-tool (cdr candidate))) "Open with default tool")
        ("d" (lambda (candidate)
               (calibredb-remove (cdr candidate))) "Delete ebook")
        ("t" (lambda (candidate)
