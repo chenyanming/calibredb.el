@@ -366,7 +366,7 @@ types are added.
 Optional argument OPTION is additional options."
   (interactive)
   (calibredb-command :command "add"
-                     :input (format "--add %s" (concat (file-name-as-directory (calibredb-complete-file-quote "Add a directory to Calibre")) "*"))
+                     :input (format "--add %s" (concat (file-name-as-directory (calibredb-complete-directory-quote "Add a directory to Calibre")) "*"))
                      :option (or option "")
                      :library (format "--library-path %s" (calibredb-root-dir-quote)))
   (if (equal major-mode 'calibredb-search-mode)
@@ -386,6 +386,13 @@ library."
 Optional argument ARG is the prompt.
 Optional argument REST is the rest."
   (let ((file (read-file-name (format "%s: " arg) (pop rest))))
+    (shell-quote-argument (expand-file-name file))))
+
+(defun calibredb-complete-directory-quote (&optional arg &rest rest)
+  "Get quoted directory name using completion.
+Optional argument ARG is the prompt.
+Optional argument REST is the rest."
+  (let ((file (read-directory-name (format "%s: " arg) (pop rest))))
     (shell-quote-argument (expand-file-name file))))
 
 ;; remove
