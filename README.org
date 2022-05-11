@@ -342,6 +342,10 @@ Besides, variable =calibredb-root-dir= also saves the current library location.
 
 2. =M-x calibredb-add-dir= and select one directory, all supported formats will be added into current library.
 
+3. =M-x dired=, mark the files, then =M-x calibredb-dired-add=, marked files in =dired= will be added
+   to current library. After adding process ends, =dired= will ask the user delete the files or
+   not.
+
 Please notice: Add books may fail! There are some reasons:
 - The book already exists in the database. If you still want to add the duplicated books, you can set ~calibredb-add-duplicate~ to ~Non-Nil~.
 - Not all book formats are supported. If you can not add a specific book, check the logs in ~*calibredb*~ buffer.
