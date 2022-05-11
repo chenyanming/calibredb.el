@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.10.0
+;; Version: 2.12.0
 
 ;; This file is NOT part of GNU Emacs.
 

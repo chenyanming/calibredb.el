@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.10.0
+;; Version: 2.12.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -309,24 +309,6 @@ Optional argument CANDIDATE is candidate to read."
     (with-temp-buffer (insert "* TODO ")
                       (insert (format "[[file:%s][%s]]" capture-path capture-title))
                       (buffer-string))))
-
-(defun calibredb-open-dired (&optional candidate arg)
-  "Open dired of the selected item.
-If the universal prefix ARG is used then open the folder
-containing the current file by the default explorer.
-Optional argument CANDIDATE is the selected item.
-Opens a dired buffer in FILE's directory.  If FILE is a
-directory, open this directory."
-  (interactive
-   (list (car (calibredb-find-candidate-at-point))
-         current-prefix-arg))
-  (if current-prefix-arg
-      (calibredb-open-with-default-tool (file-name-directory (calibredb-get-file-path candidate t) ))
-    (let ((file (calibredb-getattr candidate :file-path)))
-      (if (file-directory-p file)
-          (dired file)
-        (dired (file-name-directory file))
-        (dired-goto-file file)))))
 
 (defun calibredb-add (arg)
   "Add file(s) into calibredb.

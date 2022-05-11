@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.10.0
+;; Version: 2.12.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -121,7 +121,7 @@ When live editing the filter, it is bound to :live.")
     (define-key map "v" #'calibredb-view)
     (define-key map "V" #'calibredb-open-file-with-default-tool)
     (define-key map "," #'calibredb-quick-look)
-    (define-key map "." #'calibredb-open-dired)
+    (define-key map "." #'calibredb-dired-open)
     (define-key map "y" #'calibredb-yank-dispatch)
     (define-key map "b" #'calibredb-catalog-bib-dispatch)
     (define-key map "e" #'calibredb-export-dispatch)
