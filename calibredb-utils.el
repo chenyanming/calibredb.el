@@ -110,8 +110,7 @@ Argument FILEPATH is the file path."
   (cond ((eq system-type 'gnu/linux)
          (call-process "xdg-open" nil 0 nil (expand-file-name filepath)))
         ((eq system-type 'windows-nt)
-         (start-process "shell-process" "*Messages*"
-                        "cmd.exe" "/c" (expand-file-name filepath)))
+         (w32-shell-execute "open" (expand-file-name filepath)))
         ((eq system-type 'darwin)
          (start-process "shell-process" "*Messages*"
                         "open" (expand-file-name filepath)))
