@@ -66,7 +66,8 @@ library."
   (let ((files (mapconcat
                 (lambda (file)
                   (shell-quote-argument (expand-file-name file)))
-                files " ")))
+                files " "))
+        (buffer (current-buffer)))
     (set-process-sentinel
      (calibredb-process :command "add"
                         :input files
@@ -78,7 +79,8 @@ library."
          (setq calibredb-search-entries (calibredb-candidates))
          (setq calibredb-full-entries calibredb-search-entries)
          (calibredb-search-clear-filter)
-         (dired-do-delete))))))
+         (with-current-buffer buffer
+             (dired-do-delete)))))))
 
 (provide 'calibredb-dired)
 
