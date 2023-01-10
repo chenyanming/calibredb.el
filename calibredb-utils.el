@@ -922,7 +922,9 @@ With universal ARG \\[universal-argument] use title as initial value."
   "Show selected CANDIDATE metadata."
   (interactive)
   (unless candidate
-    (setq candidate (get-text-property (point-min) 'calibredb-entry nil)))
+    (if (eq major-mode 'calibredb-search-mode)
+        (setq candidate (cdr (get-text-property (point) 'calibredb-entry nil)))
+      (setq candidate (get-text-property (point-min) 'calibredb-entry nil))))
   (let* ((id (calibredb-getattr candidate :id)))
     (calibredb-command :command "show_metadata"
                        :id id
