@@ -84,15 +84,7 @@ Please notice: `calibredb-id-width' must >= the real id lenth."
          (let ((id (calibredb-getattr cand :id))
                (path (calibredb-getattr cand :file-path))
                (title (calibredb-getattr cand :book-title)))
-           (insert (format "[[calibredb:%s][%s %s - %s]]\n"
-                           id
-                           (cond (calibredb-format-all-the-icons
-                                  (if (fboundp 'all-the-icons-icon-for-file)
-                                      (all-the-icons-icon-for-file path) ""))
-                                 (calibredb-format-icons-in-terminal
-                                  (if (fboundp 'icons-in-terminal-icon-for-file)
-                                      (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
-                                 (t "")) id title))
+           (insert (format "[[calibredb:%s][%s]]\n" id title))
            (message "Copied: %s - \"%s\" as calibredb org link." id title)))
        (buffer-string)))
     ;; remove overlays and text properties
