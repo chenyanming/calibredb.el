@@ -66,11 +66,30 @@ Please notice: `calibredb-id-width' must >= the real id lenth."
             (concat (format "calibredb:%s" id)))
         "calibredb:"))))
 
-;; TODO: The description can not be set.
-(org-link-set-parameters
- "calibredb"
- :follow #'calibredb-org-link-view
- :complete #'calibredb-org-complete-link)
+
+(defun calibredb-org-image-data-fun (_protocol id _description)
+  "Get corresponding book ID cover page data.
+Display cover page inline in org buffer. Use this as
+:image-data-fun property in `org-link-properties'. See
+`org-display-user-inline-images' for a description of
+:image-data-fun."
+  (if (string-match "[0-9]+" id)
+      (with-current-buffer (find-file-noselect (calibredb-get-cover (cdar (calibredb-candidate id))))
+        (buffer-substring-no-properties (point) (point-max)))))
+
+
+;; `org-display-user-inline-images' is from package `org-yt'
+(if (require 'org-yt nil 'noerror)
+    (org-link-set-parameters
+     "calibredb"
+     :follow #'calibredb-org-link-view
+     :complete #'calibredb-org-complete-link
+     :image-data-fun #'calibredb-org-image-data-fun)
+  (org-link-set-parameters
+   "calibredb"
+   :follow #'calibredb-org-link-view
+   :complete #'calibredb-org-complete-link))
+
 
 (defun calibredb-org-link-copy ()
   "Copy the marked items as calibredb org links."
@@ -82,7 +101,6 @@ Please notice: `calibredb-id-width' must >= the real id lenth."
      (with-temp-buffer
        (dolist (cand candidates)
          (let ((id (calibredb-getattr cand :id))
-               (path (calibredb-getattr cand :file-path))
                (title (calibredb-getattr cand :book-title)))
            (insert (format "[[calibredb:%s][%s]]\n" id title))
            (message "Copied: %s - \"%s\" as calibredb org link." id title)))
