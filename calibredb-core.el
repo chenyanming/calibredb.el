@@ -509,14 +509,13 @@ OR author_sort LIKE '%%%s%%'
   "Query calibre database and return the result.
 Argument SQL-QUERY is the sqlite sql query string.
 
-The function works by sending SQL-QUERY to `sql-sqlite-program' for the
+The function works by sending SQL-QUERY to `sql-sqlite-program' if emacs < 29 for the
 database file defined by `calibredb-db-dir', dump the output to a hidden
 buffer called *calibredb-query-output*, then if the sqlite program
 terminates successfully, it will return the string of the output
 buffer. If the program fails, it will switch to the output buffer and
 tell user something’s wrong."
-  (interactive)
-  (if (sqlite-available-p)
+  (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
       (sqlite-execute calibredb-db-connection sql-query)
    (let ((out-buf " *calibredb-query-output*"))
     (when (get-buffer out-buf)
@@ -544,7 +543,7 @@ tell user something’s wrong."
   "Builds alist out of a full `calibredb-query' query record result.
 Argument QUERY-RESULT is the query result generate by sqlite."
   (if query-result
-      (let ((spl-query-result (if (sqlite-available-p)
+      (let ((spl-query-result (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                                   query-result
                                 (split-string (calibredb-chomp query-result) calibredb-sql-separator))))
         `((:id                     ,(let ((id (nth 0 spl-query-result)))
@@ -657,14 +656,14 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                                                   (_ " ORDER BY id"))
                                                 (when (eq calibredb-order 'desc)
                                                   " DESC"))))
-         (line-list (if (sqlite-available-p)
+         (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                         query-result
                       (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
     (cond ((equal "" query-result) '(""))
           ((equal nil query-result) '(""))
           (t (let (res-list h-list f-list a-list)
                (dolist (line line-list)
-                 (if (sqlite-available-p)
+                 (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                      (push (calibredb-query-to-alist line) res-list)
                    ;; validate if it is right format
                    (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
@@ -689,14 +688,14 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
   (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
-         (line-list (if (sqlite-available-p)
+         (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                         query-result
                       (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline)) )))
     (cond ((equal "" query-result) '(""))
           ((equal nil query-result) '(""))
           (t (let (res-list)
                (dolist (line line-list)
-                 (if (sqlite-available-p)
+                 (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                      (push (calibredb-query-to-alist line) res-list)
                    ;; validate if it is right format
                    (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
