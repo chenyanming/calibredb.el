@@ -49,25 +49,42 @@ This package integrates calibre (using *calibredb*) into emacs.
 
 * Installation
 
-** Install sqlite and calibre
+** Install sqlite 
+calibredb will use the built-in SQLite engine if it is available (for emacs
+>29). For older emacs or emacs that is not built with SQLite support, you should
+install the external sqlite3 program.
 
 *** macOS
 #+BEGIN_SRC sh
 brew install sqlite
 #+END_SRC
 
-Download calibre's DMG file from https://calibre-ebook.com/download_osx, install calibre.app to /Applications
-
 *** Windows
 With chocolatey
 #+BEGIN_SRC sh
-choco install sqlite calibre
+choco install sqlite
 #+END_SRC
 
 *** Linux
 For example, in Ubuntu 18.04:
 #+BEGIN_SRC sh
-sudo apt install sqlite3 calibre
+sudo apt install sqlite3
+#+END_SRC
+
+** Install calibre
+*** macOS
+Download calibre's DMG file from https://calibre-ebook.com/download_osx, install calibre.app to /Applications
+
+*** Windows
+With chocolatey
+#+BEGIN_SRC sh
+choco install calibre
+#+END_SRC
+
+*** Linux
+For example, in Ubuntu 18.04:
+#+BEGIN_SRC sh
+sudo apt install calibre
 #+END_SRC
 
 ** Install calibredb.el
@@ -99,7 +116,7 @@ For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer
 PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
 
 #+BEGIN_SRC emacs-lisp
-(setq sql-sqlite-program "/usr/bin/sqlite3")
+(setq sql-sqlite-program "/usr/bin/sqlite3") ;; for emacs < 29 or no sqlite built-in emacs 
 (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")
 #+END_SRC
 

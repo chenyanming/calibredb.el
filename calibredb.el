@@ -62,6 +62,9 @@
         ((not (file-regular-p calibredb-db-dir))
          (message "calibredb: %s doesn't exist!" calibredb-db-dir))
         (t
+         (if (sqlite-available-p)
+             (unless (sqlitep calibredb-db-connection)
+               (calibredb-db-connection)))
          (let ((cand (or calibredb-search-entries
                          (setq calibredb-search-entries (calibredb-candidates)))))
            (unless calibredb-full-entries
