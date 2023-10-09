@@ -163,6 +163,7 @@ The following columns are supported:
 - =calibredb-title-width=
 - =calibredb-author-width=
 - =calibredb-comment-width=
+- =calibredb-date-width=
 
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
