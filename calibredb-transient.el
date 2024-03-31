@@ -355,8 +355,8 @@ Optional argument TYPE."
   (car (alist-get 'calibredb-set-metadata-dispatch transient-history)))
 
 (defun calibredb-export-arguments ()
-  "Return the latest used arguments in the `calibredb-export-dispatch' transient."
-  (car (alist-get 'calibredb-export-dispatch transient-history)))
+  "Return the latest used arguments in the `calibredb-export-without-conversion-dispatch' transient."
+  (car (alist-get 'calibredb-export-without-conversion-dispatch transient-history)))
 
 (defun calibredb-convert-arguments ()
   "Return the latest used arguments in the `calibredb-convert-to-epub-dispatch' transient."
