@@ -516,7 +516,10 @@ terminates successfully, it will return the string of the output
 buffer. If the program fails, it will switch to the output buffer and
 tell user something’s wrong."
   (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-      (sqlite-execute calibredb-db-connection sql-query)
+      (progn
+        (unless (sqlitep calibredb-db-connection)
+          (calibredb-db-connection))
+        (sqlite-execute calibredb-db-connection sql-query) )
    (let ((out-buf " *calibredb-query-output*"))
     (when (get-buffer out-buf)
       (kill-buffer out-buf))

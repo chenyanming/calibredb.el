@@ -41,15 +41,22 @@
 (defun calibredb-switch-library ()
   "Swich Calibre Library."
   (interactive)
-  (let ((result (read-file-name "Quick switch library: ")))
-    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+  (let* ((result (read-file-name "Quick switch library: "))
+         (db (concat (file-name-as-directory result) "metadata.db")))
+    (if (file-exists-p db)
         (progn
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
           (calibredb-ref-default-bibliography)
+          (when (and
+                 (functionp 'sqlite-available-p)
+                 (sqlite-available-p)
+                 (sqlitep calibredb-db-connection))
+            (funcall 'sqlite-close calibredb-db-connection)
+            (setq calibredb-db-connection nil))
           (calibredb-search-refresh-or-resume))
-      (message "INVALID LIBRARY"))))
+      (message "%s does not exists" db))))
 
 ;;;###autoload
 (defun calibredb-library-list ()
@@ -57,13 +64,20 @@
 If under *calibredb-search* buffer, it will auto refresh after
 selecting the new item."
   (interactive)
-  (let ((result (completing-read "Quick switch library: " calibredb-library-alist)) )
-    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+  (let* ((result (completing-read "Quick switch library: " calibredb-library-alist))
+         (db (concat (file-name-as-directory result) "metadata.db")))
+    (if (file-exists-p db)
         (progn
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
           (calibredb-ref-default-bibliography)
+          (when (and
+                 (functionp 'sqlite-available-p)
+                 (sqlite-available-p)
+                 (sqlitep calibredb-db-connection))
+            (funcall 'sqlite-close calibredb-db-connection)
+            (setq calibredb-db-connection nil))
           (calibredb-search-refresh-or-resume))
       (if (s-contains? "http" result)
           (let ((library (-first (lambda (lib)
@@ -81,15 +95,22 @@ selecting the new item."
   (let* ((index (setq calibredb-library-index (if (> calibredb-library-index 0)
                                                   (1- calibredb-library-index)
                                                 (1- (length calibredb-library-alist)))))
-        (result (car (nth index calibredb-library-alist))))
-    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+         (result (car (nth index calibredb-library-alist)))
+         (db (concat (file-name-as-directory result) "metadata.db")))
+    (if (file-exists-p db)
         (progn
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
           (calibredb-ref-default-bibliography)
+          (when (and
+                 (functionp 'sqlite-available-p)
+                 (sqlite-available-p)
+                 (sqlitep calibredb-db-connection))
+            (funcall 'sqlite-close calibredb-db-connection)
+            (setq calibredb-db-connection nil))
           (calibredb-search-refresh-or-resume))
-      (message "INVALID LIBRARY"))))
+      (message "%s does not exists" db))))
 
 (defun calibredb-library-next ()
   "Next library from variable `calibredb-library-alist'.
@@ -98,15 +119,22 @@ selecting the new item."
   (interactive)
   (let* ((index (setq calibredb-library-index (if (< calibredb-library-index (1- (length calibredb-library-alist)))
                                                   (1+ calibredb-library-index) 0)))
-        (result (car (nth index calibredb-library-alist))))
-    (if (file-exists-p (concat (file-name-as-directory result) "metadata.db"))
+         (result (car (nth index calibredb-library-alist)))
+         (db (concat (file-name-as-directory result) "metadata.db")))
+    (if (file-exists-p db)
         (progn
           (setq calibredb-root-dir result)
           (calibredb-root-dir-quote)
           (setq calibredb-db-dir (concat (file-name-as-directory calibredb-root-dir) "metadata.db"))
           (calibredb-ref-default-bibliography)
+          (when (and
+                 (functionp 'sqlite-available-p)
+                 (sqlite-available-p)
+                 (sqlitep calibredb-db-connection))
+            (funcall 'sqlite-close calibredb-db-connection)
+            (setq calibredb-db-connection nil))
           (calibredb-search-refresh-or-resume))
-      (message "INVALID LIBRARY"))))
+      (message "%s does not exists" db))))
 
 (defun calibredb-virtual-library-filter (keyword)
   "Filter the virtual library based on KEYWORD."
