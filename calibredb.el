@@ -65,12 +65,7 @@
          (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
              (unless (sqlitep calibredb-db-connection)
                (calibredb-db-connection)))
-         (let ((cand (or calibredb-search-entries
-                         (setq calibredb-search-entries (calibredb-candidates)))))
-           (unless calibredb-full-entries
-             (setq calibredb-full-entries calibredb-search-entries))
-           (when (get-buffer (calibredb-search-buffer))
-             (kill-buffer (calibredb-search-buffer)))
+         (let ((cand (calibredb-search-update-buffer-with-keyword "")))
            ;; Set virtual library name when the first time to launch calibredb
            (if (equal calibredb-search-filter "")
                (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))

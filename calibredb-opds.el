@@ -91,8 +91,7 @@ Optional argument PASSWORD."
                              (let* ((dom (with-temp-buffer
                                            (insert data)
                                            (libxml-parse-xml-region (point-min) (point-max)))))
-                               (setq calibredb-search-entries (calibredb-opds-dom dom))
-                               (setq calibredb-full-entries calibredb-search-entries)
+                               (calibredb-opds-dom dom)
                                (calibredb)
                                (setq calibredb-tag-filter-p nil)
                                (setq calibredb-favorite-filter-p nil)

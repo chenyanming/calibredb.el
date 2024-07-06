@@ -30,8 +30,6 @@
 (require 'calibredb-search)
 (require 'calibredb-utils)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 
 (defcustom calibredb-consult-ripgrep-all-args
   "rga --null --line-buffered --color=never --max-columns=1000 --path-separator /\  --smart-case --no-heading --with-filename --line-number --rga-adapters=pandoc"
@@ -44,11 +42,7 @@ Can be either a string, or a list of strings or expressions."
   "consult read for calibredb."
   (interactive "P")
   (if (fboundp 'consult--read)
-      (let ((candidates (if calibredb-search-entries
-                      calibredb-search-entries
-                    (progn
-                      (setq calibredb-search-entries (calibredb-candidates))
-                      (setq calibredb-full-entries calibredb-search-entries)))))
+      (let ((candidates (calibredb-candidates)))
         (if candidates
             (calibredb-find-file (consult--read candidates
                            :prompt "Pick a book: "

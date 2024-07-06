@@ -46,7 +46,6 @@
   (require 'icons-in-terminal))
 
 (eval-when-compile (defvar calibredb-detailed-view))
-(eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-condense-comments "calibredb-search.el")
 (declare-function calibredb-attach-icon-for "calibredb-utils.el")
 (declare-function calibredb-get-file-path "calibredb-utils.el")
@@ -643,49 +642,57 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       (setq display-alist
             (cons (list (calibredb-format-item item) item) display-alist)))))
 
-(defun calibredb-candidates ()
+(defun calibredb-candidates (&optional sql count)
   "Generate ebooks candidates alist."
-  (let* ((query-result (calibredb-query (concat calibredb-query-string
-                                                (pcase calibredb-sort-by
-                                                  ('id " ORDER BY id")
-                                                  ('title " ORDER BY title")
-                                                  ('author " ORDER BY author_sort")
-                                                  ('format " ORDER BY format")
-                                                  ('date " ORDER BY last_modified")
-                                                  ('pubdate " ORDER BY pubdate")
-                                                  ('tag " ORDER BY tag")
-                                                  ('size " ORDER BY uncompressed_size")
-                                                  ('language " ORDER BY lang_code")
-                                                  (_ " ORDER BY id"))
-                                                (when (eq calibredb-order 'desc)
-                                                  " DESC"))))
+  (let* ((sql (format (if count
+                          "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)"
+                        "SELECT * FROM (%s) %s")
+                      (concat calibredb-query-string
+                              (pcase calibredb-sort-by
+                                ('id " ORDER BY id")
+                                ('title " ORDER BY title")
+                                ('author " ORDER BY author_sort")
+                                ('format " ORDER BY format")
+                                ('date " ORDER BY last_modified")
+                                ('pubdate " ORDER BY pubdate")
+                                ('tag " ORDER BY tag")
+                                ('size " ORDER BY uncompressed_size")
+                                ('language " ORDER BY lang_code")
+                                (_ " ORDER BY id"))
+                              (when (eq calibredb-order 'desc)
+                                " DESC"))
+                      (if sql (concat " WHERE " sql) "")))
+         (query-result (calibredb-query sql))
          (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                         query-result
                       (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
-    (cond ((equal "" query-result) '(""))
-          ((equal nil query-result) '(""))
-          (t (let (res-list h-list f-list a-list)
-               (dolist (line line-list)
-                 (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                     (push (calibredb-query-to-alist line) res-list)
-                   ;; validate if it is right format
-                   (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
-                       ;; decode and push to res-list
-                       (push (calibredb-query-to-alist line) res-list))))
-               ;; filter archive/highlight/favorite items
-               (dolist (item res-list)
-                 (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
-                        (setq res-list (remove item res-list))
-                        (setq a-list (cons item a-list)))
-                       ((string-match-p "favorite" (calibredb-getattr (list item) :tag))
-                        (setq res-list (remove item res-list))
-                        (setq f-list (cons item f-list)))
-                       ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
-                        (setq res-list (remove item res-list))
-                        (setq h-list (cons item h-list)))))
-               ;; merge archive/highlight/favorite/rest items
-               (setq res-list (nconc a-list res-list h-list f-list))
-               (calibredb-getbooklist res-list))))))
+
+    (if count
+        (caar query-result)
+      (cond ((equal "" query-result) '(""))
+            ((equal nil query-result) '(""))
+            (t (let (res-list h-list f-list a-list)
+                 (dolist (line line-list)
+                   (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
+                       (push (calibredb-query-to-alist line) res-list)
+                     ;; validate if it is right format
+                     (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
+                         ;; decode and push to res-list
+                         (push (calibredb-query-to-alist line) res-list))))
+                 ;; filter archive/highlight/favorite items
+                 (dolist (item res-list)
+                   (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
+                          (setq res-list (remove item res-list))
+                          (setq a-list (cons item a-list)))
+                         ((string-match-p "favorite" (calibredb-getattr (list item) :tag))
+                          (setq res-list (remove item res-list))
+                          (setq f-list (cons item f-list)))
+                         ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
+                          (setq res-list (remove item res-list))
+                          (setq h-list (cons item h-list)))))
+                 ;; merge archive/highlight/favorite/rest items
+                 (setq res-list (nconc a-list res-list h-list f-list))
+                 (calibredb-getbooklist res-list)))) )))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.

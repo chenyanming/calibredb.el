@@ -659,8 +659,7 @@ The following columns will be searched:
 If the keyword occurs in any of the columns above, the matched ebook record will
 be shown.
 
-1. Live filter searches the results in =calibredb-full-entries= rather than query
-   the database.
+1. Live filter searches the database.
 2. Keywords are separated by "Spaces" (AND operation, mainly used to narrow down
    the results, the more spaces you insert, the fewer results.)
 3. Each keyword supports REGEX.

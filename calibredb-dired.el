@@ -28,8 +28,6 @@
 
 (require 'calibredb-core)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-search-clear-filter "calibredb-search.el")
 
 (define-obsolete-function-alias #'calibredb-open-dired
@@ -76,8 +74,7 @@ library."
                                    (format "--library-path %s" (calibredb-root-dir-quote))))
      (lambda (p e)
        (when (= 0 (process-exit-status p))
-         (setq calibredb-search-entries (calibredb-candidates))
-         (setq calibredb-full-entries calibredb-search-entries)
+         (calibredb-candidates)
          (calibredb-search-clear-filter)
          (with-current-buffer buffer
              (dired-do-delete)))))))

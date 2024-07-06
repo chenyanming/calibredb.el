@@ -45,11 +45,7 @@
 The optional PREFIX argument is ignored.
 Please notice: `calibredb-id-width' must >= the real id lenth."
   (ignore prefix)
-  (let* ((candidates (if calibredb-search-entries
-                   calibredb-search-entries
-                 (progn
-                   (setq calibredb-search-entries (calibredb-candidates))
-                   (setq calibredb-full-entries calibredb-search-entries)))))
+  (let* ((candidates (calibredb-candidates)))
     (if (fboundp 'consult--read)
         (if candidates
             (let* ((cand (consult--read candidates

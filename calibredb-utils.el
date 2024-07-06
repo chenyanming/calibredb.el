@@ -33,8 +33,6 @@
 (require 'calibredb-transient)
 (require 'calibredb-annotation)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 (eval-when-compile (defvar calibredb-images-path))
 (eval-when-compile (defvar calibredb-opds-download-dir))
 
@@ -72,11 +70,7 @@
     (when (get-buffer buf-name)
       (kill-buffer buf-name))
     (setq occur-buf (get-buffer-create buf-name))
-    (let ((res-list (if calibredb-search-entries
-                        calibredb-search-entries
-                      (progn
-                        (setq calibredb-search-entries (calibredb-candidates))
-                        (setq calibredb-full-entries calibredb-search-entries)))))
+    (let ((res-list (calibredb-candidates)))
       (with-current-buffer occur-buf
         (erase-buffer)
         (insert "#+STARTUP: inlineimages nofold"))

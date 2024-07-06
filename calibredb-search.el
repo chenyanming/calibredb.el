@@ -73,12 +73,6 @@
   :group 'calibredb
   :type 'string)
 
-(defvar calibredb-full-entries nil
-  "List of the all entries currently on library.")
-
-(defvar calibredb-search-entries nil
-  "List of the entries currently on display.")
-
 (defvar calibredb-search-filter-active nil
   "When non-nil, calibredb is currently reading a filter from the minibuffer.
 When live editing the filter, it is bound to :live.")
@@ -348,9 +342,12 @@ Indicating the library you use."
           (propertize calibredb-root-dir 'face 'calibredb-search-header-library-path-face)
           (concat
            (propertize (format "Total: %s"
-                               (if (equal calibredb-search-entries '(""))
+                               (if (equal calibredb-search-entries-length 0)
                                    "0   "
-                                 (concat (number-to-string (length calibredb-search-entries)) "  "))) 'face 'calibredb-search-header-total-face)
+                                 (concat (number-to-string calibredb-search-entries-length) "  "))) 'face 'calibredb-search-header-total-face)
+           (format "Page: %s/%s  "
+                   (propertize (number-to-string calibredb-search-current-page) 'face 'font-lock-type-face)
+                   (propertize (number-to-string calibredb-search-pages) 'face 'font-lock-type-face))
            (cond ((eq calibredb-sort-by 'id)
                   "Sort: id ")
                  ((eq calibredb-sort-by 'title)
@@ -398,6 +395,7 @@ Indicating the library you use."
         buffer-read-only t
         header-line-format '(:eval (funcall calibredb-search-header-function)))
   (buffer-disable-undo)
+  (require 'hl-line)
   (set (make-local-variable 'hl-line-face) 'calibredb-search-header-highlight-face)
   (hl-line-mode)
   (if (boundp 'ivy-sort-matches-functions-alist)
@@ -429,8 +427,6 @@ Argument EVENT mouse event."
 (defun calibredb-search-refresh ()
   "Refresh calibredb."
   (interactive)
-  (setq calibredb-search-entries (calibredb-candidates))
-  (setq calibredb-full-entries calibredb-search-entries)
   (calibredb))
 
 (defun calibredb-search-refresh-or-resume (&optional begin position)
@@ -442,7 +438,7 @@ Argument EVENT mouse event."
     (if (not (equal calibredb-search-filter ""))
         (progn
           (calibredb-search-refresh)
-          (calibredb-search-update :force))
+          (calibredb-search-update-buffer))
       (calibredb-search-refresh))
     (set-window-start (selected-window) pos)
     (goto-char beg)
@@ -455,7 +451,7 @@ Argument EVENT mouse event."
     (if (not (equal calibredb-search-filter ""))
         (progn
           (calibredb-search-refresh)
-          (calibredb-search-update :force))
+          (calibredb-search-update-buffer))
       (calibredb-search-refresh))
     (while (not (equal id (calibredb-read-metadatas "id")))
       (forward-line 1))
@@ -708,15 +704,11 @@ Argument KEYWORD is the metadata keyword to be toggled."
             (t nil)))))
 ;; live filtering
 
-(defun calibredb-search--update-list ()
-  "Update `calibredb-search-entries' list."
+(defun calibredb-search-get-filterred-entries (&optional page)
+  "Update ebook candidate alist list by PAGE."
   ;; replace space with _ (SQL) The underscore represents a single character
-  (let* ((filter (calibredb-search-parse-filter calibredb-search-filter)) ;; (replace-regexp-in-string " " "_" calibredb-search-filter)
-         (head (calibredb-candidate-filter filter)))
-    ;; Determine the final list order
-    (let ((entries head))
-      (setf calibredb-search-entries
-            entries))))
+  (let* ((entries (calibredb-db-select calibredb-search-filter :limit calibredb-search-page-max-rows :page page)))
+    entries))
 
 (defun calibredb-search-print-entry--default (entry)
   "Print ENTRY to the buffer."
@@ -743,7 +735,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
       (when buffer
         (with-current-buffer buffer
           (let ((calibredb-search-filter current-filter))
-            (calibredb-search-update :force)))))))
+            (calibredb-search-update-buffer)))))))
 
 (defun calibredb-search-live-filter ()
   "Filter the calibredb-search buffer as the filter is written.
@@ -760,8 +752,7 @@ The following columns will be searched:
 If the keyword occurs in any of the columns above, the matched
 ebook record will be shown.
 
-1. Live filter is faster than before since it search the results
-   in =calibredb-full-entries= rather than query the database.
+1. Live filter directly on the database.
 
 2. The keyword supports REGEX.
 
@@ -781,33 +772,66 @@ ebook record will be shown.
                                              (calibredb-format-filter-p "(format)")
                                              (t "(live)"))) calibredb-search-filter))
         (message calibredb-search-filter))
-    (calibredb-search-update :force)))
+    (calibredb-search-update-buffer)))
 
 (defun calibredb-search-keyword-filter (keyword)
   "Filter the calibredb-search buffer with KEYWORD."
   (setq calibredb-search-filter keyword)
-  (calibredb-search-update :force))
+  (calibredb-search-update-buffer))
 
-(defun calibredb-search-update (&optional force)
+(defun calibredb-search-update-buffer (&optional page)
   "Update the calibredb-search buffer listing to match the database.
 When FORCE is non-nil, redraw even when the database hasn't changed."
   (interactive)
   (with-current-buffer (calibredb-search-buffer)
-    (when force
-      (let ((inhibit-read-only t)
-            (standard-output (current-buffer)))
-        (erase-buffer)
-        ;; reset calibredb-virtual-library-name
-        (unless (-contains? (mapcar #'cdr calibredb-virtual-library-alist) calibredb-search-filter)
-          (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
-        (calibredb-search--update-list)
-        ;; (setq calibredb-search-entries (calibredb-candidates))
-        (dolist (entry calibredb-search-entries)
+    (let* ((inhibit-read-only t)
+           (standard-output (current-buffer))
+           (id 0)
+           (entries (calibredb-search-get-filterred-entries page))
+           (len (length entries)))
+      (setq calibredb-search-entries-length (calibredb-db-select calibredb-search-filter :count t))
+      (setq calibredb-search-pages (ceiling calibredb-search-entries-length calibredb-search-page-max-rows))
+      (erase-buffer)
+      ;; reset calibredb-virtual-library-name
+      (unless (-contains? (mapcar #'cdr calibredb-virtual-library-alist) calibredb-search-filter)
+        (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+      (dolist (entry entries)
+        (setq id (1+ id))
+        (when (<= id calibredb-search-page-max-rows)
           (funcall calibredb-search-print-entry-function entry)
-          (insert "\n"))
-        ;; (insert "End of entries.\n")
-        (goto-char (point-min))         ; back to point-min after filtering
-        (setf calibredb-search-last-update (float-time))))))
+          (insert "\n")))
+      (if (< len calibredb-search-entries-length)
+          (dotimes (i calibredb-search-pages)
+            (insert " " (buttonize (format "%d" (1+ i)) #'calibredb-search-more-data (1+ i)) " "))
+        (insert "End of entries.\n"))
+      (goto-char (point-min))         ; back to point-min after filtering
+      (setf calibredb-search-last-update (float-time))
+      entries)))
+
+(defun calibredb-search-more-data (page)
+  (let ((inhibit-read-only t))
+    (setq calibredb-search-current-page page)
+    (beginning-of-line)
+    (delete-region (point) (progn (forward-line 1) (point)))
+    (calibredb-search-update-buffer page)))
+
+
+(defun calibredb-search-next-page ()
+  (interactive)
+  (if (< calibredb-search-current-page calibredb-search-pages)
+      (progn
+        (setq calibredb-search-current-page (1+ calibredb-search-current-page))
+        (calibredb-search-update-buffer calibredb-search-current-page) )
+    (message "Last page.")))
+
+(defun calibredb-search-previous-page ()
+  (interactive)
+  (if (> calibredb-search-current-page 1)
+      (progn
+        (setq calibredb-search-current-page (1- calibredb-search-current-page))
+        (calibredb-search-update-buffer calibredb-search-current-page) )
+    (message "First page.")))
+
 
 (defun calibredb-search-parse-filter (filter)
   "Parse the elements of a search FILTER into a plist."
@@ -824,48 +848,74 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     (prog1 t
       (string-match-p regexp ""))))
 
-(defun calibredb-candidate-filter (filter)
+
+
+(defcustom calibredb-search-page-max-rows 45
+  "The maximum number of entries to display in a single page."
+  :group 'calibredb
+  :type 'integer)
+
+(defvar calibredb-search-current-page 1
+  "The number of current page in the current search result.")
+
+(defvar calibredb-search-pages 0
+  "The number of pages in the current search result.")
+
+(defun calibredb-db-select (filter &rest properties)
   "Generate ebook candidate alist.
 ARGUMENT FILTER is the filter string."
-  (let ((matches (plist-get filter :matches))
-        res-list)
-    (cond (calibredb-tag-filter-p
-           (cl-loop for line in calibredb-full-entries do
-             (if (eval `(and ,@(cl-loop for regex in matches collect
-                                        (unless (equal (calibredb-tag-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :tag))))))
-                 (push line res-list))))
-          (calibredb-format-filter-p
-           (cl-loop for line in calibredb-full-entries do
-                    (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-format-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :book-format))))))
-                        (push line res-list))))
-          (calibredb-author-filter-p
-           (cl-loop for line in calibredb-full-entries do
-                    (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-author-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :author-sort))))))
-                        (push line res-list))))
-          (calibredb-date-filter-p
-           (cl-loop for line in calibredb-full-entries do
-                    (if (eval `(and ,@(cl-loop for regex in matches collect
-                                               (unless (equal (calibredb-date-width) 0) (s-contains? regex (calibredb-getattr (cdr line) :last_modified))))))
-                        (push line res-list))))
-          (t (cl-loop for line in calibredb-full-entries do
-             (if (eval `(and ,@(cl-loop for regex in matches collect
-                                        (or
-                                         (unless (equal calibredb-id-width 0) (string-match-p regex (calibredb-getattr (cdr line) :id)))
-                                         (unless (equal (calibredb-title-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-title)))
-                                         (unless (equal (calibredb-format-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :book-format)))
-                                         (unless (equal (calibredb-tag-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :tag)))
-                                         (unless (equal (calibredb-ids-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :ids)))
-                                         (unless (equal (calibredb-author-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :author-sort)))
-                                         (unless (equal (calibredb-date-width) 0) (string-match-p regex (calibredb-getattr (cdr line) :last_modified)))
-                                         ;; Normally, comments are long, it is necessary to trancate the comments to speed up the searching
-                                         ;; except calibredb-comment-width is -1.
-                                         (unless (equal (calibredb-comment-width) 0) (string-match-p regex (let ((c (calibredb-getattr (cdr line) :comment))
-                                                                                                                 (w calibredb-comment-width))
-                                                                                                             (if (> w 0) (s-truncate w c) c))))))))
-                 (push line res-list)))))
-    (nreverse res-list)))
+  (let* ((words (split-string filter " "))
+         (limit (plist-get properties :limit))
+         (count (plist-get properties :count))
+         (page (plist-get properties :page)))
+    (calibredb-candidates
+     (substring
+      (mapconcat #'identity
+                 (append
+                  (cond (calibredb-tag-filter-p
+                         (cl-loop for word in words collect
+                                  (unless (equal (calibredb-tag-width) 0) (format " OR tag like '%%%s%%' " word)))
+                         )
+                        (calibredb-format-filter-p
+                         (cl-loop for word in words collect
+                                  (unless (equal (calibredb-tag-width) 0) (format " OR format like '%%%s%%' " word)))
+                         )
+                        (calibredb-author-filter-p
+                         (cl-loop for word in words collect
+                                  (unless (equal (calibredb-tag-width) 0) (format " OR author_sort like '%%%s%%' " word)))
+                         )
+                        (calibredb-date-filter-p
+                         (cl-loop for word in words collect
+                                  (unless (equal (calibredb-tag-width) 0) (format " OR last_modified like '%%%s%%' " word)))
+                         )
+                        (t (cl-loop for word in words collect
+                                    (or
+                                     (unless (equal calibredb-id-width 0) (format " OR id like '%%%s%%' " word))
+                                     (unless (equal (calibredb-title-width) 0) (format " OR title like '%%%s%%' " word))
+                                     (unless (equal (calibredb-format-width) 0) (format " OR format like '%%%s%%' " word))
+                                     (unless (equal (calibredb-tag-width) 0) (format " OR tag like '%%%s%%' " word))
+                                     (unless (equal (calibredb-ids-width) 0) (format " OR ids like '%%%s%%' " word))
+                                     (unless (equal (calibredb-author-width) 0) (format " OR author_sort like '%%%s%%' " word))
+                                     (unless (equal (calibredb-date-width) 0) (format " OR last_modified like '%%%s%%' " word))
+                                     ;; Normally, comments are long, it is necessary to trancate the comments to speed up the searching
+                                     ;; except calibredb-comment-width is -1.
+                                     (unless (equal (calibredb-comment-width) 0) (format " text like '%%%s%%' OR " word))))))
+
+                  `( ,(when limit
+                        (format " LIMIT %s " limit) ) )
+                  `( ,(when page
+                        (format " OFFSET %s " (* (1- page) calibredb-search-page-max-rows))) )
+
+                  )
+                 " ") 3 -1 )
+     count)))
+
+
+(defun calibredb-search-update-buffer-with-keyword (keyword)
+  "Filter the *calibredb-search* buffer with KEYWORD."
+  (setq calibredb-search-filter keyword)
+  (calibredb-search-update-buffer))
+
 
 ;;; detailed view
 
@@ -920,7 +970,6 @@ ARGUMENT FILTER is the filter string."
           (let* ((original (get-text-property (point) 'calibredb-entry nil))
                  (entry (cadr original))
                  (format (list (calibredb-format-item entry)))
-                 ;; (position (seq-position calibredb-search-entries original))
                  (id (calibredb-get-init "id" (cdr (get-text-property (point) 'calibredb-entry nil)))) ; the "id" of current point
                  d-beg d-end)
             (if (equal id (calibredb-get-init "id" (cdr (get-text-property (point-min) 'calibredb-entry nil))))
