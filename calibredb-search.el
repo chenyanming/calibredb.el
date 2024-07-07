@@ -707,10 +707,8 @@ Argument KEYWORD is the metadata keyword to be toggled."
 ;; live filtering
 
 (defun calibredb-search-get-filterred-entries (&optional page)
-  "Update ebook candidate alist list by PAGE."
-  ;; replace space with _ (SQL) The underscore represents a single character
-  (let* ((entries (calibredb-db-select calibredb-search-filter :limit calibredb-search-page-max-rows :page page)))
-    entries))
+  "Get ebook candidate entries by PAGE."
+  (calibredb-search-candidates calibredb-search-filter :limit calibredb-search-page-max-rows :page page))
 
 (defun calibredb-search-print-entry--default (entry)
   "Print ENTRY to the buffer."
@@ -792,7 +790,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
            (id 0)
            (entries (calibredb-search-get-filterred-entries page))
            (len (length entries)))
-      (setq calibredb-search-entries-length (calibredb-db-select calibredb-search-filter :count t))
+      (setq calibredb-search-entries-length (calibredb-search-candidates calibredb-search-filter :count t))
       (setq calibredb-search-pages (ceiling calibredb-search-entries-length calibredb-search-page-max-rows))
       (erase-buffer)
       ;; reset calibredb-virtual-library-name
@@ -853,7 +851,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 
 
 
-(defcustom calibredb-search-page-max-rows 45
+(defcustom calibredb-search-page-max-rows 44
   "The maximum number of entries to display in a single page."
   :group 'calibredb
   :type 'integer)
@@ -864,7 +862,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 (defvar calibredb-search-pages 0
   "The number of pages in the current search result.")
 
-(defun calibredb-db-select (filter &rest properties)
+(defun calibredb-search-candidates (filter &rest properties)
   "Generate ebook candidate alist.
 Argument: FILTER is the filter string.
 Argument: PROPERTIES is the addiontal parameters."
