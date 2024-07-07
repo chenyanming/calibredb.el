@@ -1,6 +1,10 @@
 #+TITLE: RELEASES
 #+STARTUP: nofold
 * RELEASES
+** =2024-07-07=
+Version *2.13.0*:
+- Support Pages
+
 ** =2022-05-11=
 Version *2.12.0*:
 - Add consult support

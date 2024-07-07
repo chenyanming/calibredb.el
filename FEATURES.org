@@ -1,0 +1,195 @@
+#+title: Features
+
+* Supported Features
+
+For more details on the actions, check the official calibre documents:
+https://manual.calibre-ebook.com/generated/en/calibredb.html
+
+** calibredb
+Enter calibre emacs client, a new buffer called =*calibredb-search*= with =calibredb-search-mode=
+#+BEGIN_SRC emacs-lisp
+M-x calibredb
+#+END_SRC
+=RET= open the entry
+
+To toggle between detail view or compact view.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-toggle-view
+#+END_SRC
+
+TODO:
+    - Multiple dashboard with different libraries.
+    - Sorting.
+
+** calibredb-search-live-filter
+In =*calibredb-search*=,
+perform live filtering:
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-search-live-filter
+#+END_SRC
+
+The following columns will be searched:
+- id
+- text (comment)
+- tag
+- title
+- format
+- author_sort
+- ids
+
+If the keyword occurs in any of the columns above, the matched ebook record will
+be shown.
+
+1. Live filter searches the database.
+2. Keywords are separated by "Spaces" (AND operation, mainly used to narrow down
+   the results, the more spaces you insert, the fewer results.)
+3. Each keyword supports REGEX.
+
+For example, to search Ebooks may contain a tag - *work*, and the format maybe pdf
+or epub. You can insert ~work \(pdf\|epub\)~ (Notice the single backslash) in mini buffer.
+
+If you set the filter keywords in ~calibredb-virtual-library-alist~, you should
+(Notice the double backslashes):
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+                                        ("2. Read it later" . "Readit epub")
+                                        ("3. Development - rust" . "rust")))
+#+END_SRC
+
+
+Check REGEX https://www.gnu.org/software/emacs/manual/html_node/efaq/Using-regular-expressions.html.
+
+Tip: =*calibredb-search*=, =calibredb-find-counsel=, and =calibredb-find-helm= are sharing
+the same results. Therefore, after the filtering in =*calibredb-search*=, you can do
+second-level filter with =calibredb-find-counsel=, and =calibredb-find-helm=.
+
+** calibredb-find-helm
+Use helm to list all ebooks
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-find-helm
+#+END_SRC
+
+** calibredb-find-counsel
+Use counsel to list all ebooks
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-find-counsel
+#+END_SRC
+
+** calibredb-list
+Generate an org buffer which contains all files' cover images, titles and the file links.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-list
+#+END_SRC
+
+** calibredb-clone
+Create a clone of the current library. This creates a new, empty library that
+has all the same custom columns, Virtual libraries and other settings as the
+current library.
+
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-clone
+#+END_SRC
+
+Tips: Libraries can be used for any purposes, one for books, one for
+lecture notes, one for research references etc.
+
+** calibredb-library-list
+Switch library from library list defined in =calibredb-library-alist=.
+If under =*calibredb-search*= buffer, it will auto refresh after
+selecting the new item.
+
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-library-list
+#+END_SRC
+
+** calibredb-switch-library
+Switch a library temporary by selecting a path.
+
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-switch-library
+#+END_SRC
+
+** Show details
+This action will get you to the book details buffer called =*calibredb-entry*=
+
+** Dispatch
+*** calibredb-dispatch
+Under =*calilbredb-search*= or =*calilbredb-entry*= buffer, you can make actions on
+selected item with =calibredb-dispatch=, just like =magit-dispatch=.
+
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-dispatch
+#+END_SRC
+Or fire with keybinding ~?~
+
+*** calibredb-set-metadata-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-set-metadata-dispatch
+#+END_SRC
+Or fire with keybinding ~s~
+
+*** calibredb-catalog-bib-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-catalog-bib-dispatch
+#+END_SRC
+Or fire with keybinding ~b~
+
+*** calibredb-export-dispatch
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-export-dispatch
+#+END_SRC
+Or fire with keybinding ~e~
+
+
+** add
+To add a file into calibre, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-add
+#+END_SRC
+
+To add a directory into calibre, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-add-dir
+#+END_SRC
+
+** remove
+
+To remove an item, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-remove
+#+END_SRC
+
+To remove the marked items, call
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-remove-marked-items
+#+END_SRC
+
+** set_metadata
+To set metadata,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-set-metadata-dispatch
+#+END_SRC
+
+** Export
+To export the ebook,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-export-dispatch
+#+END_SRC
+
+** Yank
+To yank the ebook as org links,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-yank-dispatch
+#+END_SRC
+
+** Catalog
+*** BibTex
+Export the ebook catalogs to a BibTex file.
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-catalog-bib-dispatch
+#+END_SRC
+PS: Document can be found in https://github.com/kovidgoyal/calibre/blob/master/src/calibre/library/catalogs/bibtex.py
+
+** calibredb-rga
+Search in ebooks.
+
