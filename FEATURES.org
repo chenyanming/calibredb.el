@@ -1,7 +1,4 @@
 #+title: Features
-
-* Supported Features
-
 For more details on the actions, check the official calibre documents:
 https://manual.calibre-ebook.com/generated/en/calibredb.html
 

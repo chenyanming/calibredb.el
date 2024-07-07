@@ -1,8 +1,4 @@
 #+title: Q&A
-* Q&A
-The keybindings mentioned below are referenced from
-#+html: <a href="#keybindings">keybindings</a>.
-
 ** Transient commands
 ~calibredb~ supports ~Transient commands~ just like ~magit~. Most of the features are binded in ~Transient commands~. You can press ~?~ to checkout.
 
@@ -292,9 +288,4 @@ M-x calibredb-rga
 In ~*calibredb-search*~ buffer,
 - ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.
 - ~y f~ copy as file org link. If you click the link, it will open the file directly.
-
-** More examples?
-Please check
-#+html: <a href="#keybindings">keybindings</a> .
-All are self documented.
 

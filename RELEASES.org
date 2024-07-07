@@ -1,6 +1,5 @@
 #+TITLE: RELEASES
 #+STARTUP: nofold
-* RELEASES
 ** =2024-07-07=
 Version *2.13.0*:
 - Support Pages

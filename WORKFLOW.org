@@ -1,6 +1,4 @@
 #+title: Workflow
-
-* Workflows
 There are three ways to manage your ebooks:
 ** Start with =calibredb=
 First,  =M-x calibredb= to enter ebook dashboard.
