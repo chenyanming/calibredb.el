@@ -1080,6 +1080,7 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter tag)))
 
 (defun calibredb-filter-by-author-sort ()
@@ -1091,6 +1092,7 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p t)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter author)))
 
 (defun calibredb-filter-by-last_modified ()
@@ -1102,6 +1104,7 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p t)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter date)))
 
 
@@ -1114,6 +1117,7 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p t)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter format)))
 
 (defun calibredb-attach-icon-for (path)

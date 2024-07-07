@@ -735,6 +735,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
       (when buffer
         (with-current-buffer buffer
           (let ((calibredb-search-filter current-filter))
+            (setq calibredb-search-current-page 1)
             (calibredb-search-update-buffer)))))))
 
 (defun calibredb-search-live-filter ()

@@ -697,9 +697,7 @@ Argument PROPERTIES is for selecting different sql statement."
                           (setq h-list (cons item h-list)))))
                  ;; merge archive/highlight/favorite/rest items
                  (setq res-list (nconc a-list res-list h-list f-list))
-                 (calibredb-getbooklist res-list)))))
-          )
-    ))
+                 (calibredb-getbooklist res-list))))))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
@@ -721,23 +719,6 @@ ARGUMENT ID is the id of the ebook in string."
                      ;; concat the invalid format strings into last line
                      ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
                      )))
-               (calibredb-getbooklist res-list)) ))))
-
-(defun calibredb-candidate-query-filter (filter)
-  "DEPRECATED Generate ebook candidate alist.
-ARGUMENT FILTER is the filter string."
-  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) %s" calibredb-query-string (calibredb-query-search-string filter))))
-         (line-list (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
-    (cond ((equal "" query-result) '(""))
-          (t (let (res-list)
-               (dolist (line line-list)
-                 ;; validate if it is right format
-                 (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
-                     ;; decode and push to res-list
-                     (push (calibredb-query-to-alist line) res-list)
-                   ;; concat the invalid format strings into last line
-                   ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
-                   ))
                (calibredb-getbooklist res-list)) ))))
 
 (defun calibredb-format-item (book-alist)
