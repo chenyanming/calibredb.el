@@ -678,20 +678,21 @@ Argument PROPERTIES is for selecting different sql statement."
          (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                         query-result
                       (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
-
+    ;; (message "%s" sql)
     (cond (count (caar query-result))
           (distinct query-result)
-          (t (cond ((equal "" query-result) '(""))
-            ((equal nil query-result) '(""))
-            (t (let (res-list)
-                 (dolist (line line-list)
-                   (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                       (push (calibredb-query-to-alist line) res-list)
-                     ;; validate if it is right format
-                     (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
-                         ;; decode and push to res-list
-                         (push (calibredb-query-to-alist line) res-list))))
-                 (calibredb-getbooklist res-list))))))))
+          (t (cond ((equal "" query-result) '())
+                   ((equal nil query-result) '())
+                   ((numberp query-result) '())
+                   (t (let (res-list)
+                        (dolist (line line-list)
+                          (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
+                              (push (calibredb-query-to-alist line) res-list)
+                            ;; validate if it is right format
+                            (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
+                                ;; decode and push to res-list
+                                (push (calibredb-query-to-alist line) res-list))))
+                        (calibredb-getbooklist res-list))))))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.

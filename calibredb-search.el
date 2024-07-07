@@ -871,45 +871,78 @@ Argument: PROPERTIES is the addiontal parameters."
          (count (plist-get properties :count))
          (page (plist-get properties :page)))
     (calibredb-candidates
-     :where (substring
-             (mapconcat #'identity
-                        (append
-                         (cond (calibredb-tag-filter-p
-                                (cl-loop for word in words collect
-                                         (unless (equal (calibredb-tag-width) 0) (format " OR tag like '%%%s%%' " word)))
-                                )
-                               (calibredb-format-filter-p
-                                (cl-loop for word in words collect
-                                         (unless (equal (calibredb-tag-width) 0) (format " OR format like '%%%s%%' " word)))
-                                )
-                               (calibredb-author-filter-p
-                                (cl-loop for word in words collect
-                                         (unless (equal (calibredb-tag-width) 0) (format " OR author_sort like '%%%s%%' " word)))
-                                )
-                               (calibredb-date-filter-p
-                                (cl-loop for word in words collect
-                                         (unless (equal (calibredb-tag-width) 0) (format " OR last_modified like '%%%s%%' " word)))
-                                )
-                               (t (cl-loop for word in words collect
-                                           (or
-                                            (unless (equal calibredb-id-width 0) (format " OR id like '%%%s%%' " word))
-                                            (unless (equal (calibredb-title-width) 0) (format " OR title like '%%%s%%' " word))
-                                            (unless (equal (calibredb-format-width) 0) (format " OR format like '%%%s%%' " word))
-                                            (unless (equal (calibredb-tag-width) 0) (format " OR tag like '%%%s%%' " word))
-                                            (unless (equal (calibredb-ids-width) 0) (format " OR ids like '%%%s%%' " word))
-                                            (unless (equal (calibredb-author-width) 0) (format " OR author_sort like '%%%s%%' " word))
-                                            (unless (equal (calibredb-date-width) 0) (format " OR last_modified like '%%%s%%' " word))
-                                            ;; Normally, comments are long, it is necessary to trancate the comments to speed up the searching
-                                            ;; except calibredb-comment-width is -1.
-                                            (unless (equal (calibredb-comment-width) 0) (format " text like '%%%s%%' OR " word))))))
+     :where (concat
+             (cond (calibredb-tag-filter-p
+                    (mapconcat
+                     (lambda (word)
+                       (mapconcat 'identity
+                                  (delq nil
+                                        (list
+                                         (unless (equal (calibredb-tag-width) 0) (format "tag like '%%%s%%' " word))))
+                                  " OR "))
+                     words
+                     " AND ")
+                    )
+                   (calibredb-format-filter-p
+                    (mapconcat
+                     (lambda (word)
+                       (mapconcat 'identity
+                                  (delq nil
+                                        (list
+                                         (unless (equal (calibredb-tag-width) 0) (format "format like '%%%s%%' " word))))
+                                  " OR "))
+                     words
+                     " AND ")
+                    )
+                   (calibredb-author-filter-p
+                    (mapconcat
+                     (lambda (word)
+                       (mapconcat 'identity
+                                  (delq nil
+                                        (list
+                                         (unless (equal (calibredb-tag-width) 0) (format "author_sort like '%%%s%%' " word))))
+                                  " OR "))
+                     words
+                     " AND ")
+                    )
+                   (calibredb-date-filter-p
+                    (mapconcat
+                     (lambda (word)
+                       (mapconcat 'identity
+                                  (delq nil
+                                        (list
+                                         (unless (equal (calibredb-tag-width) 0) (format "last_modified like '%%%s%%' " word))))
+                                  " OR "))
+                     words
+                     " AND ")
+                    )
+                   (t
+                    (mapconcat
+                     (lambda (word)
+                       (format "(%s)"
+                        (mapconcat 'identity
+                                   (delq nil
+                                         (list
+                                          (unless (equal calibredb-id-width 0) (format "id like '%%%s%%'" word))
+                                          (unless (equal (calibredb-title-width) 0) (format "title like '%%%s%%'" word))
+                                          (unless (equal (calibredb-format-width) 0) (format "format like '%%%s%%'" word))
+                                          (unless (equal (calibredb-tag-width) 0) (format "tag like '%%%s%%'" word))
+                                          (unless (equal (calibredb-ids-width) 0) (format "ids like '%%%s%%'" word))
+                                          (unless (equal (calibredb-author-width) 0) (format "author_sort like '%%%s%%'" word))
+                                          (unless (equal (calibredb-date-width) 0) (format "last_modified like '%%%s%%'" word))
+                                          ;; Normally, comments are long, it is necessary to trancate the comments to speed up the searching
+                                          ;; except calibredb-comment-width is -1.
+                                          (unless (equal (calibredb-comment-width) 0) (format "text like '%%%s%%'" word))))
+                                   " OR ")))
+                     words
+                     " AND ")))
 
-                         `( ,(when limit
-                               (format " LIMIT %s " limit) ) )
-                         `( ,(when page
-                               (format " OFFSET %s " (* (1- page) calibredb-search-page-max-rows))) )
+             (when limit
+               (format " LIMIT %s " limit) )
+             (when page
+               (format " OFFSET %s " (* (1- page) calibredb-search-page-max-rows)))
 
-                         )
-                        " ") 3 -1 )
+             )
      :count count)))
 
 

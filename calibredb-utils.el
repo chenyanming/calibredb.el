@@ -1055,7 +1055,7 @@ With universal ARG \\[universal-argument] use title as initial value."
                  (if (car item) (setq l (append (split-string (car item ) ",") l)) "" )) l))))
 
 (calibredb-all "id")
-(calibredb-all "author-sort")
+(calibredb-all "author_sort")
 (calibredb-all "path")
 (calibredb-all "name")
 (calibredb-all "format")
@@ -1086,7 +1086,7 @@ With universal ARG \\[universal-argument] use title as initial value."
 (defun calibredb-filter-by-author-sort ()
   "Filter results by author-sort."
   (interactive)
-  (let ((author (completing-read "Select author: " (calibredb-all-author-sort))))
+  (let ((author (completing-read "Select author: " (calibredb-all-author_sort))))
     (setq calibredb-tag-filter-p nil)
     (setq calibredb-favorite-filter-p nil)
     (setq calibredb-author-filter-p t)
