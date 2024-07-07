@@ -781,8 +781,7 @@ ebook record will be shown.
   (calibredb-search-update-buffer))
 
 (defun calibredb-search-update-buffer (&optional page)
-  "Update the calibredb-search buffer listing to match the database.
-When FORCE is non-nil, redraw even when the database hasn't changed."
+  "Update the calibredb-search buffer listing to match the database with PAGE."
   (interactive)
   (with-current-buffer (calibredb-search-buffer)
     (let* ((inhibit-read-only t)
@@ -810,6 +809,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
       entries)))
 
 (defun calibredb-search-more-data (page)
+  "Render candidates with PAGE."
   (let ((inhibit-read-only t))
     (setq calibredb-search-current-page page)
     (beginning-of-line)
@@ -818,6 +818,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
 
 
 (defun calibredb-search-next-page ()
+  "Render next calibredb page."
   (interactive)
   (if (< calibredb-search-current-page calibredb-search-pages)
       (progn
@@ -826,6 +827,7 @@ When FORCE is non-nil, redraw even when the database hasn't changed."
     (message "Last page.")))
 
 (defun calibredb-search-previous-page ()
+  "Render previous calibredb page."
   (interactive)
   (if (> calibredb-search-current-page 1)
       (progn

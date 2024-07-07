@@ -52,7 +52,7 @@
 
 
 (defgroup calibredb nil
-  "calibredb group"
+  "Calibredb group."
   :group 'calibredb)
 
 (defcustom calibredb-db-dir nil

@@ -845,7 +845,7 @@ Argument TITLE prompts to input the title.
 Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
                             ((string= calibredb-fetch-covers "no") nil)
-                            (t (yes-or-no-p "Fetch cover?: "))))
+                            (t (yes-or-no-p "Fetch cover? "))))
          (results (calibredb-fetch-metadata-from-sources author title ids isbn fetch-cover)))
     (cond (results
            (when fetch-cover (calibredb-select-and-set-cover))
@@ -947,7 +947,8 @@ With universal ARG \\[universal-argument] use title as initial value."
 
 ;; convert ebooks
 (defmacro calibredb-convert (type)
-  "Macro of function calibredb-convert-to-TYPE."
+  "Macro of function calibredb-convert-to-TYPE.
+Argument TYPE ebook type."
   `(defun ,(intern (format "calibredb-convert-to-%s" type)) (&optional candidate)
     ,(format "TODO: Convert the slected CANDIDATE to %s." type)
     (interactive)
@@ -1046,7 +1047,8 @@ With universal ARG \\[universal-argument] use title as initial value."
       )))
 
 (defmacro calibredb-all (field)
-  "Macro of function calibredb-all-FIELD."
+  "Macro of function calibredb-all-FIELD.
+Argument FIELD table name in database."
   `(defun ,(intern (format "calibredb-all-%s" field)) ()
      ,(format "Get all %s and return as a list." field)
      (seq-uniq
