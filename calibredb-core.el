@@ -408,7 +408,14 @@ LEFT JOIN b
 ON d.book = b.id
 LEFT JOIN identifiers AS i
 ON d.book = i.book
-GROUP BY d.book"
+GROUP BY d.book
+ORDER BY
+  (CASE
+    WHEN t.tag LIKE '%highlight%' THEN 1
+    WHEN t.tag LIKE '%favorite%' THEN 2
+    WHEN t.tag LIKE '%archive%' THEN 4
+    ELSE 3
+  END),"
   "TODO calibre database query statement.")
 
 (defun calibredb-query-search-string (filter)
@@ -654,16 +661,16 @@ Argument PROPERTIES is for selecting different sql statement."
                        (t "SELECT * FROM (%s) %s"))
                       (concat calibredb-query-string
                               (pcase calibredb-sort-by
-                                ('id " ORDER BY id")
-                                ('title " ORDER BY title")
-                                ('author " ORDER BY author_sort")
-                                ('format " ORDER BY format")
-                                ('date " ORDER BY last_modified")
-                                ('pubdate " ORDER BY pubdate")
-                                ('tag " ORDER BY tag")
-                                ('size " ORDER BY uncompressed_size")
-                                ('language " ORDER BY lang_code")
-                                (_ " ORDER BY id"))
+                                ('id " id")
+                                ('title " title")
+                                ('author " author_sort")
+                                ('format " format")
+                                ('date " last_modified")
+                                ('pubdate " pubdate")
+                                ('tag " tag")
+                                ('size " uncompressed_size")
+                                ('language " lang_code")
+                                (_ " id"))
                               (when (eq calibredb-order 'desc)
                                 " DESC"))
                       (if where (concat " WHERE " where) "")))
@@ -676,7 +683,7 @@ Argument PROPERTIES is for selecting different sql statement."
           (distinct query-result)
           (t (cond ((equal "" query-result) '(""))
             ((equal nil query-result) '(""))
-            (t (let (res-list h-list f-list a-list)
+            (t (let (res-list)
                  (dolist (line line-list)
                    (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                        (push (calibredb-query-to-alist line) res-list)
@@ -684,19 +691,6 @@ Argument PROPERTIES is for selecting different sql statement."
                      (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
                          ;; decode and push to res-list
                          (push (calibredb-query-to-alist line) res-list))))
-                 ;; filter archive/highlight/favorite items
-                 (dolist (item res-list)
-                   (cond ((string-match-p "archive" (calibredb-getattr (list item) :tag))
-                          (setq res-list (remove item res-list))
-                          (setq a-list (cons item a-list)))
-                         ((string-match-p "favorite" (calibredb-getattr (list item) :tag))
-                          (setq res-list (remove item res-list))
-                          (setq f-list (cons item f-list)))
-                         ((string-match-p "highlight" (calibredb-getattr (list item) :tag))
-                          (setq res-list (remove item res-list))
-                          (setq h-list (cons item h-list)))))
-                 ;; merge archive/highlight/favorite/rest items
-                 (setq res-list (nconc a-list res-list h-list f-list))
                  (calibredb-getbooklist res-list))))))))
 
 (defun calibredb-candidate(id)
