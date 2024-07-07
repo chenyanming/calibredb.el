@@ -908,7 +908,7 @@ ARGUMENT FILTER is the filter string."
 
                   )
                  " ") 3 -1 )
-     count)))
+     :count count)))
 
 
 (defun calibredb-search-update-buffer-with-keyword (keyword)

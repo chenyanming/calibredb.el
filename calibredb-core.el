@@ -642,11 +642,14 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       (setq display-alist
             (cons (list (calibredb-format-item item) item) display-alist)))))
 
-(defun calibredb-candidates (&optional sql count)
+(defun calibredb-candidates (&optional sql &rest properties)
   "Generate ebooks candidates alist."
-  (let* ((sql (format (if count
-                          "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)"
-                        "SELECT * FROM (%s) %s")
+  (let* ((count (plist-get properties :count))
+         (distinct (plist-get properties :distinct))
+         (sql (format (cond
+                       (count "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)")
+                       (distinct (concat "SELECT DISTINCT " distinct " FROM (SELECT * FROM (%s) %s)"))
+                       (t "SELECT * FROM (%s) %s"))
                       (concat calibredb-query-string
                               (pcase calibredb-sort-by
                                 ('id " ORDER BY id")
@@ -667,9 +670,9 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                         query-result
                       (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
 
-    (if count
-        (caar query-result)
-      (cond ((equal "" query-result) '(""))
+    (cond (count (caar query-result))
+          (distinct query-result)
+          (t (cond ((equal "" query-result) '(""))
             ((equal nil query-result) '(""))
             (t (let (res-list h-list f-list a-list)
                  (dolist (line line-list)
@@ -692,7 +695,9 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                           (setq h-list (cons item h-list)))))
                  ;; merge archive/highlight/favorite/rest items
                  (setq res-list (nconc a-list res-list h-list f-list))
-                 (calibredb-getbooklist res-list)))) )))
+                 (calibredb-getbooklist res-list)))))
+          )
+    ))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
