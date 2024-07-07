@@ -411,8 +411,8 @@ ON d.book = i.book
 GROUP BY d.book
 ORDER BY
   (CASE
-    WHEN t.tag LIKE '%highlight%' THEN 1
-    WHEN t.tag LIKE '%favorite%' THEN 2
+    WHEN t.tag LIKE '%favorite%' THEN 1
+    WHEN t.tag LIKE '%highlight%' THEN 2
     WHEN t.tag LIKE '%archive%' THEN 4
     ELSE 3
   END),"

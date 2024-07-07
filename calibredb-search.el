@@ -467,6 +467,7 @@ Argument EVENT mouse event."
   (setq calibredb-author-filter-p nil)
   (setq calibredb-date-filter-p nil)
   (setq calibredb-format-filter-p nil)
+  (setq calibredb-search-current-page 1)
   (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-clear-filter ()
@@ -477,6 +478,7 @@ Argument EVENT mouse event."
   (setq calibredb-author-filter-p nil)
   (setq calibredb-date-filter-p nil)
   (setq calibredb-format-filter-p nil)
+  (setq calibredb-search-current-page 1)
   (calibredb-search-keyword-filter ""))
 
 (defun calibredb-search-quit ()
@@ -911,12 +913,6 @@ Argument: PROPERTIES is the addiontal parameters."
                          )
                         " ") 3 -1 )
      :count count)))
-
-
-(defun calibredb-search-update-buffer-with-keyword (keyword)
-  "Filter the *calibredb-search* buffer with KEYWORD."
-  (setq calibredb-search-filter keyword)
-  (calibredb-search-update-buffer))
 
 
 ;;; detailed view
