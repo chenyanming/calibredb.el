@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -31,8 +31,6 @@
 (require 'calibredb-faces)
 (require 'calibredb-utils)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 (eval-when-compile (defvar counsel-ag-base-command))
 (declare-function counsel-ag "counsel")
 
@@ -106,11 +104,7 @@ If prefix ARG is non-nil, keep the files after adding without prompt."
 (defun calibredb-ivy-read ()
   "Ivy read for calibredb."
   (if (fboundp 'ivy-read)
-      (let ((cand (if calibredb-search-entries
-                      calibredb-search-entries
-                    (progn
-                      (setq calibredb-search-entries (calibredb-candidates))
-                      (setq calibredb-full-entries calibredb-search-entries)))))
+      (let ((cand (calibredb-candidates)))
         (if cand
             (ivy-read "Pick a book: "
                       cand

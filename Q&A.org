@@ -1,0 +1,270 @@
+#+title: Q&A
+** Transient commands
+~calibredb~ supports ~Transient commands~ just like ~magit~. Most of the features are binded in ~Transient commands~. You can press ~?~ to checkout.
+
+- ~calibredb-dispatch~: Invoke a calibredb command from a list of available commands in ~*calibredb-search*~ buffer.
+- ~calibredb-entry-dispatch~: Invoke a calibredb command from a list of available commands in ~*calibredb-entry*~ buffer.
+- ~calibredb-set-metadata-dispatch~: Set metadata.
+- ~calibredb-export-dispatch~: Export files.
+- ~calibredb-catalog-bib-dispatch~: BibTex operation.
+- ~calibredb-yank-dispatch~: Invoke a Yank operation.
+
+** What is my working library?
+=M-x calibredb=, your current library path shows in the header in buffer =*calibredb-search*=
+Besides, variable =calibredb-root-dir= also saves the current library location.
+
+** How to open an ebook?
+1. =M-x calibredb=
+   - In =*calibredb-search*= buffer, move the cursor to the ebook you want to open.
+   - Press =RET/o/O/V= to open it.
+   - If you are using macOS, you can also press =,= to quick look the ebook.
+
+2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
+   - Select the ebook you want to open in the list
+   - Press =RET= to open it.
+
+3. =M-x calibredb=
+   - In =*calibredb-search*= buffer, move the cursor to the ebook and press =v= to
+     show details, or just =Right Click= on the ebook.
+   - Then in =*calibredb-entry*= buffer, press =o/O/V= to open it.
+
+** How to add ebooks?
+1. =M-x calibredb-add=, select, mark ebooks (only ivy supports mark/unmark currently -
+   with =ivy-hydra=, in ivy-window, press =m= to mark, =DEL= or =u= to unmark.
+   Other engines can only select one item) and add to current library.
+
+2. =M-x calibredb-add-dir= and select one directory, all supported formats will be added into current library.
+
+3. =M-x dired=, mark the files, then =M-x calibredb-dired-add=, marked files in =dired= will be added
+   to current library. After adding process ends, =dired= will ask the user delete the files or
+   not.
+
+Please notice: Add books may fail! There are some reasons:
+- The book already exists in the database. If you still want to add the duplicated books, you can set ~calibredb-add-duplicate~ to ~Non-Nil~.
+- Not all book formats are supported. If you can not add a specific book, check the logs in ~*calibredb*~ buffer.
+
+** How to remove ebooks?
+1. =M-x calibredb=
+   - move the cursor to the ebook you want to delete, press =d=, calibredb will
+     ask you to delete or not.
+
+2. =M-x= =calibredb-find-helm= or =calibredb-find-counsel=
+   - Select the ebook you want to delete in the list
+   - =C-i= (Helm) =C-o= (Counsel) to enter the action menu.
+   - Perform remove action as shown in the menu.
+
+PS: If you want to delete in bulk with marked items, use ~calibredb-remove-marked-items~. ~m~ to mark items, ~D~ to bulk delete.
+
+** How to switch virtual libraries?
+First, set =calibredb-library-alist= to include the calibre virtual libraries.
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+                                        ("2. Read it later" . "Readit epub")
+                                        ("3. Development - rust" . "rust")))
+#+END_SRC
+Then, in =*calibredb-search*= buffer,
+ - Press =l= to open the library list and select the library.
+ - Press =n= or =p= to switch to next or previous library.
+
+Or, in =*calibredb-search*= buffer, call =calibredb-virtual-library-list= directly and select
+the library.
+
+** How to switch libraries?
+Set =calibredb-library-alist= to include the calibre libraries.
+
+Make sure the libraries are valid. Create libraries using Calibre GUI or ~M-x
+calibredb-clone~ to clone the existing library to a new library, before setting
+it in ~calibredb-library-alist~.
+
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
+                                  ("/Users/damonchan/Documents/Books Library")
+                                  ("/Users/damonchan/Documents/HELLO")
+                                  ("/Users/damonchan/Documents/Books")
+                                  ("/Users/damonchan/Documents/World")
+                                  ("http://192.168.1.2/opds" "account" "password") ; https://github.com/janeczku/calibre-web
+                                  ("http://opds.oreilly.com/opds/")
+                                  ("https://bookserver.archive.org/catalog/")
+                                  ("http://arxiv.maplepop.com/catalog/")
+                                  ("https://m.gutenberg.org/ebooks.opds/")
+                                  ("http://www.feedbooks.com/catalog.atom")
+                                  ("https://tatsu-zine.com/catalogs.opds")
+                                  ("http://aozora.textlive.net/catalog.opds")))
+#+END_SRC
+Then, in =*calibredb-search*= buffer,
+ - Press =L= to open the library list and select the library.
+ - Press =N= or =P= to switch to next or previous library.
+
+Or in =*calibredb-search*= buffer, call =calibredb-library-list= directly and select
+the library.
+
+If the library is not defined in =calibredb-library-alist=, you can call
+=calibredb-switch-library= and select the path of the library that you want to
+switch temporarily.
+
+** How to set metadata on ebooks?
+- In =*calibredb-search*= buffer, =m/DEL/u= to mark/unmark backward/unmark forward items, and =s= to set metadata
+  in bulk. If you do not mark any items, actions will be performed on the item
+  under cursor.
+- In =*calibredb-entry*= buffer, press =s= to set metadata.
+- In =*calibredb-search*= buffer, press =s f= to fetch metadata by
+  author and title or =s i= to fetch by ISBN. For fetching by author and title
+  enter one (or more) full lastnames of the author(s) (or delete redundant input
+  from initial input). For fetching by ISBN enter the ISBN number (usually can
+  be found and copied from on of the first pages of a book). As the title may
+  contain the ISBN it is set as initial input. Wait few second for Emacs to
+  retrieve metadata from the sources. Subsequently use =C-M-n/C-M-p= to select and
+  preview the source to use for adding the metadata to the document. Press =RET=
+  to add selected metadata to source.
+- In =*calibredb-search*= buffer, press =s d= to fetch metadata by identifier.
+
+Tips: You can filter the result via ~/~ before setting the metadata.
+
+*** About ~fetch-ebook-metadata~
+We are using ~fetch-ebook-metadata~ cli tool to fetch the metadata. However,
+fetching ebook metadata is a little tricky, especially about the sources
+configurations. Since the settings on calibre GUI would affect the
+~fetch-ebook-metadata~ cli. Follow below steps to setup.
+
+1. Set up the source settings in Calibre GUI. You are right, you need to configure the settings on GUI first.
+   - Preferences -> Preferences -> Sharing/Metadata download
+   - Tick 'source' you like to use
+   - Set the 'Cover priority'
+   - Apply
+3. Specify the list of metadata download plugins to use, this should be the same as the calibre GUI configuration.
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-fetch-metadata-source-list '("Google" "Amazon.com" "Douban Books"))
+#+END_SRC
+
+** How to mark favorite/highlight/archive on ebooks?
+- In =*calibredb-search*= buffer, =m= to mark the items, =f/h/x= to toggle
+  favorite/highlight/archive status on marked items.
+
+  Demo:
+#+attr_org: :width 600px
+  [[file:img/favorite_highlight_archive.png]]
+
+** How to do live filtering?
+- Press ~/~ to start live filtering. 
+
+Minibuffer shows ~Filter (live)~, input some texts to start searching (REGEX is supported).
+
+The following columns will be searched:
+- id
+- text (comment)
+- tag
+- title
+- format
+- author_sort
+- ids
+
+If the keyword occurs in any of the columns above, the matched ebook records will
+be shown.
+
+Here is the demo:
+[[file:img/filter.gif]]
+
+If you want to search by one type of metadata, for example, by tag, please check:
+#+html: <a href="#how-to-do-group-filtering">How to do group filtering?</a>.
+
+** How to do group filtering?
+Press ~g~, then press
+- t: fitler by tag
+- f: filter by format
+- a: filter by author
+- d: filter by date
+- l: filter by virutal library
+- L: filter by library
+- r: reset (clearing the search filter)
+
+For example, after pressing ~g t~ then select any tags, group filter for tag is
+enabled. In this case, minibuffer shows ~Filter (tag)~, if you press ~/~, it only search in tag.
+
+If you press ~g r~, you can switch back to live filtering, and minibuffer will show ~Filter (live)~.
+
+** How to do quick group filtering?
+- Click the =calibredb-favorite-icon=, authors, file format, and tags.
+- Press =r/R= to reset the filtering.
+
+  Demo:
+
+  [[file:img/quick_filter.gif]]
+
+** How to do sorting?
+Press ~o~, then press
+- o: toggle the order (desc or asc)
+- i: sort by id
+- t: sort by title
+- f: sort by format
+- a: sort by author
+- d: sort by date
+- p: sort by pubdate
+- T: sort by Tag
+- s: sort by size
+- l: sort by language
+
+Configure ~calibredb-sort-by~ and ~calibredb-order~ to control the default sorting.
+
+** How to interact with org-ref?
+- Setup org-ref
+  #+BEGIN_SRC emacs-lisp
+  (require 'org-ref)
+  (setq calibredb-ref-default-bibliography "~/Desktop/catalog.bib")
+  (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
+  (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename)
+  #+END_SRC
+  or
+  #+BEGIN_SRC emacs-lisp
+    (use-package! org-ref
+    :after-call calibredb
+    :config
+    (setq calibredb-ref-default-bibliography "~/Desktop/catalog.bib")
+    (add-to-list 'org-ref-default-bibliography calibredb-ref-default-bibliography)
+    (setq org-ref-get-pdf-filename-function 'org-ref-get-mendeley-filename))
+  #+END_SRC
+
+- In =*calibredb-search*= buffer, =b= =b= to generate the ebook catalogs with a BibTex
+  file.
+- The BibTex file is generated under current library path - =calibredb-root-dir=.
+- Every time you switch your library, the corresponding BibTex file path will
+  added into =org-ref-default-bibliography= temporarily.
+- In an org file, =C-c ]= to insert cite.
+
+  Demo:
+  [[file:img/bib.gif]]
+
+** Can not remember the keybindings?
+Press ~?~, it will show you almost all actions.
+
+Demo:
+#+attr_org: :width 600px
+[[file:img/details.gif]]
+
+** How to edit annotation with org-mode?
+In =*calibredb-search*= buffer,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-edit-annotation
+#+END_SRC
+Or press ~i~.
+
+By default, the annotation would be saved to =comments= field. If you want to
+change to other filed, please set with the following statement:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-annotation-field "comments")
+#+END_SRC
+
+Please notice: Due to the limitation of *calibredb*, the blank new lines will be deleted.
+
+** How to search in ebooks directly?
+We wrap ~counsel-ag~ in ~calibredb-rga~, using the power of [[https://github.com/phiresky/ripgrep-all][ripgrep-all]].
+First, install [[https://github.com/phiresky/ripgrep-all][ripgrep-all]],
+then in =*calibredb-search*=, =*calibredb-entry*= buffer or under =pdf-view-mode= / =nov-view-mode=,
+#+BEGIN_SRC emacs-lisp
+M-x calibredb-rga
+#+END_SRC
+
+** How to interact with calibredb files in org files?
+In ~*calibredb-search*~ buffer,
+- ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.
+- ~y f~ copy as file org link. If you click the link, it will open the file directly.
+

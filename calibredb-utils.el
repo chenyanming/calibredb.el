@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -33,8 +33,6 @@
 (require 'calibredb-transient)
 (require 'calibredb-annotation)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 (eval-when-compile (defvar calibredb-images-path))
 (eval-when-compile (defvar calibredb-opds-download-dir))
 
@@ -72,11 +70,7 @@
     (when (get-buffer buf-name)
       (kill-buffer buf-name))
     (setq occur-buf (get-buffer-create buf-name))
-    (let ((res-list (if calibredb-search-entries
-                        calibredb-search-entries
-                      (progn
-                        (setq calibredb-search-entries (calibredb-candidates))
-                        (setq calibredb-full-entries calibredb-search-entries)))))
+    (let ((res-list (calibredb-candidates)))
       (with-current-buffer occur-buf
         (erase-buffer)
         (insert "#+STARTUP: inlineimages nofold"))
@@ -851,7 +845,7 @@ Argument TITLE prompts to input the title.
 Optional argument ISBN prompts to input the isbn."
   (let* ((fetch-cover (cond ((string= calibredb-fetch-covers "yes") t)
                             ((string= calibredb-fetch-covers "no") nil)
-                            (t (yes-or-no-p "Fetch cover?: "))))
+                            (t (yes-or-no-p "Fetch cover? "))))
          (results (calibredb-fetch-metadata-from-sources author title ids isbn fetch-cover)))
     (cond (results
            (when fetch-cover (calibredb-select-and-set-cover))
@@ -953,7 +947,8 @@ With universal ARG \\[universal-argument] use title as initial value."
 
 ;; convert ebooks
 (defmacro calibredb-convert (type)
-  "Macro of function calibredb-convert-to-TYPE."
+  "Macro of function calibredb-convert-to-TYPE.
+Argument TYPE ebook type."
   `(defun ,(intern (format "calibredb-convert-to-%s" type)) (&optional candidate)
     ,(format "TODO: Convert the slected CANDIDATE to %s." type)
     (interactive)
@@ -1052,25 +1047,26 @@ With universal ARG \\[universal-argument] use title as initial value."
       )))
 
 (defmacro calibredb-all (field)
-  "Macro of function calibredb-all-FIELD."
+  "Macro of function calibredb-all-FIELD.
+Argument FIELD table name in database."
   `(defun ,(intern (format "calibredb-all-%s" field)) ()
      ,(format "Get all %s and return as a list." field)
      (seq-uniq
       (let (l)
-        (cl-loop for entry in calibredb-full-entries do
-                 (setq l (append (split-string (calibredb-getattr (cdr entry) ,(intern (format ":%s" field))) ",") l))) l))))
+        (cl-loop for item in (calibredb-candidates :distinct ,(format "%s" field )) do
+                 (if (car item) (setq l (append (split-string (car item ) ",") l)) "" )) l))))
 
-(calibredb-all "tag")
 (calibredb-all "id")
-(calibredb-all "author-sort")
-(calibredb-all "book-dir")
-(calibredb-all "book-name")
-(calibredb-all "book-format")
-(calibredb-all "book-pubdate")
-(calibredb-all "book-title")
+(calibredb-all "author_sort")
+(calibredb-all "path")
+(calibredb-all "name")
+(calibredb-all "format")
+(calibredb-all "pubdate")
+(calibredb-all "title")
+(calibredb-all "tag")
 (calibredb-all "file-path")
-(calibredb-all "size")
-(calibredb-all "comment")
+(calibredb-all "uncompressed_size")
+(calibredb-all "text")
 (calibredb-all "ids")
 (calibredb-all "publisher")
 (calibredb-all "series")
@@ -1086,17 +1082,19 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter tag)))
 
 (defun calibredb-filter-by-author-sort ()
   "Filter results by author-sort."
   (interactive)
-  (let ((author (completing-read "Select author: " (calibredb-all-author-sort))))
+  (let ((author (completing-read "Select author: " (calibredb-all-author_sort))))
     (setq calibredb-tag-filter-p nil)
     (setq calibredb-favorite-filter-p nil)
     (setq calibredb-author-filter-p t)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter author)))
 
 (defun calibredb-filter-by-last_modified ()
@@ -1108,18 +1106,20 @@ With universal ARG \\[universal-argument] use title as initial value."
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p t)
     (setq calibredb-format-filter-p nil)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter date)))
 
 
 (defun calibredb-filter-by-book-format ()
   "Filter results by book format."
   (interactive)
-  (let ((format (completing-read "Select format: " (calibredb-all-book-format))))
+  (let ((format (completing-read "Select format: " (calibredb-all-format))))
     (setq calibredb-tag-filter-p nil)
     (setq calibredb-favorite-filter-p nil)
     (setq calibredb-author-filter-p nil)
     (setq calibredb-date-filter-p nil)
     (setq calibredb-format-filter-p t)
+    (setq calibredb-search-current-page 1)
     (calibredb-search-keyword-filter format)))
 
 (defun calibredb-attach-icon-for (path)

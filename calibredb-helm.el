@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -28,8 +28,6 @@
 
 (require 'calibredb-core)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 
 (declare-function calibredb-set-metadata--tags "calibredb-utils.el")
 (declare-function calibredb-set-metadata--comments "calibredb-utils.el")
@@ -83,11 +81,7 @@
                              :header-name (lambda (name)
                                             (concat name " in [" calibredb-root-dir "]"))
                              :candidates (lambda ()
-                                           (if calibredb-search-entries
-                                               calibredb-search-entries
-                                             (progn
-                                               (setq calibredb-search-entries (calibredb-candidates))
-                                               (setq calibredb-full-entries calibredb-search-entries))))
+                                           (calibredb-candidates))
                              ;; :filtered-candidate-transformer 'helm-findutils-transformer
                              ;; :action-transformer 'helm-transform-file-load-el
                              :persistent-action 'calibredb-view--helm

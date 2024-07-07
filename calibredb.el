@@ -6,7 +6,7 @@
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
 ;; Created: 9 May 2020
-;; Version: 2.12.0
+;; Version: 2.13.0
 ;; Package-Requires: ((emacs "25.1") (org "9.3") (transient "0.1.0") (s "1.12.0") (dash "2.17.0") (request "0.3.3") (esxml "0.3.7"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -65,27 +65,12 @@
          (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
              (unless (sqlitep calibredb-db-connection)
                (calibredb-db-connection)))
-         (let ((cand (or calibredb-search-entries
-                         (setq calibredb-search-entries (calibredb-candidates)))))
-           (unless calibredb-full-entries
-             (setq calibredb-full-entries calibredb-search-entries))
-           (when (get-buffer (calibredb-search-buffer))
-             (kill-buffer (calibredb-search-buffer)))
+         (let ((cand (calibredb-search-keyword-filter calibredb-search-filter)))
            ;; Set virtual library name when the first time to launch calibredb
            (if (equal calibredb-search-filter "")
                (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
            (switch-to-buffer (calibredb-search-buffer))
            (goto-char (point-min))
-           (unless (equal cand '(""))   ; not empty library
-             (dolist (item cand)
-               (let (beg end)
-                 (setq beg (point))
-                 (insert (car item))
-                 (calibredb-detailed-view-insert-image item)
-                 (setq end (point))
-                 (put-text-property beg end 'calibredb-entry item)
-                 (insert "\n")))
-             (goto-char (point-min)))
            (calibredb-ref-default-bibliography)
            (unless (eq major-mode 'calibredb-search-mode)
              (calibredb-search-mode))))))

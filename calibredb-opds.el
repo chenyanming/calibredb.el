@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -91,8 +91,7 @@ Optional argument PASSWORD."
                              (let* ((dom (with-temp-buffer
                                            (insert data)
                                            (libxml-parse-xml-region (point-min) (point-max)))))
-                               (setq calibredb-search-entries (calibredb-opds-dom dom))
-                               (setq calibredb-full-entries calibredb-search-entries)
+                               (calibredb-opds-dom dom)
                                (calibredb)
                                (setq calibredb-tag-filter-p nil)
                                (setq calibredb-favorite-filter-p nil)

@@ -1,0 +1,30 @@
+#+title: Workflow
+There are three ways to manage your ebooks:
+** Start with =calibredb=
+First,  =M-x calibredb= to enter ebook dashboard.
+You can perform the following actions:
+ - Open/View the ebook
+ - Open Dired the ebook located
+ - Fetch (from Google and Amazon.com) and set metadata on the ebook under cursor
+ - Set metadata on marked ebooks
+ - Add/Remove ebooks on current library
+ - Export the ebook under cursor
+ - Clone/Switch/Jump to different libraries
+ - Live filter the results
+ - Generate Catalog, such as a BibTex file
+ - Favorite, highlight and archive the items
+
+** Start with =calibredb-find-helm= or =calibredb-find-counsel=
+   - =M-x calibredb-find-helm= or =calibredb-find-counsel= to enter the ebook list
+   - =C-i= (Helm) =C-o= (Counsel) to enter the action menus.
+** Start with =calibredb-list=
+   - =M-x calibredb-list= to enter ebook dashboard (buffer =*calibredb-list*=)
+
+PS:
+Workflows might be slightly changed in future versions.
+
+Notice: This package use *[[https://manual.calibre-ebook.com/generated/en/calibredb.html][calibredb]]* update the *metadata.db* file rather than use sqlite to update
+the database. *Sqlite* is only used for reading rather than updating and deleting. It should be
+safe to modify the database with this package, but it is still very important to do backup by
+yourself. For example, with cloud services.
+

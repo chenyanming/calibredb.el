@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -45,11 +45,7 @@
 The optional PREFIX argument is ignored.
 Please notice: `calibredb-id-width' must >= the real id lenth."
   (ignore prefix)
-  (let* ((candidates (if calibredb-search-entries
-                   calibredb-search-entries
-                 (progn
-                   (setq calibredb-search-entries (calibredb-candidates))
-                   (setq calibredb-full-entries calibredb-search-entries)))))
+  (let* ((candidates (calibredb-candidates)))
     (if (fboundp 'consult--read)
         (if candidates
             (let* ((cand (consult--read candidates

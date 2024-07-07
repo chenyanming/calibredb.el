@@ -5,7 +5,7 @@
 ;; Author: Damon Chan <elecming@gmail.com>
 ;; URL: https://github.com/chenyanming/calibredb.el
 ;; Keywords: tools
-;; Version: 2.12.0
+;; Version: 2.13.0
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -28,8 +28,6 @@
 
 (require 'calibredb-core)
 
-(eval-when-compile (defvar calibredb-search-entries))
-(eval-when-compile (defvar calibredb-full-entries))
 (declare-function calibredb-search-clear-filter "calibredb-search.el")
 
 (define-obsolete-function-alias #'calibredb-open-dired
@@ -76,8 +74,7 @@ library."
                                    (format "--library-path %s" (calibredb-root-dir-quote))))
      (lambda (p e)
        (when (= 0 (process-exit-status p))
-         (setq calibredb-search-entries (calibredb-candidates))
-         (setq calibredb-full-entries calibredb-search-entries)
+         (calibredb-candidates)
          (calibredb-search-clear-filter)
          (with-current-buffer buffer
              (dired-do-delete)))))))
