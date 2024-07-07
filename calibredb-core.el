@@ -642,10 +642,12 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
       (setq display-alist
             (cons (list (calibredb-format-item item) item) display-alist)))))
 
-(defun calibredb-candidates (&optional sql &rest properties)
-  "Generate ebooks candidates alist."
+(defun calibredb-candidates (&rest properties)
+  "Generate ebooks candidates alist.
+Argument PROPERTIES is for selecting different sql statement."
   (let* ((count (plist-get properties :count))
          (distinct (plist-get properties :distinct))
+         (where (plist-get properties :where))
          (sql (format (cond
                        (count "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)")
                        (distinct (concat "SELECT DISTINCT " distinct " FROM (SELECT * FROM (%s) %s)"))
@@ -664,7 +666,7 @@ Argument CALIBRE-ITEM-LIST is the calibred item list."
                                 (_ " ORDER BY id"))
                               (when (eq calibredb-order 'desc)
                                 " DESC"))
-                      (if sql (concat " WHERE " sql) "")))
+                      (if where (concat " WHERE " where) "")))
          (query-result (calibredb-query sql))
          (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
                         query-result

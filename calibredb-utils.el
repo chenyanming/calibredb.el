@@ -1051,7 +1051,7 @@ With universal ARG \\[universal-argument] use title as initial value."
      ,(format "Get all %s and return as a list." field)
      (seq-uniq
       (let (l)
-        (cl-loop for item in (calibredb-candidates nil :distinct ,(format "%s" field )) do
+        (cl-loop for item in (calibredb-candidates :distinct ,(format "%s" field )) do
                  (if (car item) (setq l (append (split-string (car item ) ",") l)) "" )) l))))
 
 (calibredb-all "id")
