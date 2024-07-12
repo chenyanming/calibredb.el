@@ -134,12 +134,18 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
                                   ("/Volumes/ShareDrive/Documents/Library/"))))
 #+END_SRC
 
+** Page
+The maximum number of entries to display in a single page:
+#+begin_src emacs-lisp
+(setq calibredb-search-page-max-rows 44)
+#+end_src
+
 ** Virtual Libraries
 Virtual libraries are some convenient shortcuts for quick filtering the Ebooks
 by setting the ~calibredb-search-filter~.
 
 #+BEGIN_SRC emacs-lisp
-(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work pdf")
                                         ("2. Read it later" . "Readit epub")
                                         ("3. Development - rust" . "rust")))
 #+END_SRC

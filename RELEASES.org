@@ -3,6 +3,10 @@
 ** =2024-07-07=
 Version *2.13.0*:
 - Support Pages
+- Breaking change:
+  - Filtering: Each keyword is sent to database and compare with each column
+    using LIKE. Use space to separate keywords, acting as AND operation for
+    filtering multiple columns. (Previously support REGEX but now removed)
 
 ** =2022-05-11=
 Version *2.12.0*:
