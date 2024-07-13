@@ -40,21 +40,16 @@ be shown.
 1. Live filter searches the database.
 2. Keywords are separated by "Spaces" (AND operation, mainly used to narrow down
    the results, the more spaces you insert, the fewer results.)
-3. Each keyword supports REGEX.
 
-For example, to search Ebooks may contain a tag - *work*, and the format maybe pdf
-or epub. You can insert ~work \(pdf\|epub\)~ (Notice the single backslash) in mini buffer.
+For example, to search Ebooks may contain a tag - *work*, and the format maybe pdf. You can insert ~work pdf~ (Notice the single backslash) in mini buffer.
 
 If you set the filter keywords in ~calibredb-virtual-library-alist~, you should
 (Notice the double backslashes):
 #+BEGIN_SRC emacs-lisp
-(setq calibredb-virtual-library-alist '(("1. Development - work" . "work \\(pdf\\|epub\\)")
+(setq calibredb-virtual-library-alist '(("1. Development - work" . "work pdf")
                                         ("2. Read it later" . "Readit epub")
                                         ("3. Development - rust" . "rust")))
 #+END_SRC
-
-
-Check REGEX https://www.gnu.org/software/emacs/manual/html_node/efaq/Using-regular-expressions.html.
 
 Tip: =*calibredb-search*=, =calibredb-find-counsel=, and =calibredb-find-helm= are sharing
 the same results. Therefore, after the filtering in =*calibredb-search*=, you can do
