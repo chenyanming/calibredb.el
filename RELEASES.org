@@ -2,7 +2,10 @@
 #+STARTUP: nofold
 ** =2024-07-07=
 Version *2.13.0*:
-- Support Pages
+- Support Pages: No matter how big the database was, calibredb only query the
+  database <= ~calibredb-search-page-max-rows~ items. It also reduces unnecessary
+  memory usage by removing ~calibredb-search-entries~ and ~calibredb-full-entries~
+  and query the database directly.
 - Breaking change:
   - Filtering: Each keyword is sent to database and compare with each column
     using LIKE. Use space to separate keywords, acting as AND operation for
