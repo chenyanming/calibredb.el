@@ -1054,7 +1054,9 @@ Argument FIELD table name in database."
      (seq-uniq
       (let (l)
         (cl-loop for item in (calibredb-candidates :distinct ,(format "%s" field )) do
-                 (if (car item) (setq l (append (split-string (car item ) ",") l)) "" )) l))))
+                 (if (listp item)
+                     (if (car item) (setq l (append (split-string (car item ) ",") l)) "" )
+                   (setq l (append (split-string item ",") l)))) l))))
 
 (calibredb-all "id")
 (calibredb-all "author_sort")

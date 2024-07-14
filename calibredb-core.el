@@ -408,15 +408,23 @@ LEFT JOIN b
 ON d.book = b.id
 LEFT JOIN identifiers AS i
 ON d.book = i.book
-GROUP BY d.book
+GROUP BY d.book"
+  "TODO calibre database query statement.")
+
+
+(defvar calibredb-sql-count-string "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)"
+  "calibre database query statement: count total items.")
+
+
+(defvar calibredb-sql-order-by-string "
 ORDER BY
   (CASE
-    WHEN t.tag LIKE '%favorite%' THEN 1
-    WHEN t.tag LIKE '%highlight%' THEN 2
-    WHEN t.tag LIKE '%archive%' THEN 4
-    ELSE 3
-  END),"
-  "TODO calibre database query statement.")
+   WHEN t.tag LIKE '%favorite%' THEN 1
+   WHEN t.tag LIKE '%highlight%' THEN 2
+   WHEN t.tag LIKE '%archive%' THEN 4
+   ELSE 3
+   END),"
+  "calibre database query statement: order by favorite, highlight, archive.")
 
 (defun calibredb-query-search-string (filter)
   "DEPRECATED Return the where part of SQL based on FILTER."
@@ -551,33 +559,32 @@ tell user something’s wrong."
 (defun calibredb-query-to-alist (query-result)
   "Builds alist out of a full `calibredb-query' query record result.
 Argument QUERY-RESULT is the query result generate by sqlite."
-  (if query-result
-      (let ((spl-query-result (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                                  query-result
-                                (split-string (calibredb-chomp query-result) calibredb-sql-separator))))
-        `((:id                     ,(let ((id (nth 0 spl-query-result)))
-                                      (if (stringp id)
-                                          id
-                                        (number-to-string id))))
-          (:author-sort            ,(nth 1 spl-query-result))
-          (:book-dir               ,(nth 2 spl-query-result))
-          (:book-name              ,(nth 3 spl-query-result))
-          (:book-format  ,(downcase (or (nth 4 spl-query-result) "")))
-          (:book-pubdate           ,(nth 5 spl-query-result))
-          (:book-title             ,(nth 6 spl-query-result))
-          (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
-                                  (file-name-as-directory (nth 2 spl-query-result))
-                                  (nth 3 spl-query-result) "." (downcase (or (nth 4 spl-query-result) ""))))
-          (:tag                    ,(or (nth 7 spl-query-result) ""))
-          (:size                   ,(format "%.2f" (/ (let ((size (or (nth 8 spl-query-result) "")))
-                                                        (if (stringp size)
-                                                            (string-to-number size) size)) 1048576.0)))
-          (:comment                ,(or (nth 9 spl-query-result) ""))
-          (:ids                    ,(or (nth 10 spl-query-result) ""))
-          (:publisher              ,(or (nth 11 spl-query-result) ""))
-          (:series                 ,(or (nth 12 spl-query-result) ""))
-          (:lang_code              ,(or (nth 13 spl-query-result) ""))
-          (:last_modified          ,(or (nth 14 spl-query-result) ""))))))
+  (if-let ((spl-query-result (if (listp query-result)
+                                 query-result
+                               (split-string (calibredb-chomp query-result) calibredb-sql-separator))))
+      `((:id                     ,(let ((id (nth 0 spl-query-result)))
+                                    (if (stringp id)
+                                        id
+                                      (number-to-string id))))
+        (:author-sort            ,(nth 1 spl-query-result))
+        (:book-dir               ,(nth 2 spl-query-result))
+        (:book-name              ,(nth 3 spl-query-result))
+        (:book-format  ,(downcase (or (nth 4 spl-query-result) "")))
+        (:book-pubdate           ,(nth 5 spl-query-result))
+        (:book-title             ,(nth 6 spl-query-result))
+        (:file-path    ,(concat (file-name-as-directory calibredb-root-dir)
+                                (file-name-as-directory (nth 2 spl-query-result))
+                                (nth 3 spl-query-result) "." (downcase (or (nth 4 spl-query-result) ""))))
+        (:tag                    ,(or (nth 7 spl-query-result) ""))
+        (:size                   ,(format "%.2f" (/ (let ((size (or (nth 8 spl-query-result) "")))
+                                                      (if (stringp size)
+                                                          (string-to-number size) size)) 1048576.0)))
+        (:comment                ,(or (nth 9 spl-query-result) ""))
+        (:ids                    ,(or (nth 10 spl-query-result) ""))
+        (:publisher              ,(or (nth 11 spl-query-result) ""))
+        (:series                 ,(or (nth 12 spl-query-result) ""))
+        (:lang_code              ,(or (nth 13 spl-query-result) ""))
+        (:last_modified          ,(or (nth 14 spl-query-result) "")))))
 
 (defun calibredb-getattr (my-alist key)
   "Get the attribute.
@@ -656,10 +663,11 @@ Argument PROPERTIES is for selecting different sql statement."
          (distinct (plist-get properties :distinct))
          (where (plist-get properties :where))
          (sql (format (cond
-                       (count "SELECT COUNT(id) FROM (SELECT * FROM (%s) %s)")
+                       (count calibredb-sql-count-string)
                        (distinct (concat "SELECT DISTINCT " distinct " FROM (SELECT * FROM (%s) %s)"))
                        (t "SELECT * FROM (%s) %s"))
                       (concat calibredb-query-string
+                              calibredb-sql-order-by-string
                               (pcase calibredb-sort-by
                                 ('id " id")
                                 ('title " title")
@@ -673,48 +681,43 @@ Argument PROPERTIES is for selecting different sql statement."
                                 (_ " id"))
                               (when (eq calibredb-order 'desc)
                                 " DESC"))
-                      (if where (concat " WHERE " where) "")))
-         (query-result (calibredb-query sql))
-         (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                        query-result
-                      (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
-    ;; (message "%s" sql)
-    (cond (count (caar query-result))
-          (distinct query-result)
-          (t (cond ((equal "" query-result) '())
-                   ((equal nil query-result) '())
-                   ((numberp query-result) '())
-                   (t (let (res-list)
-                        (dolist (line line-list)
-                          (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                              (push (calibredb-query-to-alist line) res-list)
-                            ;; validate if it is right format
-                            (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
-                                ;; decode and push to res-list
-                                (push (calibredb-query-to-alist line) res-list))))
-                        (calibredb-getbooklist res-list))))))))
+                      (if where (concat " WHERE " where) ""))))
+    (when-let* ((query-result (calibredb-query sql))
+                (valid-query-result-p (or (listp query-result)
+                                          (if (stringp query-result)
+                                              (not (string= query-result "")))))
+                (line-list (if (listp query-result)
+                               query-result
+                             (split-string (calibredb-chomp query-result) calibredb-sql-newline) )))
+      ;; (message "%s" sql)
+      (cond (count (if (listp query-result)
+                       (caar line-list)
+                     (string-to-number (car line-list))))
+            (distinct line-list)
+            (t (let (res-list)
+                 (dolist (line line-list)
+                   (if (listp line)
+                       (push (calibredb-query-to-alist line) res-list)
+                     ;; validate if it is right format
+                     (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
+                         ;; decode and push to res-list
+                         (push (calibredb-query-to-alist line) res-list))))
+                 (calibredb-getbooklist res-list)))))))
 
 (defun calibredb-candidate(id)
   "Generate one ebook candidate alist.
 ARGUMENT ID is the id of the ebook in string."
-  (let* ((query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
-         (line-list (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                        query-result
-                      (if query-result (split-string (calibredb-chomp query-result) calibredb-sql-newline)) )))
-    (cond ((equal "" query-result) '(""))
-          ((equal nil query-result) '(""))
-          (t (let (res-list)
-               (dolist (line line-list)
-                 (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-                     (push (calibredb-query-to-alist line) res-list)
-                   ;; validate if it is right format
-                   (if (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line)
-                       ;; decode and push to res-list
-                       (push (calibredb-query-to-alist line) res-list)
-                     ;; concat the invalid format strings into last line
-                     ;; (setf (cadr (assoc :comment (car res-list))) (concat (cadr (assoc :comment (car res-list))) line))
-                     )))
-               (calibredb-getbooklist res-list)) ))))
+  (if-let* ((valid-id-p (stringp id))
+            (query-result (calibredb-query (format "SELECT * FROM (%s) WHERE id = %s" calibredb-query-string id)))
+            (valid-query-result-p (or (listp query-result)
+                                      (if (stringp query-result)
+                                          (not (string= query-result "")))))
+            (line (if (listp query-result) (car query-result)
+                    (car (split-string (calibredb-chomp query-result) calibredb-sql-newline))))
+            (valid-line-p (or (listp line)
+                              (string-match-p (concat "^[0-9]\\{1,10\\}" calibredb-sql-separator) line))))
+      (calibredb-getbooklist (list (calibredb-query-to-alist line) ))
+    '("")))
 
 (defun calibredb-format-item (book-alist)
   "Format the candidate string shown in helm or ivy.

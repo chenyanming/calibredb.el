@@ -780,6 +780,9 @@ ebook record will be shown.
   (setq calibredb-search-filter keyword)
   (calibredb-search-update-buffer))
 
+(defvar calibredb-search-entries-length 0
+  "The number of entries in the current search result.")
+
 (defun calibredb-search-update-buffer (&optional page)
   "Update the calibredb-search buffer listing to match the database with PAGE."
   (interactive)
