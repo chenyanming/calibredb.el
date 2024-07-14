@@ -867,11 +867,18 @@ ebook record will be shown.
 (defvar calibredb-search-pages 0
   "The number of pages in the current search result.")
 
+(defun calibredb-sanitize-filter (filter)
+  "Sanitize FILTER for use in SQL queries by escaping special characters."
+  (let ((sanitized filter))
+    ;; Escape single quotes by doubling them
+    (setq sanitized (replace-regexp-in-string "'" "''" sanitized))
+    sanitized))
+
 (defun calibredb-search-candidates (filter &rest properties)
   "Generate ebook candidate alist.
 Argument: FILTER is the filter string.
 Argument: PROPERTIES is the addiontal parameters."
-  (let* ((words (split-string filter " "))
+  (let* ((words (split-string (calibredb-sanitize-filter filter) " "))
          (limit (plist-get properties :limit))
          (count (plist-get properties :count))
          (page (plist-get properties :page)))
