@@ -110,6 +110,16 @@ Argument FILEPATH is the file path."
                         "open" (expand-file-name filepath)))
         (t (message "unknown system!?"))))
 
+(defun calibredb-list-ebooks-files (directory file-extensions)
+  "Recursively list all ebook files with FILE-EXTENSIONS in DIRECTORY.
+FILE-EXTENSIONS should be a list of strings."
+  (let* ((regex (format "\\.%s\\'" (regexp-opt file-extensions)))
+         (files (directory-files-recursively directory regex t)))
+    (cond ((> (length files) 0)
+           files)
+          (t (error "No Ebooks found in %s" directory)
+             nil))))
+
 (defun calibredb-get-file-path (entry &optional prompt)
   "Get file path from a valid candidate ENTRY.
 Optional argument PROMPT to Select a format."
@@ -122,11 +132,16 @@ Optional argument PROMPT to Select a format."
                  (let* ((parent (file-name-directory file-path))
                         (filename (file-name-base file-path))
                         (ext (s-split "," (file-name-extension file-path)))
-                        (files (-map (lambda (e) (expand-file-name (concat filename "." e) parent)) ext)))
+                        (files (calibredb-list-ebooks-files parent ext)))
                    (if calibredb-preferred-format
-                       (or (-first (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files) (car files))
+                       (let ((preferred-files (-filter (lambda (f) (string= (file-name-extension f) calibredb-preferred-format)) files)))
+                         (cond ((> (length preferred-files) 1)
+                                (completing-read (format "Select a file (%s): " calibredb-preferred-format) preferred-files))
+                               ((= (length preferred-files) 1)
+                                (car preferred-files))
+                               (t (car files))))
                      (if prompt
-                         (completing-read "Select a format: " files)
+                         (completing-read (format "Select a file %s: " ext) files)
                        (car files))))
                file-path)))))           ; if extension does not have comma, at last just retrun it.
 
