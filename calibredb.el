@@ -52,32 +52,35 @@
 (require 'calibredb-opds)
 (require 'calibredb-consult)
 (require 'calibredb-dired)
+(require 'calibredb-folder)
 
 ;;;###autoload
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
-  (cond ((null calibredb-db-dir)
-         (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
-        ((not (file-regular-p calibredb-db-dir))
-         (message "calibredb: %s doesn't exist!" calibredb-db-dir))
-        (t
-         (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
-             (unless (sqlitep calibredb-db-connection)
-               (calibredb-db-connection)))
-         ;; opds
-         (if (s-contains? "http" calibredb-root-dir)
-             (let ((cand))
-               ;; Set virtual library name when the first time to launch calibredb
-               (if (equal calibredb-search-filter "")
-                   (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
-               (switch-to-buffer (calibredb-search-buffer))
-               (goto-char (point-min))
-               (calibredb-ref-default-bibliography)
-               (unless (eq major-mode 'calibredb-search-mode)
-                 (calibredb-search-mode))
-               (calibredb-opds-request-page calibredb-root-dir))
-           ;; metadata.db
+  (cond
+   ;; opds
+   ((s-contains? "http" calibredb-root-dir)
+    ;; Set virtual library name when the first time to launch calibredb
+    (if (equal calibredb-search-filter "")
+        (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+    (switch-to-buffer (calibredb-search-buffer))
+    (goto-char (point-min))
+    (calibredb-ref-default-bibliography)
+    (unless (eq major-mode 'calibredb-search-mode)
+      (calibredb-search-mode))
+    (calibredb-opds-request-page calibredb-root-dir))
+   ;; metadata.db
+   ((and (file-exists-p calibredb-db-dir)
+         (s-contains? "metadata.db" calibredb-db-dir))
+    (cond ((null calibredb-db-dir)
+           (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
+          ((not (file-regular-p calibredb-db-dir))
+           (message "calibredb: %s doesn't exist!" calibredb-db-dir))
+          (t
+           (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
+               (unless (sqlitep calibredb-db-connection)
+                 (calibredb-db-connection)))
            (let ((cand (calibredb-search-keyword-filter calibredb-search-filter)))
              ;; Set virtual library name when the first time to launch calibredb
              (if (equal calibredb-search-filter "")
@@ -86,7 +89,21 @@
              (goto-char (point-min))
              (calibredb-ref-default-bibliography)
              (unless (eq major-mode 'calibredb-search-mode)
-               (calibredb-search-mode)))))))
+               (calibredb-search-mode))))))
+   ;; .metadata.calibre
+   ((and (file-exists-p calibredb-db-dir)
+         (s-contains? ".metadata.calibre" calibredb-db-dir))
+    ;; Set virtual library name when the first time to launch calibredb
+    (if (equal calibredb-search-filter "")
+        (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+    (switch-to-buffer (calibredb-search-buffer))
+    (goto-char (point-min))
+    (calibredb-ref-default-bibliography)
+    (unless (eq major-mode 'calibredb-search-mode)
+      (calibredb-search-mode))
+    (calibredb-search-update-buffer 1 (calibredb-folder-match-decode)))
+   (t
+    (message "calibredb: %s is invalid." calibredb-db-dir))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here

@@ -127,6 +127,7 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
   :defer t
   :config
   (setq calibredb-root-dir "~/OneDrive/Org/Doc/Calibre")
+  ;; for folder driver metadata: it should be .metadata.calibre
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
   (setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre")
                                   ("~/Documents/Books Library")
