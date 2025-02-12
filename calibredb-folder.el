@@ -65,6 +65,10 @@
   "Return the file extensions EXTN based on the MIME content type."
   (mailcap-parse-mimetypes)
   (if (stringp mime)
-      (car (rassoc (downcase mime) mailcap-mime-extensions))))
+      (let ((ext (car (rassoc (downcase mime) mailcap-mime-extensions))))
+        (if (string-empty-p ext)
+            ".txt"
+          ext))
+    ".txt"))
 
 (provide 'calibredb-folder)
