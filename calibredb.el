@@ -65,15 +65,28 @@
          (if (and (functionp 'sqlite-available-p) (sqlite-available-p))
              (unless (sqlitep calibredb-db-connection)
                (calibredb-db-connection)))
-         (let ((cand (calibredb-search-keyword-filter calibredb-search-filter)))
-           ;; Set virtual library name when the first time to launch calibredb
-           (if (equal calibredb-search-filter "")
-               (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
-           (switch-to-buffer (calibredb-search-buffer))
-           (goto-char (point-min))
-           (calibredb-ref-default-bibliography)
-           (unless (eq major-mode 'calibredb-search-mode)
-             (calibredb-search-mode))))))
+         ;; opds
+         (if (s-contains? "http" calibredb-root-dir)
+             (let ((cand))
+               ;; Set virtual library name when the first time to launch calibredb
+               (if (equal calibredb-search-filter "")
+                   (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+               (switch-to-buffer (calibredb-search-buffer))
+               (goto-char (point-min))
+               (calibredb-ref-default-bibliography)
+               (unless (eq major-mode 'calibredb-search-mode)
+                 (calibredb-search-mode))
+               (calibredb-opds-request-page calibredb-root-dir))
+           ;; metadata.db
+           (let ((cand (calibredb-search-keyword-filter calibredb-search-filter)))
+             ;; Set virtual library name when the first time to launch calibredb
+             (if (equal calibredb-search-filter "")
+                 (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
+             (switch-to-buffer (calibredb-search-buffer))
+             (goto-char (point-min))
+             (calibredb-ref-default-bibliography)
+             (unless (eq major-mode 'calibredb-search-mode)
+               (calibredb-search-mode)))))))
 
 (provide 'calibredb)
 ;;; calibredb.el ends here

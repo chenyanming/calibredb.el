@@ -783,16 +783,17 @@ ebook record will be shown.
 (defvar calibredb-search-entries-length 0
   "The number of entries in the current search result.")
 
-(defun calibredb-search-update-buffer (&optional page)
-  "Update the calibredb-search buffer listing to match the database with PAGE."
+(defun calibredb-search-update-buffer (&optional page original-entries)
+  "Update the calibredb-search buffer listing to match the database with PAGE.
+If ORIGINAL-ENTRIES is non-nil, use it as the entries to display."
   (interactive)
   (with-current-buffer (calibredb-search-buffer)
     (let* ((inhibit-read-only t)
            (standard-output (current-buffer))
            (id 0)
-           (entries (calibredb-search-get-filterred-entries page))
+           (entries (or original-entries (calibredb-search-get-filterred-entries page)))
            (len (length entries)))
-      (setq calibredb-search-entries-length (calibredb-search-candidates calibredb-search-filter :count t))
+      (setq calibredb-search-entries-length (if original-entries len (calibredb-search-candidates calibredb-search-filter :count t)))
       (setq calibredb-search-pages (ceiling calibredb-search-entries-length calibredb-search-page-max-rows))
       (erase-buffer)
       ;; reset calibredb-virtual-library-name
