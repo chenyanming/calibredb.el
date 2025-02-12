@@ -1,4 +1,4 @@
-;;; calibredb-folder.el -*- lexical-binding: t; -*-
+;;; calibredb-folder.el --- Support .metadata.calibre folder metadata -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020 Damon Chan
 
