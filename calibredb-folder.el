@@ -28,15 +28,11 @@
 
 (require 'calibredb-core)
 
-(defcustom calibredb-folder-program (concat (file-name-directory load-file-name) "calibredb-folder.py")
-  "The command to list books in the folder that has .metadata.calibre file."
-  :type 'string
-  :group 'calibredb)
-
 (defun calibredb-folder-match-decode ()
   "Extract the JSON array from the last line of LOG-STRING and decode its structure."
-  (let* ((lines (split-string (shell-command-to-string (format "%s %s %s" calibredb-debug-program calibredb-folder-program calibredb-root-dir)) "\n" t))
-         (json-string (car (last lines)))
+  (let* ((json-string (with-temp-buffer
+                        (insert-file-contents (expand-file-name ".metadata.calibre" calibredb-root-dir))
+                        (buffer-string)))
          (entries (json-parse-string json-string :object-type 'alist :array-type 'list :null-object nil)))
     (calibredb-getbooklist
                (let ((no 0))
