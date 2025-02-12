@@ -256,6 +256,11 @@ Set negative to keep original length."
 (define-obsolete-variable-alias 'calibredb-format-icons
   'calibredb-format-all-the-icons "calibredb 2.3.2")
 
+(defcustom calibredb-format-nerd-icons nil
+  "Set Non-nil to show file format icons with nerd-icons."
+  :group 'calibredb
+  :type 'boolean)
+
 (defcustom calibredb-format-all-the-icons nil
   "Set Non-nil to show file format icons with all-the-icons."
   :group 'calibredb
@@ -745,7 +750,8 @@ Argument BOOK-ALIST ."
         (setq title (concat title "\n")))
     (format
      (if calibredb-detailed-view
-         (let ((num (cond (calibredb-format-all-the-icons 3)
+         (let ((num (cond (calibredb-format-nerd-icons 3)
+                          (calibredb-format-all-the-icons 3)
                           (calibredb-format-icons-in-terminal 3)
                           ((>= calibredb-id-width 0) calibredb-id-width)
                           (t 0 ))))
@@ -758,18 +764,8 @@ Argument BOOK-ALIST ."
             (calibredb-format-column (format "%sIds:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sComment:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sSize:" (make-string num ? )) (+ 8 num) :left) "%s"))
-       "%s%s%s %s %s %s (%s) %s %s %s")
-     (cond (calibredb-format-all-the-icons
-            (concat (if (fboundp 'all-the-icons-icon-for-file)
-                        (all-the-icons-icon-for-file (calibredb-get-file-path (list book-alist))) "")
-                    " "))
-           (calibredb-format-icons-in-terminal
-            (concat (if (fboundp 'icons-in-terminal-icon-for-file)
-                        (icons-in-terminal-icon-for-file (calibredb-get-file-path (list book-alist) ) :v-adjust 0 :height 1) "")
-                    " "))
-           (calibredb-format-character-icons
-            (concat (calibredb-attach-icon-for (calibredb-get-file-path (list book-alist))) " "))
-           (t ""))
+       "%s %s%s %s %s %s (%s) %s %s %s")
+     (calibredb-icons-for-file-extensions format)
      (calibredb-format-column (format "%s" (propertize id 'face 'calibredb-id-face 'id id)) calibredb-id-width :left)
      (calibredb-format-column (format "%s%s"
                                       (if (s-contains? calibredb-favorite-keyword tag)
@@ -826,6 +822,40 @@ Argument BOOK-ALIST ."
                  (propertize size 'face 'calibredb-size-face) "")
              (if calibredb-size-show
                  (propertize "Mb" 'face 'calibredb-size-face) ""))) ))
+
+(defun calibredb-icons-for-file-extensions (extensions-string)
+  "Return the appropriate icon(s) for the given EXTENSIONS-STRING.
+If the string contains `calibredb-preferred-format`, only show that format.
+Otherwise, show icons for the first available format."
+  (let* ((extensions (split-string (string-trim extensions-string) ","))
+         (preferred-format (car (member calibredb-preferred-format extensions)))
+         (extensions-to-show (if preferred-format
+                                 (list preferred-format)
+                               (list (car extensions)))))
+    (cond
+     (calibredb-format-nerd-icons
+      (mapconcat (lambda (ext)
+                   (if (fboundp 'nerd-icons-icon-for-file)
+                       (nerd-icons-icon-for-file (concat "file." (string-trim ext)))
+                     ""))
+                 extensions-to-show " "))
+     (calibredb-format-all-the-icons
+      (mapconcat (lambda (ext)
+                   (if (fboundp 'all-the-icons-icon-for-file)
+                       (all-the-icons-icon-for-file (concat "file." (string-trim ext)))
+                     ""))
+                 extensions-to-show " "))
+     (calibredb-format-icons-in-terminal
+      (mapconcat (lambda (ext)
+                   (if (fboundp 'icons-in-terminal-icon-for-file)
+                       (icons-in-terminal-icon-for-file ext :v-adjust 0 :height 1)
+                     ""))
+                 extensions-to-show " "))
+     (calibredb-format-character-icons
+      (mapconcat (lambda (ext)
+                   (calibredb-attach-icon-for ext))
+                 extensions-to-show " "))
+     (t ""))))
 
 (provide 'calibredb-core)
 

@@ -182,8 +182,14 @@ Enable size indicator:
 Then in =*calibredb-search*= buffer, press =r= to refresh the library.
 
 ** File format icons
-You can choose [[https://github.com/domtronn/all-the-icons.el][all-the-icons]], [[https://github.com/seagle0128/icons-in-terminal.el][icons-in-terminal]], unicode icons to render the icons. You have
-to install the icons packages by yourself, otherwise it would not work.
+You can choose [[https://github.com/rainstormstudio/nerd-icons.el][nerd-icons]], [[https://github.com/domtronn/all-the-icons.el][all-the-icons]], [[https://github.com/seagle0128/icons-in-terminal.el][icons-in-terminal]], unicode icons to
+render the icons. You have to install the icons packages by yourself, otherwise
+it would not work.
+
+To enable nerd-icons:
+#+BEGIN_SRC emacs-lisp
+(setq calibredb-format-nerd-icons t)
+#+END_SRC
 
 To enable all-the-icons:
 #+BEGIN_SRC emacs-lisp

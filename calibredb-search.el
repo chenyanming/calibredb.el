@@ -970,7 +970,8 @@ Argument: PROPERTIES is the addiontal parameters."
 (defun calibredb-detail-view-insert-image (entry)
   "Insert image in *calibredb-search* under detail view based on ENTRY."
   (if (and calibredb-detial-view calibredb-detailed-view-image-show)
-      (let ((num (cond (calibredb-format-all-the-icons 3)
+      (let ((num (cond (calibredb-format-nerd-icons 3)
+                       (calibredb-format-all-the-icons 3)
                        (calibredb-format-icons-in-terminal 3)
                        ((>= calibredb-id-width 0) calibredb-id-width)
                        (t 0 ))))
@@ -981,7 +982,8 @@ Argument: PROPERTIES is the addiontal parameters."
 (defun calibredb-detailed-view-insert-image (entry)
   "Insert image in *calibredb-search* under detailed view based on ENTRY."
   (if (and calibredb-detailed-view calibredb-detailed-view-image-show)
-      (let* ((num (cond (calibredb-format-all-the-icons 3)
+      (let* ((num (cond (calibredb-format-nerd-icons 3)
+                        (calibredb-format-all-the-icons 3)
                         (calibredb-format-icons-in-terminal 3)
                         ((>= calibredb-id-width 0) calibredb-id-width)
                         (t 0 )))
@@ -1132,6 +1134,9 @@ Argument: PROPERTIES is the addiontal parameters."
            (insert (format "[[file:%s][%s %s - %s]]\n"
                            path
                            (cond (calibredb-format-all-the-icons
+                                  (if (fboundp 'nerd-icons-icon-for-file)
+                                      (nerd-icons-icon-for-file path) ""))
+                                 (calibredb-format-all-the-icons
                                   (if (fboundp 'all-the-icons-icon-for-file)
                                       (all-the-icons-icon-for-file path) ""))
                                  (calibredb-format-icons-in-terminal
