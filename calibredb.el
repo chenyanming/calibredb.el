@@ -71,7 +71,8 @@
       (calibredb-search-mode))
     (calibredb-opds-request-page calibredb-root-dir))
    ;; metadata.db
-   ((and (file-exists-p calibredb-db-dir)
+   ((and (stringp calibredb-db-dir)
+         (file-exists-p calibredb-db-dir)
          (s-contains? "metadata.db" calibredb-db-dir))
     (cond ((null calibredb-db-dir)
            (message "calibredb: calibredb-db-dir is nil! calibredb won't work without it."))
@@ -91,8 +92,7 @@
              (unless (eq major-mode 'calibredb-search-mode)
                (calibredb-search-mode))))))
    ;; .metadata.calibre
-   ((and (file-exists-p calibredb-db-dir)
-         (s-contains? ".metadata.calibre" calibredb-db-dir))
+   ((and (file-exists-p (concat calibredb-root-dir ".metadata.calibre")))
     ;; Set virtual library name when the first time to launch calibredb
     (if (equal calibredb-search-filter "")
         (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
