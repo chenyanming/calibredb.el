@@ -756,7 +756,7 @@ Argument BOOK-ALIST ."
                           ((>= calibredb-id-width 0) calibredb-id-width)
                           (t 0 ))))
            (concat
-            "%s%s%s"
+            "%s %s%s"
             (calibredb-format-column (format "%sFormat:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sDate:" (make-string num ? )) (+ 8 num) :left) "%s\n"
             (calibredb-format-column (format "%sAuthor:" (make-string num ? ))  (+ 8 num) :left) "%s\n"
