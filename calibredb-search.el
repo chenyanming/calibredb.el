@@ -67,6 +67,7 @@
 (declare-function calibredb-virtual-library-list "calibredb-library.el")
 (declare-function calibredb-virtual-library-next "calibredb-library.el")
 (declare-function calibredb-virtual-library-previous "calibredb-library.el")
+(declare-function calibredb-folder-parse-metadata "calibredb-folder.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
@@ -439,7 +440,7 @@ Argument EVENT mouse event."
     (if (not (equal calibredb-search-filter ""))
         (progn
           (calibredb-search-refresh)
-          (calibredb-search-update-buffer))
+          (calibredb-search-update-buffer-by-library-type))
       (calibredb-search-refresh))
     (set-window-start (selected-window) pos)
     (goto-char beg)
@@ -452,7 +453,7 @@ Argument EVENT mouse event."
     (if (not (equal calibredb-search-filter ""))
         (progn
           (calibredb-search-refresh)
-          (calibredb-search-update-buffer))
+          (calibredb-search-update-buffer-by-library-type))
       (calibredb-search-refresh))
     (while (not (equal id (calibredb-read-metadatas "id")))
       (forward-line 1))
@@ -707,9 +708,17 @@ Argument KEYWORD is the metadata keyword to be toggled."
             (t nil)))))
 ;; live filtering
 
-(defun calibredb-search-get-filterred-entries (&optional page)
-  "Get ebook candidate entries by PAGE."
-  (calibredb-search-candidates calibredb-search-filter :limit calibredb-search-page-max-rows :page page))
+(defun calibredb-search-get-filterred-entries (&rest properties)
+  "Get ebook candidate entries by DB, OPDS or FOLDER."
+  (let ((db (plist-get properties :db))
+        (page (plist-get properties :page))
+        (opds (plist-get properties :opds))
+        (folder (plist-get properties :folder)))
+    (cond
+     (db
+      (calibredb-search-candidates calibredb-search-filter :limit calibredb-search-page-max-rows :page page))
+     (opds opds)
+     (folder (calibredb-folder-parse-metadata calibredb-search-filter)))))
 
 (defun calibredb-search-print-entry--default (entry)
   "Print ENTRY to the buffer."
@@ -737,7 +746,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
         (with-current-buffer buffer
           (let ((calibredb-search-filter current-filter))
             (setq calibredb-search-current-page 1)
-            (calibredb-search-update-buffer)))))))
+            (calibredb-search-update-buffer-by-library-type)))))))
 
 (defun calibredb-search-live-filter ()
   "Filter the calibredb-search buffer as the filter is written.
@@ -774,35 +783,51 @@ ebook record will be shown.
                                              (calibredb-format-filter-p "(format)")
                                              (t "(live)"))) calibredb-search-filter))
         (message calibredb-search-filter))
-    (calibredb-search-update-buffer)))
+    (calibredb-search-update-buffer-by-library-type)))
+
+(defun calibredb-search-update-buffer-by-library-type ()
+  "Update the calibredb-search buffer by library type, opds, metadata or
+folder meatadata."
+  (cond
+   ((s-contains? "http" calibredb-root-dir)
+    (message "OPDS does not suppprt search at this moment."))
+   ((and (stringp calibredb-db-dir)
+         (file-exists-p calibredb-db-dir)
+         (s-contains? "metadata.db" calibredb-db-dir))
+    (calibredb-search-update-buffer))
+   ((and (file-exists-p (concat calibredb-root-dir ".metadata.calibre")))
+    (calibredb-search-update-buffer :folder t))))
 
 (defun calibredb-search-keyword-filter (keyword)
   "Filter the calibredb-search buffer with KEYWORD."
   (setq calibredb-search-filter keyword)
-  (calibredb-search-update-buffer))
+  (calibredb-search-update-buffer-by-library-type))
 
 (defvar calibredb-search-entries-length 0
   "The number of entries in the current search result.")
 
-(defun calibredb-search-update-buffer (&optional page original-entries)
-  "Update the calibredb-search buffer listing to match the database with PAGE.
-If ORIGINAL-ENTRIES is non-nil, use it as the entries to display."
+(defun calibredb-search-update-buffer (&rest properties)
+  "Update the calibredb-search buffer listing to match the database with PAGE."
   (interactive)
   (with-current-buffer (calibredb-search-buffer)
-    (let* ((inhibit-read-only t)
+    (let* ((opds (plist-get properties :opds))
+           (folder (plist-get properties :folder))
+           (page (or (plist-get properties :page) 1))
+           (db (if (or opds folder) nil t))
+           (inhibit-read-only t)
            (standard-output (current-buffer))
            (id 0)
-           (entries (or original-entries (calibredb-search-get-filterred-entries page)))
+           (entries (calibredb-search-get-filterred-entries :db db :page page :opds opds :folder folder))
            (len (length entries)))
-      (setq calibredb-search-entries-length (if original-entries len (calibredb-search-candidates calibredb-search-filter :count t)))
-      (setq calibredb-search-pages (if original-entries 1 (ceiling calibredb-search-entries-length calibredb-search-page-max-rows) ))
+      (setq calibredb-search-entries-length (if db (calibredb-search-candidates calibredb-search-filter :count t) len))
+      (setq calibredb-search-pages (if db (ceiling calibredb-search-entries-length calibredb-search-page-max-rows) 1))
       (erase-buffer)
       ;; reset calibredb-virtual-library-name
       (unless (-contains? (mapcar #'cdr calibredb-virtual-library-alist) calibredb-search-filter)
         (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
       (dolist (entry entries)
         (setq id (1+ id))
-        (when (<= id (if original-entries len calibredb-search-page-max-rows ))
+        (when (<= id (if db calibredb-search-page-max-rows len))
           (funcall calibredb-search-print-entry-function entry)
           (insert "\n")))
       (if (< len calibredb-search-entries-length)
@@ -819,7 +844,7 @@ If ORIGINAL-ENTRIES is non-nil, use it as the entries to display."
     (setq calibredb-search-current-page page)
     (beginning-of-line)
     (delete-region (point) (progn (forward-line 1) (point)))
-    (calibredb-search-update-buffer page)))
+    (calibredb-search-update-buffer :page page)))
 
 
 (defun calibredb-search-next-page ()
@@ -828,7 +853,7 @@ If ORIGINAL-ENTRIES is non-nil, use it as the entries to display."
   (if (< calibredb-search-current-page calibredb-search-pages)
       (progn
         (setq calibredb-search-current-page (1+ calibredb-search-current-page))
-        (calibredb-search-update-buffer calibredb-search-current-page) )
+        (calibredb-search-update-buffer :page calibredb-search-current-page))
     (message "Last page.")))
 
 (defun calibredb-search-previous-page ()
@@ -837,7 +862,7 @@ If ORIGINAL-ENTRIES is non-nil, use it as the entries to display."
   (if (> calibredb-search-current-page 1)
       (progn
         (setq calibredb-search-current-page (1- calibredb-search-current-page))
-        (calibredb-search-update-buffer calibredb-search-current-page) )
+        (calibredb-search-update-buffer :page calibredb-search-current-page) )
     (message "First page.")))
 
 

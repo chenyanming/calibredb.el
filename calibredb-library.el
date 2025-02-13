@@ -92,7 +92,7 @@ selecting the new item."
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
         (setq calibredb-db-dir (concat calibredb-root-dir ".metadata.calibre"))
-        (calibredb-search-update-buffer 1 (calibredb-folder-match-decode)))))))
+        (calibredb-search-update-buffer :folder t))))))
 
 (defun calibredb-library-previous ()
   "Next library from variable `calibredb-library-alist'.
@@ -130,7 +130,7 @@ selecting the new item."
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
         (setq calibredb-db-dir nil)
-        (calibredb-search-update-buffer 1 (calibredb-folder-match-decode)))))))
+        (calibredb-search-update-buffer :folder t))))))
 
 (defun calibredb-library-next ()
   "Next library from variable `calibredb-library-alist'.
@@ -167,7 +167,7 @@ selecting the new item."
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
         (setq calibredb-db-dir nil)
-        (calibredb-search-update-buffer 1 (calibredb-folder-match-decode)))))))
+        (calibredb-search-update-buffer :folder t))))))
 
 (defun calibredb-virtual-library-filter (keyword)
   "Filter the virtual library based on KEYWORD."

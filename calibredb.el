@@ -101,7 +101,7 @@
     (calibredb-ref-default-bibliography)
     (unless (eq major-mode 'calibredb-search-mode)
       (calibredb-search-mode))
-    (calibredb-search-update-buffer 1 (calibredb-folder-match-decode)))
+    (calibredb-search-update-buffer :folder (calibredb-folder-parse-metadata)))
    (t
     (message "calibredb: %s is invalid." calibredb-db-dir))))
 
