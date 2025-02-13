@@ -118,7 +118,13 @@ ARGUMENT FILTER is the filter string."
                    (:publisher          ,(or (alist-get 'publisher entry) ""))
                    (:series             "")
                    (:lang_code          ,(mapconcat 'identity (alist-get 'languages entry) ","))
-                   (:last_modified      ,(or (alist-get 'last_modified entry) (alist-get 'pubdate entry) "")))))
+                   (:last_modified      ,(let ((lst-md (alist-get 'last_modified entry))
+                                               (pub-d (alist-get 'pubdate entry)))
+                                           (if (string-equal lst-md "None")
+                                               (if (string-equal pub-d "None")
+                                                   ""
+                                                 pub-d)
+                                             lst-md))))))
          entries))))))
 
 
