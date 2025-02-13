@@ -40,7 +40,12 @@
   "Return the file extensions EXTN based on the MIME content type."
   (mailcap-parse-mimetypes)
   (if (stringp mime)
-      (car (rassoc (downcase mime) mailcap-mime-extensions))))
+      (let ((type (car (rassoc (downcase mime) mailcap-mime-extensions))))
+        (if type type
+          (if (string-match (regexp-opt '("atom" "xml")) mime)
+              ".atom"
+            ".")))
+    "."))
 
 (defun calibredb-opds-host ()
   "Modify `url-recreate-url' to fit the needs."
@@ -102,11 +107,44 @@ Optional argument PASSWORD."
                                )))))
     output))
 
+(defun calibredb-opds-request-search-page (url keyword &optional account password)
+  "Request URL on KEYWORD.
+Optional argument KEYWORD.
+Optional argument ACCOUNT.
+Optional argument PASSWORD."
+  (require 'request)
+  (message "Loading %s..." url)
+  (let (output)
+    (setq calibredb-opds-root-url url)
+    (if (fboundp 'request)
+        (request url
+          :parser 'buffer-string
+          :headers `(("User-Agent" . "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.101 Safari/537.36")
+                     ("Content-Type" . "application/xml")
+                     ,(if (and account password)
+                          `("Authorization" . ,(concat "Basic "
+                                                       (base64-encode-string
+                                                        (concat account ":" password))))))
+          :sync nil
+          :success (cl-function
+                    (lambda (&key data &allow-other-keys)
+                      (let* ((dom (with-temp-buffer
+                                    (insert data)
+                                    (libxml-parse-xml-region (point-min) (point-max)))))
+                        ;; (setq output dom)
+                        ;; (pp output)
+                        (calibredb-opds-request-page
+                         (replace-regexp-in-string "{.*}"
+                                                   keyword
+                                                   ;; "http://m.gutenberg.org/ebooks/search.opds/?query={searchTerms}"
+                                                   (dom-attr (esxml-query "[type^=application]" dom) 'template))))))))
+    output))
+
 (defun calibredb-opds-download (title url format &optional account password)
   "Download file of TITLE URL FORMAT.
 Optional argument ACCOUNT.
 Optional argument PASSWORD."
-  (let* ((file (expand-file-name (format "%s%s" title format) calibredb-opds-download-dir))
+  (let* ((file (expand-file-name (format "%s.%s" title format) calibredb-opds-download-dir))
          (cmd (if (and account password)
                   (format "curl -u %s:\"%s\" -L %s -o %s" account password (shell-quote-argument url) (shell-quote-argument file ))
                 (format "curl -L %s -o %s" (shell-quote-argument url) (shell-quote-argument file)))))
@@ -146,7 +184,7 @@ Optional argument PASSWORD."
                                                       ((s-contains? "base64" url) url) ; base64 image
                                                       (t (format "%s%s" (calibredb-opds-host) url))))))
                   (:book-name              "")
-                  (:book-format            ,(or (dom-attr (esxml-query "[type^=application]" entry) 'type) "")) ; TODO: support more formats
+                  (:book-format            ,(substring (calibredb-opds-mailcap-mime-to-extn (dom-attr (esxml-query "[type^=application]" entry) 'type)) 1) ) ; TODO: support more formats
                   (:book-pubdate           ,(dom-text (or (esxml-query "issued" entry)
                                                           (esxml-query "published" entry))))
                   (:book-title             ,(dom-text (esxml-query "title" entry)))
@@ -175,14 +213,13 @@ Optional argument PASSWORD."
                   (:last_modified          ,(dom-text (esxml-query "updated" entry))))) )
         entries))) )))
 
-(defun calibredb-opds-search (&optional url)
+(defun calibredb-opds-search (url)
   "Search library from URL."
   (interactive)
-  (let* ((url (or url (completing-read "Search library: " calibredb-library-alist)))
-         (library (-first (lambda (lib)
-                            (s-contains? (file-name-directory (car lib)) url))
+  (let* ((library (-first (lambda (lib)
+                            (s-contains? (file-name-directory (car lib)) calibredb-root-dir))
                           calibredb-library-alist)))
-    (calibredb-opds-request-page (format "%s/search\?query=%s" url  (read-string "Search: ")) (nth 1 library) (nth 2 library))))
+    (calibredb-opds-request-search-page url (read-string "Search: ") (nth 1 library) (nth 2 library))))
 
 (provide 'calibredb-opds)
 
