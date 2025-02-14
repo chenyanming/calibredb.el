@@ -177,6 +177,16 @@ nil: Prompt delete or not."
   :type 'file
   :group 'calibredb)
 
+(defcustom calibredb-ebook-meta-program
+  (cond
+   ((eq system-type 'darwin)
+    "/Applications/calibre.app/Contents/MacOS/ebook-meta")
+   (t
+    "ebook-meta"))
+  "Executable used to get ebook metadata."
+  :type 'file
+  :group 'calibredb)
+
 (defcustom calibredb-fetch-metadata-source-list '("Google" "Amazon.com")
   "Source alist used to fetch ebook metadata."
   :type 'sexp

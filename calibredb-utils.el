@@ -162,12 +162,19 @@ Download it if book-cover is non-nil."
   (let ((file-path (calibredb-getattr entry :file-path))
         (book-format (calibredb-getattr entry :book-format))
         (book-cover (calibredb-getattr entry :book-cover)))
-    (pp book-cover)
+    ;; (pp book-cover)
     (cond ((image-type-available-p (intern book-format)) file-path) ; the file is an image
           ((file-exists-p (concat (file-name-directory file-path) "cover.jpg"))
            (concat (file-name-directory file-path) "cover.jpg")) ; cover.jpg exists
+          ((file-exists-p (calibredb-infile-cover-path file-path))
+           (calibredb-infile-cover-path file-path))
           ((not book-cover)                                      ; book-cover is nil, use default cover
-           (expand-file-name "cover.jpg" calibredb-images-path))
+           ;; first try to extract cover from the file
+           (let ((infile-cover (calibredb-infile-cover-path file-path)))
+             (calibredb-extract-cover entry)
+             (if (file-exists-p infile-cover)
+                 infile-cover
+               (expand-file-name "cover.jpg" calibredb-images-path))))
           ((s-contains? "base64" book-cover)
            (if (string-match "data:image/\\(.*\\);base64,\\(.*\\)" book-cover)
                (let ((cover (expand-file-name (format "cover.%s" (match-string 1 book-cover)) temporary-file-directory)))
@@ -198,6 +205,30 @@ Download it if book-cover is non-nil."
                    (write-region (point) (point-max) filename)))
              filename))
           (t (expand-file-name "cover.jpg" calibredb-images-path))))) ;return the default image
+
+(defun calibredb-extract-cover (entry)
+  "Extract ENTRY and save the cover to the same directory."
+  ;; only extract cover if calibredb-root-dir is not a http link
+  (unless (s-contains? "http" calibredb-root-dir)
+    ;; only extract cover if ebook-meta is available
+    (when (executable-find calibredb-ebook-meta-program)
+      ;; extract cover
+      (let* ((file (calibredb-getattr entry :file-path))
+             (cover (calibredb-infile-cover-path file)))
+        (call-process-shell-command (format "%s %s --get-cover %s" calibredb-ebook-meta-program (shell-quote-argument file) (shell-quote-argument cover)) nil "*ebook-meta*")
+        (if (file-exists-p cover)
+            (message "Saved %s" cover)
+          ;; can not generate cover.jpg, try to copy cover.jpg from calibredb-images-path
+          (copy-file (expand-file-name "cover.jpg" calibredb-images-path)
+                     cover))))))
+
+(defun calibredb-infile-cover-path (file)
+  "Extract FILE and return the cover path."
+  (let* ((file-directory (file-name-directory file))
+         (file-base (file-name-base file))
+         (cover (expand-file-name (concat file-base ".jpg") file-directory)))
+    cover))
+
 
 (defun calibredb-insert-image (path alt width height)
   "Insert an image for PATH at point with max WIDTH and max HEIGTH, falling back to ALT."

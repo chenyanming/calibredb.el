@@ -47,6 +47,8 @@
 (declare-function calibredb-find-file-other-frame "calibredb-utils.el")
 (declare-function calibredb-open-file-with-default-tool "calibredb-utils.el")
 (declare-function calibredb-open-dired "calibredb-utils.el")
+(declare-function calibredb-infile-cover-path "calibredb-utils.el")
+(declare-function calibredb-extract-cover "calibredb-utils.el")
 (declare-function calibredb-catalog-bib-dispatch "calibredb-transient.el")
 (declare-function calibredb-export-dispatch "calibredb-transient.el")
 (declare-function calibredb-edit-annotation "calibredb-annotation.el")
@@ -993,18 +995,6 @@ Argument: PROPERTIES is the addiontal parameters."
   (setq calibredb-detailed-view (not calibredb-detailed-view))
   (calibredb-search-toggle-view-refresh))
 
-(defun calibredb-detail-view-insert-image (entry)
-  "Insert image in *calibredb-search* under detail view based on ENTRY."
-  (if (and calibredb-detial-view calibredb-detailed-view-image-show)
-      (let ((num (cond (calibredb-format-nerd-icons 3)
-                       (calibredb-format-all-the-icons 3)
-                       (calibredb-format-icons-in-terminal 3)
-                       ((>= calibredb-id-width 0) calibredb-id-width)
-                       (t 0 ))))
-        (insert "\n")
-        (insert (make-string num ? ))
-        (calibredb-insert-image (calibredb-get-cover (cdr entry)) "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))))
-
 (defun calibredb-detailed-view-insert-image (entry)
   "Insert image in *calibredb-search* under detailed view based on ENTRY."
   (if (and calibredb-detailed-view calibredb-detailed-view-image-show)
@@ -1015,16 +1005,28 @@ Argument: PROPERTIES is the addiontal parameters."
                         (t 0 )))
              (file (calibredb-getattr (cdr entry) :file-path))
              (format (calibredb-getattr (cdr entry) :book-format))
-             (cover (concat (file-name-directory file) "cover.jpg")))
-          (if (image-type-available-p (intern format))
-              (progn
-                (insert "\n")
-                (insert (make-string num ? ))
-                (calibredb-insert-image file "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))
-            (progn
-              (insert "\n")
-              (insert (make-string num ? ))
-              (calibredb-insert-image cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))))))
+             (cover (concat (file-name-directory file) "cover.jpg"))
+             (infile-cover (calibredb-infile-cover-path file)))
+        (cond ((image-type-available-p (intern format))
+               (progn
+                 (insert "\n")
+                 (insert (make-string num ? ))
+                 (calibredb-insert-image file "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height)))
+              ((file-exists-p cover)
+               (insert "\n")
+               (insert (make-string num ? ))
+               (calibredb-insert-image cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))
+              ((file-exists-p infile-cover)
+               (insert "\n")
+               (insert (make-string num ? ))
+               (calibredb-insert-image infile-cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height))
+              (t
+               ;; extract cover
+               (calibredb-extract-cover (cdr entry))
+               (when (file-exists-p infile-cover)
+                 (insert "\n")
+                 (insert (make-string num ? ))
+                 (calibredb-insert-image infile-cover "" calibredb-detailed-view-image-max-width calibredb-detailed-view-image-max-height)))))))
 
 (defun calibredb-toggle-view-at-point ()
   "Toggle between detailed view or compact view in *calibredb-search* buffer at point."
