@@ -102,7 +102,7 @@ ARGUMENT FILTER is the filter string."
          (lambda (entry)
            (setq no (1+ no))
            (list `((:id                 ,(number-to-string (let ((ids (alist-get 'application_id entry)))
-                                                             (if (numberp ids) ids 0))))
+                                                             (if (numberp ids) ids no))))
                    (:author-sort        ,(or (mapconcat 'identity (alist-get 'authors entry) ",") ""))
                    (:book-dir           "")
                    (:book-cover         nil)
