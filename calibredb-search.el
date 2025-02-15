@@ -836,7 +836,10 @@ folder meatadata."
           (insert "\n")))
       (if (< len calibredb-search-entries-length)
           (dotimes (i calibredb-search-pages)
-            (insert " " (buttonize (format "%d" (1+ i)) #'calibredb-search-more-data (1+ i)) " "))
+            (let ((button-string (format "%d" (1+ i))))
+              (if (equal (string-to-number button-string) calibredb-search-current-page)
+                  (add-face-text-property 0 (length button-string) 'calibredb-current-page-button-face t button-string))
+              (insert " " (buttonize button-string #'calibredb-search-more-data (1+ i)) " ") ))
         (insert "End of entries.\n"))
       (goto-char (point-min))         ; back to point-min after filtering
       (setf calibredb-search-last-update (float-time))

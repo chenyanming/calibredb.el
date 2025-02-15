@@ -209,6 +209,17 @@
   "Face used for *calibredb-edit-annotation* header title face."
   :group 'calibredb-faces)
 
+(defface calibredb-current-page-button-face
+  '((((class color) (background light))
+     (:weight bold
+      :height 1.1))
+    (((class color) (background dark))
+     (:weight bold
+      :height 1.1))
+    (t (:inherit default)))
+  "Face used for current page button"
+  :group 'calibredb-faces)
+
 (provide 'calibredb-faces)
 
 ;;; calibredb-faces.el ends here
