@@ -91,7 +91,7 @@ selecting the new item."
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
-        (setq calibredb-db-dir (concat calibredb-root-dir ".metadata.calibre"))
+        (setq calibredb-db-dir (expand-file-name ".metadata.calibre" calibredb-root-dir))
         (calibredb-search-update-buffer :folder t))))))
 
 (defun calibredb-library-previous ()

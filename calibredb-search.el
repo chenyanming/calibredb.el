@@ -540,7 +540,9 @@ Argument EVENT mouse event."
 
 (defun calibredb-condense-comments (str)
   "Condense whitespace in STR into a single space."
-  (replace-regexp-in-string "[[:space:]\n\r]+" " " str))
+  (replace-regexp-in-string
+   "[[:space:]\n\r]+" " "
+   (replace-regexp-in-string "<[^>]+>" "" str)))
 
 (defun calibredb-favorite-mouse-1 (event)
   "Visit the location click on.
@@ -797,7 +799,7 @@ folder meatadata."
          (file-exists-p calibredb-db-dir)
          (s-contains? "metadata.db" calibredb-db-dir))
     (calibredb-search-update-buffer))
-   ((and (file-exists-p (concat calibredb-root-dir ".metadata.calibre")))
+   ((and (file-exists-p (expand-file-name ".metadata.calibre" calibredb-root-dir)))
     (calibredb-search-update-buffer :folder t))))
 
 (defun calibredb-search-keyword-filter (keyword)

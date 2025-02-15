@@ -92,7 +92,7 @@
              (unless (eq major-mode 'calibredb-search-mode)
                (calibredb-search-mode))))))
    ;; .metadata.calibre
-   ((and (file-exists-p (concat calibredb-root-dir ".metadata.calibre")))
+   ((and (file-exists-p (expand-file-name ".metadata.calibre" calibredb-root-dir)))
     ;; Set virtual library name when the first time to launch calibredb
     (if (equal calibredb-search-filter "")
         (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))

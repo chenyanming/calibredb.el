@@ -110,7 +110,7 @@ ARGUMENT FILTER is the filter string."
                    (:book-format        ,(substring (calibredb-folder-mailcap-mime-to-extn (alist-get 'mime entry)) 1))
                    (:book-pubdate       ,(or (alist-get 'pubdate entry) ""))
                    (:book-title         ,(alist-get 'title entry))
-                   (:file-path          ,(concat calibredb-root-dir (alist-get 'lpath entry) ))
+                   (:file-path          ,(expand-file-name (alist-get 'lpath entry) calibredb-root-dir))
                    (:tag                ,(or (mapconcat 'identity (alist-get 'tags entry) ",") ""))
                    (:size               ,(format "%.2f" (/ (or (alist-get 'size entry) 0) 1048576.0)))
                    (:comment            ,(or (alist-get 'comments entry) ""))
