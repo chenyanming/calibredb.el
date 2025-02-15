@@ -137,12 +137,13 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
 #+END_SRC
 
 ** OPDS
-calibredb support download ebooks from OPDS server
+calibredb supports download ebooks from OPDS server
 #+begin_src emacs-lisp
   (push '("http://arxiv.maplepop.com/catalog/" (name . "arxiv")) calibredb-library-alist)
   (push '("https://m.gutenberg.org/ebooks.opds/" (name . "Gutenberg")) calibredb-library-alist)
   (push '("http://aozora.textlive.net/catalog.opds" (name . "青空文库")) calibredb-library-alist)
   (push '("https://opds.wol.moe/zh_CN" (name . "轻小说")) calibredb-library-alist)
+  (push '("http://192.168.1.192:54995/opds" (name . "calibre-web") (account . "account") (password . "password")) calibredb-library-alist)
 #+end_src
 
 ** Page
