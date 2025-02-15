@@ -107,8 +107,8 @@ For Spacemacs [[https://github.com/dalanicolai/calibre-layer][this calibre-layer
 (setq calibredb-root-dir "~/OneDrive/Doc/Calibre")
 ;; for folder driver metadata: it should be .metadata.calibre
 (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-(setq calibredb-library-alist '(("~/OneDrive/Doc/Calibre")
-                                ("/Users/damonchan/Documents/Books Library")
+(setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre" (name . "Calibre")) ;; with name
+                                ("/Users/damonchan/Documents/Books Library") ;; no name
                                 ("/Users/damonchan/Documents/HELLO")
                                 ("/Users/damonchan/Documents/Books")
                                 ("/Users/damonchan/Documents/World")))
@@ -135,6 +135,15 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
                                   ("~/Documents/LIB1")
                                   ("/Volumes/ShareDrive/Documents/Library/"))))
 #+END_SRC
+
+** OPDS
+calibredb support download ebooks from OPDS server
+#+begin_src emacs-lisp
+  (push '("http://arxiv.maplepop.com/catalog/" (name . "arxiv")) calibredb-library-alist)
+  (push '("https://m.gutenberg.org/ebooks.opds/" (name . "Gutenberg")) calibredb-library-alist)
+  (push '("http://aozora.textlive.net/catalog.opds" (name . "青空文库")) calibredb-library-alist)
+  (push '("https://opds.wol.moe/zh_CN" (name . "轻小说")) calibredb-library-alist)
+#+end_src
 
 ** Page
 The maximum number of entries to display in a single page:
