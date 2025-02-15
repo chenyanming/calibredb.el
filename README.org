@@ -130,8 +130,8 @@ PS: If ~sqlite3~ and ~calibredb~ is in not in your system path, set them with
   (setq calibredb-root-dir "~/OneDrive/Org/Doc/Calibre")
   ;; for folder driver metadata: it should be .metadata.calibre
   (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
-  (setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre")
-                                  ("~/Documents/Books Library")
+  (setq calibredb-library-alist '(("~/OneDrive/Org/Doc/Calibre" (name . "Calibre")) ;; with name
+                                  ("~/Documents/Books Library") ;; no name
                                   ("~/Documents/LIB1")
                                   ("/Volumes/ShareDrive/Documents/Library/"))))
 #+END_SRC

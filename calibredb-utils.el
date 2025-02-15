@@ -271,8 +271,8 @@ Optional argument CANDIDATE is the selected item."
                                         (s-contains? (file-name-directory (car lib)) url))
                                       calibredb-library-alist)))
                  (if (string-match (regexp-opt '("atom" "xml")) type)
-                   (calibredb-opds-request-page url (nth 1 library) (nth 2 library))
-                   (calibredb-opds-download title url type (nth 1 library) (nth 2 library)))))) )
+                     (calibredb-opds-request-page url (assoc-default 'account library) (assoc-default 'password library))
+                   (calibredb-opds-download title url type (assoc-default 'account library) (assoc-default 'password library)))))))
           ((s-equals? "" file) (message "No files."))
           (t (find-file file)))))
 

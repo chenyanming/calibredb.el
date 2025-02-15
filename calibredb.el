@@ -58,12 +58,17 @@
 (defun calibredb ()
   "Enter calibre Search Buffer."
   (interactive)
+  ;; Set virtual library name when the first time to launch calibredb
+  (let* ((remaining (cdr (-first (lambda (lib)
+                                   (s-contains? (car lib) calibredb-root-dir))
+                                 calibredb-library-alist)))
+         (library-name (or (assoc-default 'name remaining)
+                           calibredb-virtual-library-default-name)))
+    (setq calibredb-virtual-library-default-name library-name)
+    (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
   (cond
    ;; opds
    ((s-contains? "http" calibredb-root-dir)
-    ;; Set virtual library name when the first time to launch calibredb
-    (if (equal calibredb-search-filter "")
-        (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
     (switch-to-buffer (calibredb-search-buffer))
     (goto-char (point-min))
     (calibredb-ref-default-bibliography)
@@ -83,9 +88,6 @@
                (unless (sqlitep calibredb-db-connection)
                  (calibredb-db-connection)))
            (let ((cand (calibredb-search-keyword-filter calibredb-search-filter)))
-             ;; Set virtual library name when the first time to launch calibredb
-             (if (equal calibredb-search-filter "")
-                 (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
              (switch-to-buffer (calibredb-search-buffer))
              (goto-char (point-min))
              (calibredb-ref-default-bibliography)
@@ -93,9 +95,6 @@
                (calibredb-search-mode))))))
    ;; .metadata.calibre
    ((and (file-exists-p (expand-file-name ".metadata.calibre" calibredb-root-dir)))
-    ;; Set virtual library name when the first time to launch calibredb
-    (if (equal calibredb-search-filter "")
-        (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
     (switch-to-buffer (calibredb-search-buffer))
     (goto-char (point-min))
     (calibredb-ref-default-bibliography)

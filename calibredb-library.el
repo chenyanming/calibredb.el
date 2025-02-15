@@ -65,14 +65,21 @@ If under *calibredb-search* buffer, it will auto refresh after
 selecting the new item."
   (interactive)
   (let* ((result (completing-read "Quick switch library: " calibredb-library-alist))
+         (remaining (cdr (-first (lambda (lib)
+                                   (s-contains? (car lib) result))
+                                 calibredb-library-alist)))
+         (library-name (or (assoc-default 'name remaining)
+                           calibredb-virtual-library-default-name))
          (db (concat (file-name-as-directory result) "metadata.db")))
+    (setq calibredb-virtual-library-default-name library-name)
+    (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
      ((s-contains? "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
-        (calibredb-opds-request-page result (nth 1 library) (nth 2 library))))
+        (calibredb-opds-request-page result (assoc-default 'account remaining) (assoc-default 'password remaining))))
      ((file-exists-p db)
       (progn
         (setq calibredb-root-dir result)
@@ -103,14 +110,18 @@ selecting the new item."
                                                   (1- calibredb-library-index)
                                                 (1- (length calibredb-library-alist)))))
          (result (car (nth index calibredb-library-alist)))
+         (remaining (cdr (nth index calibredb-library-alist)))
+         (library-name (or (assoc-default 'name remaining) calibredb-virtual-library-default-name))
          (db (concat (file-name-as-directory result) "metadata.db")))
+    (setq calibredb-virtual-library-default-name library-name)
+    (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
      ((s-contains? "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
-        (calibredb-opds-request-page result (nth 1 library) (nth 2 library))))
+        (calibredb-opds-request-page result (assoc-default 'account remaining) (assoc-default 'password remaining))))
      ((file-exists-p db)
       (progn
         (setq calibredb-root-dir result)
@@ -140,14 +151,18 @@ selecting the new item."
   (let* ((index (setq calibredb-library-index (if (< calibredb-library-index (1- (length calibredb-library-alist)))
                                                   (1+ calibredb-library-index) 0)))
          (result (car (nth index calibredb-library-alist)))
+         (remaining (cdr (nth index calibredb-library-alist)))
+         (library-name (or (assoc-default 'name  remaining) calibredb-virtual-library-default-name))
          (db (concat (file-name-as-directory result) "metadata.db")))
+    (setq calibredb-virtual-library-default-name library-name)
+    (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
      ((s-contains? "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
         (setq calibredb-root-dir (car library))
-        (calibredb-opds-request-page result (nth 1 library) (nth 2 library))))
+        (calibredb-opds-request-page result (assoc-default 'account remaining) (assoc-default 'password remaining))))
      ((file-exists-p db)
       (progn
         (setq calibredb-root-dir result)
@@ -171,7 +186,7 @@ selecting the new item."
 
 (defun calibredb-virtual-library-filter (keyword)
   "Filter the virtual library based on KEYWORD."
-  (setq calibredb-virtual-library-name keyword) ; set calibredb-virtual-library-name
+  (setq calibredb-virtual-library-name (format "%s (%s)" calibredb-virtual-library-default-name keyword)) ; set calibredb-virtual-library-name
   (setq calibredb-tag-filter-p nil)
   (setq calibredb-favorite-filter-p nil)
   (setq calibredb-author-filter-p nil)
