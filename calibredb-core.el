@@ -38,6 +38,7 @@
 (require 'thingatpt)
 (require 'pcase)
 (require 'mailcap)
+(require 'seq)
 
 (ignore-errors
   (require 'helm)

@@ -64,7 +64,14 @@
 If under *calibredb-search* buffer, it will auto refresh after
 selecting the new item."
   (interactive)
-  (let* ((result (completing-read "Quick switch library: " calibredb-library-alist))
+  (let* ((result (let* ((options (mapcar (lambda (x)
+                                           (if (alist-get 'name (cdr x))
+                                               (alist-get 'name (cdr x))
+                                             (car x)))
+                                         calibredb-library-alist))
+                        (selected (completing-read "Quick switch library: " options nil t)))
+                   (or (car (seq-find (lambda (x) (equal (alist-get 'name (cdr x)) selected)) calibredb-library-alist))
+                       selected)))
          (remaining (cdr (-first (lambda (lib)
                                    (s-contains? (car lib) result))
                                  calibredb-library-alist)))
