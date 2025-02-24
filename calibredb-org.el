@@ -96,10 +96,11 @@ Display cover page inline in org buffer. Use this as
     (kill-new
      (with-temp-buffer
        (dolist (cand candidates)
-         (let ((id (calibredb-getattr cand :id))
-               (title (calibredb-getattr cand :book-title)))
-           (insert (format "[[calibredb:%s][%s]]\n" id title))
-           (message "Copied: %s - \"%s\" as calibredb org link." id title)))
+         (let* ((id (calibredb-getattr cand :id))
+                (title (calibredb-getattr cand :book-title))
+                (link (format "[[calibredb:%s][%s]]\n" id title)))
+           (insert link)
+           (message "Copied (org link): %s" link)))
        (buffer-string)))
     ;; remove overlays and text properties
     (let* ((beg (point-min))
@@ -107,6 +108,116 @@ Display cover page inline in org buffer. Use this as
            (inhibit-read-only t))
       (remove-overlays beg end)
       (remove-text-properties beg end '(calibredb-mark nil)))))
+
+(defun calibredb-org-title-copy ()
+  "Copy the marked items' titles."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (kill-new
+     (with-temp-buffer
+       (dolist (cand candidates)
+         (let* ((title (calibredb-getattr cand :book-title)))
+           (insert title (if (> (length candidates) 1) "\n" ""))
+           (message "Copied (title): %s" title)))
+       (buffer-string)))
+    ;; remove overlays and text properties
+    (let* ((beg (point-min))
+           (end (point-max))
+           (inhibit-read-only t))
+      (remove-overlays beg end)
+      (remove-text-properties beg end '(calibredb-mark nil)))))
+
+(defun calibredb-org-protocol-link-copy ()
+  "Copy the marked items as org-protocol links."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (kill-new
+     (with-temp-buffer
+       (dolist (cand candidates)
+         (let* ((id (calibredb-getattr cand :id))
+                (title (calibredb-org-protocol-convert-to-space (calibredb-getattr cand :book-title)))
+                (org-protocol-link (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id title) ) ))
+           ;; (insert (format "[[calibredb:%s][%s]]\n" id title))
+           (insert org-protocol-link (if (> (length candidates) 1) "\n" ""))
+           (message "Copied (org-protocol): %s" org-protocol-link)))
+       (buffer-string)))
+    ;; remove overlays and text properties
+    (let* ((beg (point-min))
+           (end (point-max))
+           (inhibit-read-only t))
+      (remove-overlays beg end)
+      (remove-text-properties beg end '(calibredb-mark nil)))))
+
+
+(defun calibredb-org-protocol-link-markdown-copy ()
+  "Copy the marked items as org-protocol markdown links."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (kill-new
+     (with-temp-buffer
+       (dolist (cand candidates)
+         (let* ((id (calibredb-getattr cand :id))
+                (title (calibredb-org-protocol-convert-to-space (calibredb-getattr cand :book-title) ))
+                (org-protocol-link (format "[%s](%s)" title (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id title) ))  ))
+           (insert org-protocol-link (if (> (length candidates) 1) "\n" ""))
+           (message "Copied (org-protocol markdown): %s" org-protocol-link)))
+       (buffer-string)))
+    ;; remove overlays and text properties
+    (let* ((beg (point-min))
+           (end (point-max))
+           (inhibit-read-only t))
+      (remove-overlays beg end)
+      (remove-text-properties beg end '(calibredb-mark nil)))))
+
+(defun calibredb-org-markdown-copy ()
+  "Copy the marked items as markdown links."
+  (interactive)
+  (let ((candidates (calibredb-find-marked-candidates)))
+    (unless candidates
+      (setq candidates (calibredb-find-candidate-at-point)))
+    (kill-new
+     (with-temp-buffer
+         (dolist (cand candidates)
+           (let* ((id (calibredb-getattr cand :id))
+                  (path (calibredb-get-file-path cand t))
+                  (title (calibredb-getattr cand :book-title))
+                  (org-protocol-link (format "[%s](%s)" title path)))
+           (insert org-protocol-link (if (> (length candidates) 1) "\n" ""))
+           (message "Copied (markdown): %s" org-protocol-link)))
+         (buffer-string)))
+    ;; remove overlays and text properties
+    (let* ((beg (point-min))
+           (end (point-max))
+           (inhibit-read-only t))
+      (remove-overlays beg end)
+      (remove-text-properties beg end '(calibredb-mark nil)))))
+
+(defun calibredb-org-protocol (data)
+  (let* ((id (plist-get data :id))
+         (title (plist-get data :title)))
+    (calibredb-show-entry
+     (cond ((and (file-exists-p (expand-file-name ".metadata.calibre" calibredb-root-dir)))
+            (cdar (calibredb-folder-candidate id)))
+           (t (cdar (calibredb-candidate id)))))
+    nil))
+
+
+(defun calibredb-org-setup-org-protocol()
+  (require 'org-protocol)
+  (add-to-list 'org-protocol-protocol-alist '("calibredb"
+                                              :protocol "calibredb"
+                                              :function calibredb-org-protocol
+                                              :kill-client t)))
+
+(defun calibredb-org-protocol-convert-to-space (s)
+  "Convert some special characters to plain spaces in S."
+  (replace-regexp-in-string (regexp-opt '(":" "'")) " " s t t))
 
 (provide 'calibredb-org)
 

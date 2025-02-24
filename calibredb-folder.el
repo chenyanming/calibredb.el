@@ -44,9 +44,10 @@
       (string-match-p regexp ""))))
 
 
-(defun calibredb-folder-candidate-filter (filter entries)
+(defun calibredb-folder-candidates-filter (filter entries)
   "Generate ebook candidate alist.
-ARGUMENT FILTER is the filter string."
+ARGUMENT FILTER is the filter string.
+ARGUMENT ENTRIES is the list of entries."
   (let ((matches (plist-get filter :matches))
         res-list)
     (cond (calibredb-tag-filter-p
@@ -87,45 +88,76 @@ ARGUMENT FILTER is the filter string."
                  (push line res-list)))))
     (nreverse res-list)))
 
-(defun calibredb-folder-parse-metadata (&optional filter)
-  "Extract the JSON array from the last line of LOG-STRING and decode its structure."
+(defun calibredb-folder-candidate-filter (id entries)
+  "Get the folder candidate by ID in ENTRIES."
+  (-first (lambda (entry)
+            (string-equal id (calibredb-getattr (list entry) :id)))
+          entries))
+
+(defun calibredb-folder-candidate (id)
+  "Extract the json array and decode its structure to get the book list, then get the entry by ID."
+  (let* ((json-string (with-temp-buffer
+                        (insert-file-contents (expand-file-name ".metadata.calibre" calibredb-root-dir))
+                        (buffer-string)))
+         (entries (json-parse-string json-string :object-type 'alist :array-type 'list :null-object nil)))
+    (calibredb-getbooklist
+     (list (calibredb-folder-candidate-filter id (calibredb-folder-entries-to-plist entries)) ))))
+
+(defun calibredb-folder-candidates (&optional filter)
+  "Extract the json array and decode its structure to get the book list.
+ARGUMENT FILTER is the filter string."
   (let* ((json-string (with-temp-buffer
                         (insert-file-contents (expand-file-name ".metadata.calibre" calibredb-root-dir))
                         (buffer-string)))
          (entries (json-parse-string json-string :object-type 'alist :array-type 'list :null-object nil))
          (filter (calibredb-folder-parse-filter calibredb-search-filter)))
     (calibredb-getbooklist
-     (calibredb-folder-candidate-filter
-      filter
-      (let ((no 0))
-        (-mapcat
-         (lambda (entry)
-           (setq no (1+ no))
-           (list `((:id                 ,(number-to-string (let ((ids (alist-get 'application_id entry)))
-                                                             (if (numberp ids) ids no))))
-                   (:author-sort        ,(or (mapconcat 'identity (alist-get 'authors entry) ",") ""))
-                   (:book-dir           "")
-                   (:book-cover         nil)
-                   (:book-name          "")
-                   (:book-format        ,(substring (calibredb-folder-mailcap-mime-to-extn (alist-get 'mime entry)) 1))
-                   (:book-pubdate       ,(or (alist-get 'pubdate entry) ""))
-                   (:book-title         ,(alist-get 'title entry))
-                   (:file-path          ,(expand-file-name (alist-get 'lpath entry) calibredb-root-dir))
-                   (:tag                ,(or (mapconcat 'identity (alist-get 'tags entry) ",") ""))
-                   (:size               ,(format "%.2f" (/ (or (alist-get 'size entry) 0) 1048576.0)))
-                   (:comment            ,(or (alist-get 'comments entry) ""))
-                   (:ids                ,(or (mapconcat (lambda(x) (format "%s:%s" (car x) (cdr x)))(alist-get 'identifiers entry) ",") ""))
-                   (:publisher          ,(or (alist-get 'publisher entry) ""))
-                   (:series             "")
-                   (:lang_code          ,(mapconcat 'identity (alist-get 'languages entry) ","))
-                   (:last_modified      ,(let ((lst-md (alist-get 'last_modified entry))
-                                               (pub-d (alist-get 'pubdate entry)))
-                                           (if (string-equal lst-md "None")
-                                               (if (string-equal pub-d "None")
-                                                   ""
-                                                 pub-d)
-                                             lst-md))))))
-         entries))))))
+     (calibredb-folder-candidates-filter filter (calibredb-folder-entries-to-plist entries)))))
+
+
+(defun calibredb-folder-entries-to-plist (entries)
+  "Convert folder metadata ENTRIES to plist."
+  (let ((unsorted-entries (-mapcat
+                           (lambda (entry)
+                             ;; use lpath as calibredb internal id, since the id maybe missing in the
+                             ;; metadata, use md5 of file path to generate a unique id, it will be the
+                             ;; same if the file path does not change.
+                             (let* ((lpath (alist-get 'lpath entry))
+                                    (lst (nth 5 (file-attributes (expand-file-name lpath calibredb-root-dir)))))
+                               (list `((:id                 ,(md5 lpath))
+                                       (:author-sort        ,(or (mapconcat 'identity (alist-get 'authors entry) ",") ""))
+                                       (:book-dir           "")
+                                       (:book-cover         nil)
+                                       (:book-name          "")
+                                       (:book-format        ,(substring (calibredb-folder-mailcap-mime-to-extn (alist-get 'mime entry)) 1))
+                                       (:book-pubdate       ,(or (alist-get 'pubdate entry) ""))
+                                       (:book-title         ,(alist-get 'title entry))
+                                       (:file-path          ,(expand-file-name lpath calibredb-root-dir))
+                                       (:tag                ,(or (mapconcat 'identity (alist-get 'tags entry) ",") ""))
+                                       (:size               ,(format "%.2f" (/ (or (alist-get 'size entry) 0) 1048576.0)))
+                                       (:comment            ,(or (alist-get 'comments entry) ""))
+                                       (:ids                ,(or (mapconcat (lambda(x) (format "%s:%s" (car x) (cdr x)))(alist-get 'identifiers entry) ",") ""))
+                                       (:publisher          ,(or (alist-get 'publisher entry) ""))
+                                       (:series             "")
+                                       (:lang_code          ,(mapconcat 'identity (alist-get 'languages entry) ","))
+                                       (:lst ,lst) ;; used for sorting
+                                       (:last_modified      ,(let ((lst-md (alist-get 'last_modified entry))
+                                                                   (pub-d (alist-get 'pubdate entry)))
+                                                               (if lst
+                                                                   (format-time-string "%Y-%m-%d %H:%M:%S"
+                                                                                       lst)
+                                                                 (if (string-equal lst-md "None")
+                                                                     (if (string-equal pub-d "None")
+                                                                         ""
+                                                                       pub-d)
+                                                                   lst-md)))))) ))
+                           entries)))
+    ;; always sort by last modified time
+    (sort unsorted-entries
+          (lambda (a b)
+            (let* ((a-time (calibredb-getattr (list a) :lst))
+                   (b-time (calibredb-getattr (list b) :lst)))
+              (time-less-p a-time b-time))))))
 
 
 (defun calibredb-folder-mailcap-mime-to-extn (mime)

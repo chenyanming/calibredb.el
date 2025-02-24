@@ -69,7 +69,7 @@
 (declare-function calibredb-virtual-library-list "calibredb-library.el")
 (declare-function calibredb-virtual-library-next "calibredb-library.el")
 (declare-function calibredb-virtual-library-previous "calibredb-library.el")
-(declare-function calibredb-folder-parse-metadata "calibredb-folder.el")
+(declare-function calibredb-folder-candidates "calibredb-folder.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
@@ -722,7 +722,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
      (db
       (calibredb-search-candidates calibredb-search-filter :limit calibredb-search-page-max-rows :page page))
      (opds opds)
-     (folder (calibredb-folder-parse-metadata calibredb-search-filter)))))
+     (folder (calibredb-folder-candidates calibredb-search-filter)))))
 
 (defun calibredb-search-print-entry--default (entry)
   "Print ENTRY to the buffer."
@@ -1161,22 +1161,23 @@ Argument: PROPERTIES is the addiontal parameters."
     (kill-new
      (with-temp-buffer
        (dolist (cand candidates)
-         (let ((id (calibredb-getattr cand :id))
-               (path (calibredb-get-file-path cand t))
-               (title (calibredb-getattr cand :book-title)))
-           (insert (format "[[file:%s][%s %s - %s]]\n"
-                           path
-                           (cond (calibredb-format-all-the-icons
-                                  (if (fboundp 'nerd-icons-icon-for-file)
-                                      (nerd-icons-icon-for-file path) ""))
-                                 (calibredb-format-all-the-icons
-                                  (if (fboundp 'all-the-icons-icon-for-file)
-                                      (all-the-icons-icon-for-file path) ""))
-                                 (calibredb-format-icons-in-terminal
-                                  (if (fboundp 'icons-in-terminal-icon-for-file)
-                                      (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
-                                 (t "")) id title))
-           (message "Copied: %s - \"%s\" as org link." id title)))
+         (let* ((id (calibredb-getattr cand :id))
+                (path (calibredb-get-file-path cand t))
+                (title (calibredb-getattr cand :book-title))
+                (link (format "[[file:%s][%s %s - %s]]\n"
+                              path
+                              (cond (calibredb-format-all-the-icons
+                                     (if (fboundp 'nerd-icons-icon-for-file)
+                                         (nerd-icons-icon-for-file path) ""))
+                                    (calibredb-format-all-the-icons
+                                     (if (fboundp 'all-the-icons-icon-for-file)
+                                         (all-the-icons-icon-for-file path) ""))
+                                    (calibredb-format-icons-in-terminal
+                                     (if (fboundp 'icons-in-terminal-icon-for-file)
+                                         (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
+                                    (t "")) id title)))
+           (insert link)
+           (message "Copied (org file link): %s" link)))
        (buffer-string)))
     ;; remove overlays and text properties
     (let* ((beg (point-min))
