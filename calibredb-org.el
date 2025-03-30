@@ -139,8 +139,8 @@ Display cover page inline in org buffer. Use this as
      (with-temp-buffer
        (dolist (cand candidates)
          (let* ((id (calibredb-getattr cand :id))
-                (title (calibredb-org-protocol-convert-to-space (calibredb-getattr cand :book-title)))
-                (org-protocol-link (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id title) ) ))
+                (title (calibredb-getattr cand :book-title))
+                (org-protocol-link (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id (url-hexify-string title)) ) ))
            ;; (insert (format "[[calibredb:%s][%s]]\n" id title))
            (insert org-protocol-link (if (> (length candidates) 1) "\n" ""))
            (message "Copied (org-protocol): %s" org-protocol-link)))
@@ -163,8 +163,8 @@ Display cover page inline in org buffer. Use this as
      (with-temp-buffer
        (dolist (cand candidates)
          (let* ((id (calibredb-getattr cand :id))
-                (title (calibredb-org-protocol-convert-to-space (calibredb-getattr cand :book-title) ))
-                (org-protocol-link (format "[%s](%s)" title (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id title) ))  ))
+                (title (calibredb-getattr cand :book-title))
+                (org-protocol-link (format "[%s](%s)" title (url-encode-url (format "org-protocol://calibredb?id=%s&title=%s" id (url-hexify-string title)) ))  ))
            (insert org-protocol-link (if (> (length candidates) 1) "\n" ""))
            (message "Copied (org-protocol markdown): %s" org-protocol-link)))
        (buffer-string)))
@@ -214,10 +214,6 @@ Display cover page inline in org buffer. Use this as
                                               :protocol "calibredb"
                                               :function calibredb-org-protocol
                                               :kill-client t)))
-
-(defun calibredb-org-protocol-convert-to-space (s)
-  "Convert some special characters to plain spaces in S."
-  (replace-regexp-in-string (regexp-opt '(":" "'")) " " s t t))
 
 (provide 'calibredb-org)
 
