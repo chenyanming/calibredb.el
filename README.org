@@ -146,6 +146,12 @@ calibredb supports download ebooks from OPDS server
   (push '("http://192.168.1.192:54995/opds" (name . "calibre-web") (account . "account") (password . "password")) calibredb-library-alist)
 #+end_src
 
+** Page
+The maximum number of entries to display in a single page:
+#+begin_src emacs-lisp
+(setq calibredb-search-page-max-rows 44)
+#+end_src
+
 ** Virtual Libraries
 Virtual libraries are some convenient shortcuts for quick filtering the Ebooks
 by setting the ~calibredb-search-filter~.
