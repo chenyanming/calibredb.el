@@ -897,9 +897,15 @@ folder meatadata."
 
 
 (defcustom calibredb-search-page-max-rows-auto-adjust t
-  "When non-nil, adjust the max rows of the page based on screen lines."
+  "When non-nil, auto adjust the max rows."
   :group 'calibredb
   :type 'boolean)
+
+(defcustom calibredb-search-page-max-rows-auto-adjust-offset 4
+  "WORKAROUND: The offset when auto adjust the max rows.
+It may not be accurate, but it is a good guess."
+  :group 'calibredb
+  :type 'integer)
 
 (defcustom calibredb-search-page-max-rows 44
   "The maximum number of entries to display in a single page."
@@ -913,11 +919,20 @@ folder meatadata."
   "The number of pages in the current search result.")
 
 (defun calibredb-search-page-max-rows ()
-  "Return the maximum number of entries to display in a single page."
-  (if calibredb-search-page-max-rows-auto-adjust
-      ;; Exclude the header-line and round down
-      (max 1 (floor (- (window-screen-lines) 1)))
-    calibredb-search-page-max-rows))
+  "Return the maximum number of entries to display.
+In the *calibredb-search* window."
+  (let ((win (get-buffer-window "*calibredb-search*" 'visible)))
+    (if calibredb-search-page-max-rows-auto-adjust
+        (if (window-live-p win)
+            (let* ((window-pixel-height (window-pixel-height win))
+                   (font-height (line-pixel-height))
+                   (offset (* calibredb-search-page-max-rows-auto-adjust-offset (line-pixel-height))))  ;; Height of mode line
+              ;; Calculate visible height by subtracting header and mode line heights
+              (let ((visible-pixel-height (- window-pixel-height offset)))
+                ;; Calculate the number of lines that fit in the visible height
+                (max 1 (floor visible-pixel-height font-height))))
+          calibredb-search-page-max-rows)
+      calibredb-search-page-max-rows)))
 
 
 (defun calibredb-sanitize-filter (filter)
