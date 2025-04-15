@@ -896,7 +896,7 @@ folder meatadata."
       (string-match-p regexp ""))))
 
 
-(defcustom calibredb-search-page-max-rows-auto-adjust t
+(defcustom calibredb-search-page-max-rows-auto-adjust nil
   "When non-nil, auto adjust the max rows."
   :group 'calibredb
   :type 'boolean)
