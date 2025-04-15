@@ -919,19 +919,25 @@ It may not be accurate, but it is a good guess."
 (defvar calibredb-search-pages 0
   "The number of pages in the current search result.")
 
+(defvar calibredb-search-buffer-line-pixel-height nil
+  "The pixel height of the *calibredb-search* buffer line.")
+
 (defun calibredb-search-page-max-rows ()
   "Return the maximum number of entries to display.
 In the *calibredb-search* window."
   (let ((win (get-buffer-window "*calibredb-search*" 'visible)))
     (if calibredb-search-page-max-rows-auto-adjust
         (if (window-live-p win)
-            (let* ((window-pixel-height (window-pixel-height win))
-                   (font-height (line-pixel-height))
-                   (offset (* calibredb-search-page-max-rows-auto-adjust-offset (line-pixel-height))))  ;; Height of mode line
+            (progn
+              (unless calibredb-search-buffer-line-pixel-height
+                (setq calibredb-search-buffer-line-pixel-height (line-pixel-height)))
+              (let* ((window-pixel-height (window-pixel-height win))
+                     (font-height calibredb-search-buffer-line-pixel-height)
+                     (offset (* calibredb-search-page-max-rows-auto-adjust-offset font-height)))  ;; Height of mode line
               ;; Calculate visible height by subtracting header and mode line heights
               (let ((visible-pixel-height (- window-pixel-height offset)))
                 ;; Calculate the number of lines that fit in the visible height
-                (max 1 (floor visible-pixel-height font-height))))
+                (max 1 (floor visible-pixel-height font-height)))) )
           calibredb-search-page-max-rows)
       calibredb-search-page-max-rows)))
 
