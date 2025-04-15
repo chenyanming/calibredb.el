@@ -897,7 +897,8 @@ folder meatadata."
 
 
 (defcustom calibredb-search-page-max-rows-auto-adjust nil
-  "When non-nil, auto adjust the max rows."
+  "WORKAROUND: When non-nil, auto adjust the max rows of the page.
+It is unstable when live search, and the algorithm is also inaccurate."
   :group 'calibredb
   :type 'boolean)
 
