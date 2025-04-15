@@ -335,7 +335,13 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
 
 (defun calibredb-search-buffer ()
   "Create buffer calibredb-search."
-  (get-buffer-create "*calibredb-search*"))
+  (let ((buffer (get-buffer "*calibredb-search*")))
+    (if (buffer-live-p buffer)
+        buffer
+      (setq buffer (get-buffer-create "*calibredb-search*"))
+      (with-current-buffer buffer
+        (calibredb-search-mode)))
+    buffer))
 
 (defun calibredb-search-header ()
   "TODO: Return the string to be used as the Calibredb header.
@@ -720,7 +726,7 @@ Argument KEYWORD is the metadata keyword to be toggled."
         (folder (plist-get properties :folder)))
     (cond
      (db
-      (calibredb-search-candidates calibredb-search-filter :limit calibredb-search-page-max-rows :page page))
+      (calibredb-search-candidates calibredb-search-filter :limit (calibredb-search-page-max-rows) :page page))
      (opds opds)
      (folder (calibredb-folder-candidates calibredb-search-filter)))))
 
@@ -822,16 +828,17 @@ folder meatadata."
            (standard-output (current-buffer))
            (id 0)
            (entries (calibredb-search-get-filterred-entries :db db :page page :opds opds :folder folder))
-           (len (length entries)))
+           (len (length entries))
+           (rows (calibredb-search-page-max-rows)))
       (setq calibredb-search-entries-length (if db (calibredb-search-candidates calibredb-search-filter :count t) len))
-      (setq calibredb-search-pages (if db (ceiling calibredb-search-entries-length calibredb-search-page-max-rows) 1))
+      (setq calibredb-search-pages (if db (ceiling calibredb-search-entries-length rows) 1))
       (erase-buffer)
       ;; reset calibredb-virtual-library-name
       (unless (-contains? (mapcar #'cdr calibredb-virtual-library-alist) calibredb-search-filter)
         (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
       (dolist (entry entries)
         (setq id (1+ id))
-        (when (<= id (if db calibredb-search-page-max-rows len))
+        (when (<= id (if db rows len))
           (funcall calibredb-search-print-entry-function entry)
           (insert "\n")))
       (if (< len calibredb-search-entries-length)
@@ -889,6 +896,10 @@ folder meatadata."
       (string-match-p regexp ""))))
 
 
+(defcustom calibredb-search-page-max-rows-auto-adjust t
+  "When non-nil, adjust the max rows of the page based on screen lines."
+  :group 'calibredb
+  :type 'boolean)
 
 (defcustom calibredb-search-page-max-rows 44
   "The maximum number of entries to display in a single page."
@@ -900,6 +911,14 @@ folder meatadata."
 
 (defvar calibredb-search-pages 0
   "The number of pages in the current search result.")
+
+(defun calibredb-search-page-max-rows ()
+  "Return the maximum number of entries to display in a single page."
+  (if calibredb-search-page-max-rows-auto-adjust
+      ;; Exclude the header-line and round down
+      (max 1 (floor (- (window-screen-lines) 1)))
+    calibredb-search-page-max-rows))
+
 
 (defun calibredb-sanitize-filter (filter)
   "Sanitize FILTER for use in SQL queries by escaping special characters."
@@ -986,7 +1005,7 @@ Argument: PROPERTIES is the addiontal parameters."
              (when limit
                (format " LIMIT %s " limit) )
              (when page
-               (format " OFFSET %s " (* (1- page) calibredb-search-page-max-rows)))
+               (format " OFFSET %s " (* (1- page) (calibredb-search-page-max-rows))))
 
              )
      :count count)))
