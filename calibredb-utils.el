@@ -224,9 +224,12 @@ Download it if book-cover is non-nil."
 
 (defun calibredb-infile-cover-path (file)
   "Extract FILE and return the cover path."
-  (let* ((file-directory (file-name-directory file))
+  (let* ((ori-file-directory (file-name-directory file))
+         (file-directory (concat ori-file-directory "covers"))
          (file-base (file-name-base file))
          (cover (expand-file-name (concat file-base ".jpg") file-directory)))
+    (unless (file-exists-p file-directory)
+      (make-directory file-directory))
     cover))
 
 
