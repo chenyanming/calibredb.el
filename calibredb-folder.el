@@ -114,6 +114,23 @@ ARGUMENT FILTER is the filter string."
     (calibredb-getbooklist
      (calibredb-folder-candidates-filter filter (calibredb-folder-entries-to-plist entries)))))
 
+(defun calibredb-folder-update-tags-by-lpath (lpath tags-string)
+  "Update tags in .metadata.calibre for book with LPATH.
+Using comma-separated TAGS-STRING.
+Uses global `calibredb-root-dir`."
+  (when-let* ((metadata-path (expand-file-name ".metadata.calibre" calibredb-root-dir))
+              (json-string (with-temp-buffer
+                             (insert-file-contents metadata-path)
+                             (buffer-string)))
+              (entries (json-parse-string json-string :object-type 'alist))
+              (new-tags (vconcat (mapcar #'string-trim (split-string tags-string ","))))
+              (entry (cl-find-if (lambda (entry)
+                                   (string= (alist-get 'lpath entry) lpath))
+                                 entries)))
+    (setf (alist-get 'tags entry) new-tags)
+    (let ((coding-system-for-write 'utf-8))
+      (with-temp-file metadata-path
+        (insert (json-serialize entries))))))
 
 (defun calibredb-folder-entries-to-plist (entries)
   "Convert folder metadata ENTRIES to plist."
@@ -140,6 +157,7 @@ ARGUMENT FILTER is the filter string."
                                        (:publisher          ,(or (alist-get 'publisher entry) ""))
                                        (:series             "")
                                        (:lang_code          ,(mapconcat 'identity (alist-get 'languages entry) ","))
+                                       (:lpath ,lpath) ;; used for locating the entry and setting metadata
                                        (:lst ,lst) ;; used for sorting
                                        (:last_modified      ,(let ((lst-md (alist-get 'last_modified entry))
                                                                    (pub-d (alist-get 'pubdate entry)))
@@ -152,12 +170,32 @@ ARGUMENT FILTER is the filter string."
                                                                        pub-d)
                                                                    lst-md)))))) ))
                            entries)))
-    ;; always sort by last modified time
+    ;; sort by
+    ;; calibredb-favorite-keyword
+    ;; calibredb-highlight-keyword
+    ;; last modified time
     (sort unsorted-entries
           (lambda (a b)
-            (let* ((a-time (calibredb-getattr (list a) :lst))
-                   (b-time (calibredb-getattr (list b) :lst)))
-              (time-less-p a-time b-time))))))
+            (let* ((a-tags (calibredb-getattr (list a) :tag))
+                   (b-tags (calibredb-getattr (list b) :tag))
+                   (a-fav (s-contains? calibredb-favorite-keyword a-tags))
+                   (b-fav (s-contains? calibredb-favorite-keyword b-tags))
+                   (a-hig (s-contains? calibredb-highlight-keyword a-tags))
+                   (b-hig (s-contains? calibredb-highlight-keyword b-tags)))
+              (cond
+               ;; A is favorite, B is not — B goes first
+               ((and a-fav (not b-fav)) nil)
+               ;; B is favorite, A is not — A goes first
+               ((and b-fav (not a-fav)) t)
+               ;; A is highlight, B is not — B goes first
+               ((and a-hig (not b-hig)) nil)
+               ;; B is highlight, A is not — A goes first
+               ((and b-hig (not a-hig)) t)
+               ;; Both same in terms of favorite tag — fall back to timestamp sort
+               (t
+                (let ((a-time (calibredb-getattr (list a) :lst))
+                      (b-time (calibredb-getattr (list b) :lst)))
+                  (time-less-p a-time b-time)))))))))
 
 
 (defun calibredb-folder-mailcap-mime-to-extn (mime)

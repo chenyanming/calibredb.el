@@ -521,25 +521,36 @@ Argument PROPS are the additional parameters."
 Argument CANDS is the list of candiates.
 Argument FIELD is the metadata field, e.g. tags, author.
 Argument INPUT is the metadata contents to be set."
-  (let ((cand (pop cands)))
-    ;; (pp cand)
-    (if cand
-        (set-process-sentinel
-         (let* ((id (calibredb-getattr cand :id)))
-           (calibredb-process :command "set_metadata"
-                              :option "--field"
-                              :input (format "%s:\"%s\"" field input)
-                              :id id
-                              :library (format "--library-path \"%s\"" calibredb-root-dir)))
-         (lambda (p _e)
-           (when (= 0 (process-exit-status p))
-             (calibredb-set-metadata-process cands field input))))
-      ;; if no candidate left to be processed, refresh *calibredb-search*
-      (cond ((equal major-mode 'calibredb-show-mode)
-             (calibredb-show-refresh))
-            ((eq major-mode 'calibredb-search-mode)
-             (calibredb-search-refresh-or-resume))
-            (t nil)))))
+  (let* ((cand (pop cands))
+         (lpath (calibredb-getattr cand :lpath)))
+    (if lpath
+        (pcase field
+          ("tags"
+           (calibredb-folder-update-tags-by-lpath lpath input)
+           (cond ((equal major-mode 'calibredb-show-mode)
+                  (calibredb-show-refresh))
+                 ((eq major-mode 'calibredb-search-mode)
+                  (calibredb-search-refresh-or-resume))
+                 (t nil)))
+          (_ (message "We do not support setting %s for .matadata.calibre at this moment." calibredb-db-dir)))
+      ;; (pp cand)
+      (if cand
+          (set-process-sentinel
+           (let* ((id (calibredb-getattr cand :id)))
+             (calibredb-process :command "set_metadata"
+                                :option "--field"
+                                :input (format "%s:\"%s\"" field input)
+                                :id id
+                                :library (format "--library-path \"%s\"" calibredb-root-dir)))
+           (lambda (p _e)
+             (when (= 0 (process-exit-status p))
+               (calibredb-set-metadata-process cands field input))))
+        ;; if no candidate left to be processed, refresh *calibredb-search*
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb-search-refresh-or-resume))
+              (t nil))))))
 
 
 (defun calibredb-set-metadata--tags (&optional candidate)

@@ -70,6 +70,7 @@
 (declare-function calibredb-virtual-library-next "calibredb-library.el")
 (declare-function calibredb-virtual-library-previous "calibredb-library.el")
 (declare-function calibredb-folder-candidates "calibredb-folder.el")
+(declare-function calibredb-folder-update-tags-by-lpath "calibredb-folder.el")
 
 (defcustom calibredb-search-filter ""
   "Query string filtering shown entries."
@@ -693,29 +694,41 @@ Argument KEYWORD is the tag keyword."
 Argument CANDS is the list of candiates.
 Argument KEYWORD is the metadata keyword to be toggled."
   (let* ((cand (pop cands))
-         (tags (calibredb-read-metadatas "tags" cand)))
-    ;; (pp cand)
-    (if cand
-        (set-process-sentinel
-         (let* ((id (calibredb-getattr cand :id)))
-           (if (s-contains? keyword tags)
+         (tags (calibredb-read-metadatas "tags" cand))
+         (lpath (calibredb-getattr cand :lpath)))
+    (if lpath
+        (progn
+          (if (s-contains? keyword tags)
+              (calibredb-folder-update-tags-by-lpath lpath (s-replace keyword "" tags))
+            (calibredb-folder-update-tags-by-lpath lpath keyword))
+          (cond ((equal major-mode 'calibredb-show-mode)
+                 (calibredb-show-refresh))
+                ((eq major-mode 'calibredb-search-mode)
+                 (calibredb-search-refresh-or-resume))
+                (t nil)))
+      ;; (pp cand)
+      (if cand
+          (set-process-sentinel
+           (let* ((id (calibredb-getattr cand :id)))
+             (if (s-contains? keyword tags)
+                 (calibredb-process :command "set_metadata"
+                                    :option (format "--field tags:\"%s\"" (s-replace keyword "" tags))
+                                    :id id
+                                    :library (format "--library-path \"%s\"" calibredb-root-dir))
                (calibredb-process :command "set_metadata"
-                                  :option (format "--field tags:\"%s\"" (s-replace keyword "" tags))
+                                  :option (format "--field tags:\"%s,%s\"" tags keyword)
                                   :id id
-                                  :library (format "--library-path \"%s\"" calibredb-root-dir))
-             (calibredb-process :command "set_metadata"
-                                :option (format "--field tags:\"%s,%s\"" tags keyword)
-                                :id id
-                                :library (format "--library-path \"%s\"" calibredb-root-dir))))
-         (lambda (p _e)
-           (when (= 0 (process-exit-status p))
-             (calibredb-toggle-metadata-process cands keyword))))
-      ;; if no candidate left to be processed, refresh *calibredb-search*
-      (cond ((equal major-mode 'calibredb-show-mode)
-             (calibredb-show-refresh))
-            ((eq major-mode 'calibredb-search-mode)
-             (calibredb-search-refresh-or-resume))
-            (t nil)))))
+                                  :library (format "--library-path \"%s\"" calibredb-root-dir))))
+           (lambda (p _e)
+             (when (= 0 (process-exit-status p))
+               (calibredb-toggle-metadata-process cands keyword))))
+        ;; if no candidate left to be processed, refresh *calibredb-search*
+        (cond ((equal major-mode 'calibredb-show-mode)
+               (calibredb-show-refresh))
+              ((eq major-mode 'calibredb-search-mode)
+               (calibredb-search-refresh-or-resume))
+              (t nil))))))
+
 ;; live filtering
 
 (defun calibredb-search-get-filterred-entries (&rest properties)
