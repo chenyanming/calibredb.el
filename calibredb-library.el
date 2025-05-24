@@ -81,7 +81,7 @@ selecting the new item."
     (setq calibredb-virtual-library-default-name library-name)
     (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
-     ((s-contains? "http" result)
+     ((string-prefix-p "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
@@ -123,7 +123,7 @@ selecting the new item."
     (setq calibredb-virtual-library-default-name library-name)
     (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
-     ((s-contains? "http" result)
+     ((string-prefix-p "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))
@@ -164,7 +164,7 @@ selecting the new item."
     (setq calibredb-virtual-library-default-name library-name)
     (setq calibredb-virtual-library-name calibredb-virtual-library-default-name)
     (cond
-     ((s-contains? "http" result)
+     ((string-prefix-p "http" result)
       (let ((library (-first (lambda (lib)
                                (s-contains? (car lib) result))
                              calibredb-library-alist)))

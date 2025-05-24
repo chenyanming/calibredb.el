@@ -265,7 +265,7 @@ Optional argument SWITCH to switch to *calibredb-search* buffer to other window.
                                                     (propertize ext
                                                                 'face 'calibredb-format-face
                                                                 'mouse-face 'calibredb-mouse-face
-                                                                'help-echo (if (s-contains? "http" file)
+                                                                'help-echo (if (string-prefix-p "http" file)
                                                                                file
                                                                              (expand-file-name
                                                                               (concat (file-name-base file) "." ext)
@@ -812,7 +812,7 @@ ebook record will be shown.
   "Update the calibredb-search buffer by library type, opds, metadata or
 folder meatadata."
   (cond
-   ((s-contains? "http" calibredb-root-dir)
+   ((string-prefix-p "http" calibredb-root-dir)
     (message "OPDS does not suppprt search at this moment."))
    ((and (stringp calibredb-db-dir)
          (file-exists-p calibredb-db-dir)

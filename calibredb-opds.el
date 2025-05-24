@@ -178,7 +178,7 @@ Optional argument PASSWORD."
                   (:author-sort            ,(dom-text (esxml-query "author>name" entry))) ; TODO: support mutitple authors
                   (:book-dir               "")
                   (:book-cover             ,(let ((url (or (dom-attr (esxml-query "[type^=image]" entry) 'href) "")))
-                                              (if (and (stringp url) (s-contains? "http" url))
+                                              (if (and (stringp url) (string-prefix-p "http" url))
                                                   url
                                                 (cond ((s-equals-p "" url) nil) ; no image url, return nil
                                                       ((s-contains? "base64" url) url) ; base64 image
@@ -189,7 +189,7 @@ Optional argument PASSWORD."
                                                           (esxml-query "published" entry))))
                   (:book-title             ,(dom-text (esxml-query "title" entry)))
                   (:file-path              ,(let ((url (or (dom-attr (esxml-query "[type^=application]" entry) 'href) "")))
-                                              (if (and (stringp url) (s-contains? "http" url))
+                                              (if (and (stringp url) (string-prefix-p "http" url))
                                                   url
                                                 (cond ((s-equals-p "" url) "")
                                                       ((s-equals-p (s-left 1 url) "/") (format "%s%s" (calibredb-opds-host) url))
