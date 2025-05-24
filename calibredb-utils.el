@@ -127,7 +127,7 @@ Optional argument PROMPT to Select a format."
     (cond ((s-equals? "" file-path) "")         ; no file-path field
           ((file-exists-p file-path) file-path) ; default file-path is a valid file
           ((calibredb-local-file-exists-p entry) (calibredb-local-file entry)) ; valid local file is found
-          ((s-contains? "http" file-path) file-path) ; for http link, just return
+          ((string-prefix-p "http" file-path) file-path) ; for http link, just return
           (t (if (s-contains? "," (file-name-extension file-path)) ; try to split the extension (for example, it may be epub,pdf) and return the first format
                  (let* ((parent (file-name-directory file-path))
                         (filename (file-name-base file-path))
@@ -209,7 +209,7 @@ Download it if book-cover is non-nil."
 (defun calibredb-extract-cover (entry)
   "Extract ENTRY and save the cover to the same directory."
   ;; only extract cover if calibredb-root-dir is not a http link
-  (unless (s-contains? "http" calibredb-root-dir)
+  (unless (string-prefix-p "http" calibredb-root-dir)
     ;; only extract cover if ebook-meta is available
     (when (executable-find calibredb-ebook-meta-program)
       ;; extract cover
@@ -262,7 +262,7 @@ Optional argument CANDIDATE is the selected item."
                   (let ((calibredb-preferred-format nil))
                     (calibredb-get-file-path candidate t))
                 (calibredb-get-file-path candidate t))))
-    (cond ((s-contains? "http" file)
+    (cond ((string-prefix-p "http" file)
            (let ((url (calibredb-getattr candidate :file-path))
                  (title (calibredb-getattr candidate :book-title))
                  (type (calibredb-getattr candidate :book-format)))
