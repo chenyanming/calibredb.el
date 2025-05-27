@@ -68,7 +68,7 @@
     (setq calibredb-virtual-library-name calibredb-virtual-library-default-name))
   (cond
    ;; opds
-   ((s-contains? "http" calibredb-root-dir)
+   ((string-prefix-p "http" calibredb-root-dir)
     (switch-to-buffer (calibredb-search-buffer))
     (goto-char (point-min))
     (calibredb-ref-default-bibliography)
