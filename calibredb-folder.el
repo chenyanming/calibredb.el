@@ -201,6 +201,7 @@ Uses global `calibredb-root-dir`."
 (defun calibredb-folder-mailcap-mime-to-extn (mime)
   "Return the file extensions EXTN based on the MIME content type."
   (mailcap-parse-mimetypes)
+  (add-to-list 'mailcap-mime-extensions '(".md" . "text/x-markdown"))
   (if (stringp mime)
       (let ((ext (car (rassoc (downcase mime) mailcap-mime-extensions))))
         (if (string-empty-p ext)
