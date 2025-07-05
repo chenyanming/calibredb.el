@@ -32,7 +32,7 @@
 
 
 (defcustom calibredb-consult-ripgrep-all-args
-  "rga --null --line-buffered --color=never --max-columns=1000 --path-separator /\  --smart-case --no-heading --with-filename --line-number --rga-adapters=pandoc"
+  "rga --null --line-buffered --color=never --max-columns=1000 --path-separator /\  --smart-case --no-heading --with-filename --line-number --type pdf"
   "Command line arguments for ripgrep, see `calibredb-consult-ripgrep-all'.
 The dynamically computed arguments are appended.
 Can be either a string, or a list of strings or expressions."
@@ -80,14 +80,46 @@ Can be either a string, or a list of strings or expressions."
 (defun calibredb-consult-ripgrep-all (&optional dir initial)
   "Search with `rga` for files in DIR where the content matches a regexp.
   The initial input is given by the INITIAL argument. See `consult-grep`
-  for more details."
+  for more details.
+PS: Currently only support pdf, but it is still not perfect."
   (interactive "P")
   (if (fboundp 'consult--grep)
-      (let* ((result (consult--grep "Search Calibredb: " #'calibredb-consult--ripgrep-all-make-builder (or dir calibredb-root-dir) initial))
-             (parts (split-string result ":"))
-             (file-name (car parts)))
-        (when file-name
-          (find-file file-name))) ))
+      (pcase-let* ((`(,prompt ,paths ,dir) (consult--directory-prompt "Search Calibredb: " (or dir calibredb-root-dir)))
+                   (default-directory dir)
+                   (builder (funcall #'calibredb-consult--ripgrep-all-make-builder paths))
+                   (consult-preview-key nil))
+        (consult--read
+         (consult--async-command builder
+           (consult--grep-format builder)
+           :file-handler t) ;; allow tramp
+         :prompt prompt
+         :lookup (lambda (selected candidates &rest _)
+                   (let* ((result selected)
+                          (parts (split-string result ":"))
+                          (file-name (car parts))
+                          (page (when (string-match "Page \\([0-9]+\\)" (nth 2 parts))
+                                  (match-string 1 (nth 2 parts)))))
+                     (find-file file-name)
+                     (when page
+                       (cond
+                        ((memq major-mode '(doc-view-mode pdf-view-mode))
+                         (if (eq major-mode 'doc-view-mode)
+                             (doc-view-goto-page (string-to-number page))
+                           (pdf-view-goto-page (string-to-number page))))
+                        (t ;; workaround, after find-file, the pdf is not yet opened, major-mode is still the old one
+                         (require 'eaf)
+                         (when-let* ((buffer (eaf-interleave--find-buffer (expand-file-name file-name))))
+                           (switch-to-buffer buffer)
+                           (eaf-interleave--display-buffer buffer)
+                           (eaf-interleave--pdf-viewer-goto-page (expand-file-name file-name) (string-to-number page))))))))
+         :state (consult--grep-state)
+         :initial (consult--async-split-initial initial)
+         :add-history (consult--async-split-thingatpt 'symbol)
+         :require-match t
+         :category 'consult-grep
+         :group #'consult--prefix-group
+         :history '(:input consult--grep-history)
+         :sort nil))))
 
 (provide 'calibredb-consult)
 

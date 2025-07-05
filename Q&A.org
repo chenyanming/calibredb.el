@@ -263,6 +263,8 @@ then in =*calibredb-search*=, =*calibredb-entry*= buffer or under =pdf-view-mode
 M-x calibredb-rga
 #+END_SRC
 
+Or use ~calibredb-consult-ripgrep-all~ for consult version.
+
 ** How to interact with calibredb files in org files?
 In ~*calibredb-search*~ buffer,
 - ~y y~ copy as calibredb link. If you click the link, it will open the corresponding ~*calibredb-entry*~ buffer.

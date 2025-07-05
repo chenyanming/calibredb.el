@@ -75,7 +75,7 @@
   ["Other operation"
    [("b" "BibTex"   calibredb-catalog-bib-dispatch)
     ("i" "Edit Annotation" calibredb-edit-annotation)]
-   [("'" "Search with rga" calibredb-rga)
+   [("'" "Search with rga" calibredb-consult-ripgrep-all)
     ("/" "Live Filter" calibredb-search-live-filter)]
    [("y" "Yank" calibredb-yank-dispatch)]]
   [("q" "Quit"   transient-quit-one)])
@@ -92,7 +92,7 @@
    [("e" "Export" calibredb-export-dispatch)
     ("s" "set_metadata"   calibredb-set-metadata-dispatch)
     ("y" "Yank"   calibredb-yank-dispatch)
-    ("'" "Search with rga" calibredb-rga)]]
+    ("'" "Search with rga" calibredb-consult-ripgrep-all)]]
   [("q" "Quit"   transient-quit-one)])
 
 (transient-define-prefix calibredb-set-metadata-dispatch ()
