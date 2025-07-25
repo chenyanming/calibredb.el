@@ -96,9 +96,9 @@ Display cover page inline in org buffer. Use this as
     (kill-new
      (with-temp-buffer
        (dolist (cand candidates)
-         (let* ((id (calibredb-getattr cand :id))
-                (title (calibredb-getattr cand :book-title))
-                (link (format "[[calibredb:%s][%s]]\n" id title)))
+         (let* ((title (calibredb-getattr cand :book-title))
+                (author (calibredb-getattr cand :author-sort))
+                (link (format "[[calibredb:%s][%s]]\n" id author)))
            (insert link)
            (message "Copied (org link): %s" link)))
        (buffer-string)))

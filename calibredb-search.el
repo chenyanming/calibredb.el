@@ -1216,9 +1216,10 @@ Argument: PROPERTIES is the addiontal parameters."
      (with-temp-buffer
        (dolist (cand candidates)
          (let* ((id (calibredb-getattr cand :id))
+                (author (calibredb-getattr cand :author-sort))
                 (path (calibredb-get-file-path cand t))
                 (title (calibredb-getattr cand :book-title))
-                (link (format "[[file:%s][%s %s - %s]]\n"
+                (link (format "[[file:%s][%s%s - %s]]\n"
                               path
                               (cond (calibredb-format-all-the-icons
                                      (if (fboundp 'nerd-icons-icon-for-file)
@@ -1229,7 +1230,7 @@ Argument: PROPERTIES is the addiontal parameters."
                                     (calibredb-format-icons-in-terminal
                                      (if (fboundp 'icons-in-terminal-icon-for-file)
                                          (icons-in-terminal-icon-for-file path :v-adjust 0 :height 1) ""))
-                                    (t "")) id title)))
+                                    (t "")) title author)))
            (insert link)
            (message "Copied (org file link): %s" link)))
        (buffer-string)))
