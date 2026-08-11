@@ -95,7 +95,7 @@
     (shell-command-to-string (format "%s -e %s -- %s"
                               calibredb-debug-program
                               calibredb-folder-program
-                              calibredb-root-dir))
+                              (calibredb-root-dir-quote)))
     (switch-to-buffer (calibredb-search-buffer))
     (goto-char (point-min))
     (calibredb-ref-default-bibliography)

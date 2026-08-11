@@ -109,7 +109,7 @@ selecting the new item."
         (shell-command-to-string (format "%s -e %s -- %s"
                                          calibredb-debug-program
                                          calibredb-folder-program
-                                         calibredb-root-dir))
+                                         (calibredb-root-dir-quote)))
         (setq calibredb-db-dir (expand-file-name ".metadata.calibre" calibredb-root-dir))
         (calibredb-search-update-buffer :folder t))))))
 
@@ -156,7 +156,7 @@ selecting the new item."
         (shell-command-to-string (format "%s -e %s -- %s"
                                          calibredb-debug-program
                                          calibredb-folder-program
-                                         calibredb-root-dir))
+                                         (calibredb-root-dir-quote)))
         (setq calibredb-db-dir (expand-file-name ".metadata.calibre" calibredb-root-dir))
         (calibredb-search-update-buffer :folder t))))))
 
@@ -202,7 +202,7 @@ selecting the new item."
         (shell-command-to-string (format "%s -e %s -- %s"
                                          calibredb-debug-program
                                          calibredb-folder-program
-                                         calibredb-root-dir))
+                                         (calibredb-root-dir-quote)))
         (setq calibredb-db-dir (expand-file-name ".metadata.calibre" calibredb-root-dir))
         (calibredb-search-update-buffer :folder t))))))
 
