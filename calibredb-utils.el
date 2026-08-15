@@ -289,6 +289,18 @@ Optional argument CANDIDATE is the selected item."
   (find-file-other-frame (if current-prefix-arg
                              (let ((calibredb-preferred-format nil))
                                (calibredb-get-file-path candidate t))
+                           (calibredb-get-file-path candidate t))))
+
+(defun calibredb-find-file-with-eaf (&optional candidate arg)
+  "Open file with eaf of the selected item.
+If the universal prefix ARG is used, ignore `calibredb-preferred-format'.
+Optional argument CANDIDATE is the selected item."
+  (interactive
+   (list (car (calibredb-find-candidate-at-point))
+         current-prefix-arg))
+  (eaf-open (if current-prefix-arg
+                             (let ((calibredb-preferred-format nil))
+                               (calibredb-get-file-path candidate t))
                              (calibredb-get-file-path candidate t))))
 
 (defun calibredb-open-file-with-default-tool (&optional candidate arg)
