@@ -148,7 +148,7 @@ Optional argument PASSWORD."
          (cmd (if (and account password)
                   (format "curl -u %s:\"%s\" -L %s -o %s" account password (shell-quote-argument url) (shell-quote-argument file ))
                 (format "curl -L %s -o %s" (shell-quote-argument url) (shell-quote-argument file)))))
-    (message cmd)
+    (message "%s" cmd)
     (if (file-exists-p file)
         (find-file file)
       (set-process-sentinel
